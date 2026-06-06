@@ -58,6 +58,13 @@ libraries of each platform, so it is built on each OS.
 Requirements: **Go 1.25+**, a C toolchain, and the Gio system dependencies
 (see the [Gio install guide](https://gioui.org/doc/install)).
 
+Requirements on ubuntu 26.04 :
+
+```sh
+sudo apt install -y goland gcc pkg-config libasound2-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev wayland-protocols libx11-dev libxcursor-dev libxfixes-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev libffi-dev libx11-xcb-dev libxcb1-dev   libx11-dev libxcursor-dev libxfixes-dev   libwayland-dev libegl1-mesa-dev
+```
+
+
 ```sh
 cd src
 go build ./cmd/gologo
@@ -130,6 +137,13 @@ chaque OS.
 
 Prérequis : **Go 1.25+**, une chaîne C, et les dépendances système de Gio
 (voir le [guide d'installation Gio](https://gioui.org/doc/install)).
+
+Dépendances nécessaires sur ubuntu 26.04 :
+
+```sh
+sudo apt install -y goland gcc pkg-config libasound2-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev wayland-protocols libx11-dev libxcursor-dev libxfixes-dev libegl1-mesa-dev libgles2-mesa-dev libvulkan-dev libffi-dev libx11-xcb-dev libxcb1-dev   libx11-dev libxcursor-dev libxfixes-dev   libwayland-dev libegl1-mesa-dev
+```
+
 
 ```sh
 cd src
