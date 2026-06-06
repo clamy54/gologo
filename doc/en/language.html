@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Logo language · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html">From the square to the arcade</a></li>
+    <li><a href="language.html" class="active">The Logo language</a></li>
+    <li><a href="examples.html">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>The Logo language</h1>
+    <p>A full introduction: data, variables, procedures, loops, conditionals, graphics</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="turtle">1. The turtle and the graphics field</h2>
+
+  <p>In the middle of the graphics screen there is a little arrow&nbsp;: the
+  <strong>turtle</strong>. It has a position (a point on the screen), a heading (the
+  direction it points in) and a pen it can lower to draw or raise to move without
+  leaving a trail.</p>
+
+  <p>The graphics field is a space 1600 steps wide by 1000 steps high. The origin, the
+  point [0, 0], is at the centre. The x axis runs from −800 to +800 (left to right),
+  the y axis from −500 to +500 (bottom to top). The turtle always starts at the
+  centre, pointing upward (heading 0).</p>
+
+  <h3>Moving the turtle</h3>
+
+  <pre><code><span class="kw">FD</span> <span class="num">100</span>      <span class="cmt">; forward 100 steps</span>
+<span class="kw">BK</span> <span class="num">50</span>       <span class="cmt">; back 50 steps</span>
+<span class="kw">RT</span> <span class="num">90</span>       <span class="cmt">; turn right by 90 degrees</span>
+<span class="kw">LT</span> <span class="num">45</span>       <span class="cmt">; turn left by 45 degrees</span></code></pre>
+
+  <p>The heading follows the compass convention&nbsp;: 0 = north (up), 90 = east
+  (right), 180 = south (down), 270 = west (left). <code>RT</code> adds degrees
+  clockwise, <code>LT</code> counter-clockwise.</p>
+
+  <p>To place the turtle directly at a point&nbsp;:</p>
+
+  <pre><code><span class="kw">SETPOS</span> [ <span class="num">100</span> <span class="num">50</span> ]   <span class="cmt">; go to point (100, 50), keeping the heading</span>
+<span class="kw">SETHEADING</span> <span class="num">180</span>     <span class="cmt">; set heading to 180 (downward)</span>
+<span class="kw">HOME</span>             <span class="cmt">; turtle back to centre, heading 0</span></code></pre>
+
+  <h3>The pen</h3>
+
+  <p>By default, the pen is down&nbsp;: the turtle draws as it moves. You raise or
+  lower it with&nbsp;:</p>
+
+  <pre><code><span class="kw">PU</span>          <span class="cmt">; Pen Up</span>
+<span class="kw">PD</span>          <span class="cmt">; Pen Down</span>
+<span class="kw">PRINT PENDOWN?</span>   <span class="cmt">; TRUE if the pen is down</span></code></pre>
+
+  <p>The line colour is changed with <code>SETPC</code> (SETPENCOLOR), giving a code
+  from 0 to 15, or a red-green-blue triple&nbsp;:</p>
+
+  <pre><code><span class="kw">SETPC</span> <span class="num">6</span>              <span class="cmt">; cyan (default colour)</span>
+<span class="kw">SETPC</span> <span class="num">1</span>              <span class="cmt">; red</span>
+<span class="kw">SETPC</span> [ <span class="num">255</span> <span class="num">128</span> <span class="num">0</span> ]   <span class="cmt">; orange (free RGB colour)</span></code></pre>
+
+  <div class="palette">
+    <div class="palette-cell" style="background:#000">0 black</div>
+    <div class="palette-cell" style="background:#c00">1 red</div>
+    <div class="palette-cell" style="background:#080">2 green</div>
+    <div class="palette-cell" style="background:#aa0">3 yellow</div>
+    <div class="palette-cell" style="background:#00c">4 blue</div>
+    <div class="palette-cell" style="background:#a0a">5 magenta</div>
+    <div class="palette-cell" style="background:#0aa">6 cyan</div>
+    <div class="palette-cell" style="background:#bbb;color:#333">7 white</div>
+    <div class="palette-cell" style="background:#555">8 gray</div>
+    <div class="palette-cell" style="background:#f44">9 light red</div>
+    <div class="palette-cell" style="background:#4d4">10 light green</div>
+    <div class="palette-cell" style="background:#ee4">11 light yellow</div>
+    <div class="palette-cell" style="background:#44f">12 light blue</div>
+    <div class="palette-cell" style="background:#e4e">13 light magenta</div>
+    <div class="palette-cell" style="background:#4ee">14 light cyan</div>
+    <div class="palette-cell" style="background:#e80">15 orange</div>
+  </div>
+
+  <h3>Background and border</h3>
+
+  <pre><code><span class="kw">SETBG</span> <span class="num">4</span>              <span class="cmt">; blue background (default)</span>
+<span class="kw">SETBORDER</span> <span class="num">0</span>          <span class="cmt">; black border</span>
+<span class="kw">CS</span>                   <span class="cmt">; clears the screen and resets everything</span>
+<span class="kw">CLEAN</span>                <span class="cmt">; erases the drawing without moving the turtle</span></code></pre>
+
+  <h3>Field modes</h3>
+
+  <p>What happens when the turtle reaches the edge of the field? It depends on the
+  chosen mode&nbsp;:</p>
+
+  <ul>
+    <li><code>FENCE</code> (default)&nbsp;: the turtle refuses to leave and shows
+      <code>LA TORTUE VA SORTIR</code> (the turtle would go out).</li>
+    <li><code>WRAP</code>&nbsp;: wrapped field, the turtle reappears on the opposite
+      edge, like a game of snake.</li>
+    <li><code>WINDOW</code>&nbsp;: extended window, the moving space reaches well
+      beyond what you see on screen.</li>
+  </ul>
+
+  <pre><code><span class="kw">WRAP</span>
+<span class="kw">REPEAT</span> <span class="num">200</span> [ <span class="kw">FD</span> <span class="num">10</span> <span class="kw">RT</span> <span class="num">7</span> ]   <span class="cmt">; a spiral that wraps</span></code></pre>
+
+  <h3>Multiple turtles</h3>
+
+  <p>By default there is a single turtle, numbered <code>0</code>. You can keep
+  several alive on the same screen&nbsp;: <code>SETTURTLE n</code> selects the active
+  turtle (created if needed), and all the usual commands (<code>FD</code>,
+  <code>RT</code>, <code>SETPC</code>…) then act on it. Each turtle keeps its own
+  position, heading and pen&nbsp;; the background, scale and field mode, however, are
+  shared by the whole screen. Numbers range from <code>0</code> to <code>1023</code>
+  (up to 1024 turtles).</p>
+
+  <pre><code><span class="kw">SETTURTLE</span> <span class="num">1</span>          <span class="cmt">; creates and selects a 2nd turtle</span>
+<span class="kw">SETPC</span> <span class="num">1</span> <span class="kw">RT</span> <span class="num">90</span> <span class="kw">FD</span> <span class="num">100</span>  <span class="cmt">; it draws in red, to the right</span>
+<span class="kw">SETTURTLE</span> <span class="num">0</span>          <span class="cmt">; back to the 1st turtle (unchanged)</span></code></pre>
+
+  <p><code>ASK n [ … ]</code> runs a block on turtle <code>n</code> (or on each turtle
+  of a list of numbers) then returns to the previously active turtle.
+  <code>TURTLE</code> outputs the current number, <code>TURTLES</code> the number of
+  turtles, and <code>CLEARTURTLES</code> keeps only one (#0).</p>
+
+  <p><code>SPRITE</code> and <code>SETPC</code> act on the active turtle too&nbsp;: each
+  turtle can therefore have its own shape and its own pen colour.</p>
+
+  <pre><code><span class="kw">SETTURTLE</span> <span class="num">2</span>                <span class="cmt">; now we have turtles 0, 1 and 2</span>
+<span class="kw">ASK</span> <span class="num">1</span> [ <span class="kw">RT</span> <span class="num">120</span> ]            <span class="cmt">; each one faces a different way</span>
+<span class="kw">ASK</span> <span class="num">2</span> [ <span class="kw">RT</span> <span class="num">240</span> ]
+<span class="kw">ASK</span> [ <span class="num">0</span> <span class="num">1</span> <span class="num">2</span> ] [ <span class="kw">FD</span> <span class="num">80</span> ]    <span class="cmt">; the three fan out from the centre, then back to #2</span></code></pre>
+
+  <p><code>COLLIDE? [ a b ]</code> outputs <code>TRUE</code> if turtles
+  <code>a</code> and <code>b</code> exist, are <strong>visible</strong> and overlap:
+  handy for a small game (hitting a target, avoiding an obstacle…).</p>
+
+  <h3>Drawing your own shape: <code>DEFSPRITE</code></h3>
+
+  <p>In the spirit of BASIC's <code>DEFGR$</code>, <code>DEFSPRITE</code> defines a
+  16×16 pixel shape "in ASCII": a list of up to 16 rows of 16 characters, where
+  <code>.</code> = empty pixel and any other character (an <code>X</code> for
+  instance) = filled pixel. The shape gets a number from <strong>3 to 255</strong>
+  (0, 1, 2 are the built-in shapes), then <code>SPRITE</code> selects it. It is drawn
+  in the pen colour and rotates with the heading. Shapes survive <code>CLEARSCREEN</code>
+  (but not <code>RESET</code>).</p>
+
+  <pre><code><span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+  ......XXXX......
+  ....XXXXXXXX....
+  ...XX.XXXX.XX...
+  ...XXXXXXXXXX...
+  ...XX.XXXX.XX...
+  ....XX.XX.XX....
+  ......XXXX......
+]
+<span class="kw">SPRITE</span> <span class="num">3</span>                  <span class="cmt">; the active turtle takes this shape</span></code></pre>
+
+  <h3>Animating turtles: <code>ANIME</code></h3>
+
+  <p><code>ANIME id x y speed mode</code> (EN <code>ANIMATE</code>) moves a turtle
+  automatically toward a point, <strong>in parallel</strong> with the program.
+  <code>speed</code> is the number of Logo steps travelled per frame;
+  <code>CADENCE</code> (EN <code>SETFPS</code>) sets the frames per second (default
+  30). Because speed is per frame, the ratio between two speeds stays the same
+  whatever the frame rate.</p>
+
+  <p>The <code>mode</code> is a word: <code>"ONCE</code> (go to the target then
+  stop), <code>"LOOP</code> (jump back to the start and repeat, handy for
+  scrolling) or <code>"PINGPONG</code> (continuous back and forth). If the pen is
+  down the turtle leaves a trail; raise it (<code>PU</code>) for a clean move. A
+  manual command (<code>FD</code>, <code>SETXY</code>…) on the turtle stops its
+  animation, as do <code>STOPANIMATE</code> and <code>Ctrl+C</code>.</p>
+
+  <pre><code><span class="kw">SETFPS</span> <span class="num">60</span>
+<span class="kw">ANIMATE</span> <span class="num">1</span> <span class="num">300</span> <span class="num">150</span> <span class="num">2</span> <span class="str">"PINGPONG</span>   <span class="cmt">; turtle 1 makes slow round trips</span>
+<span class="kw">ANIMATE</span> <span class="num">2</span> <span class="num">-300</span> <span class="num">150</span> <span class="num">8</span> <span class="str">"LOOP</span>      <span class="cmt">; turtle 2 goes 4 times faster</span>
+<span class="kw">WAIT</span> <span class="num">180</span>                     <span class="cmt">; 3 s: both move (the program waits, the animation does not)</span>
+<span class="kw">STOPANIMATE</span> <span class="num">1</span>                    <span class="cmt">; stops turtle 1 ; turtle 2 keeps going. (STOPANIMATE) stops them all</span></code></pre>
+
+  <p>The wait is essential here: without it the four lines run in an instant and
+  <code>STOPANIMATE 1</code> stops turtle 1 before you can see it move. During
+  <code>WAIT</code> the program pauses, but the animations keep running.</p>
+
+  <p>Combined with <code>COLLIDE?</code>, this is enough for a small game: a target
+  moves on its own while the loop reads the joystick to move the player, until they
+  touch. Here is a complete game, playable with the arrow keys: bring the player
+  (at the bottom) onto the target sweeping across the top.</p>
+
+  <pre><code><span class="kw">CLEARSCREEN</span>
+<span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">0</span> <span class="num">-200</span>              <span class="cmt">; the player (turtle 0) starts at the bottom</span>
+<span class="kw">ASK</span> <span class="num">1</span> [ <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">-600</span> <span class="num">150</span> ]       <span class="cmt">; the target (turtle 1) starts on the left</span>
+<span class="kw">ANIMATE</span> <span class="num">1</span> <span class="num">600</span> <span class="num">150</span> <span class="num">4</span> <span class="str">"PINGPONG</span>   <span class="cmt">; it sweeps the top back and forth</span>
+<span class="kw">WHILE</span> [ <span class="kw">NOT</span> <span class="kw">COLLIDE?</span> [ <span class="num">0</span> <span class="num">1</span> ] ] [
+  <span class="kw">MAKE</span> <span class="str">"D</span> <span class="kw">JOYSTICK</span> <span class="num">0</span>
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">1</span> [ <span class="kw">SETH</span> <span class="num">0</span>   <span class="kw">FD</span> <span class="num">20</span> ]      <span class="cmt">; up</span>
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">5</span> [ <span class="kw">SETH</span> <span class="num">180</span> <span class="kw">FD</span> <span class="num">20</span> ]      <span class="cmt">; down</span>
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">SETH</span> <span class="num">90</span>  <span class="kw">FD</span> <span class="num">20</span> ]      <span class="cmt">; right</span>
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">SETH</span> <span class="num">270</span> <span class="kw">FD</span> <span class="num">20</span> ]      <span class="cmt">; left</span>
+  <span class="kw">WAIT</span> <span class="num">1</span>
+]
+<span class="kw">STOPANIMATE</span> <span class="num">1</span>
+<span class="kw">PRINT</span> [ CAUGHT! ]</code></pre>
+
+  <p>The target moves on its own (animation engine) while the loop reads the joystick
+  and moves the player; as soon as they touch, <code>COLLIDE?</code> becomes true and
+  the loop ends. <code>Ctrl+C</code> interrupts the game (and the animations).</p>
+
+  <h3>SCENE: flicker-free animation</h3>
+
+  <p>The <code>ANIMATE</code> engine moves sprites without erasing anything. But many
+  games and animations redraw the whole scene themselves on every frame:
+  <code>CLEAN</code>, then redraw the background and the turtles inside a loop. The
+  screen may then be shown <em>in the middle</em> of the redraw (right after
+  <code>CLEAN</code>, an empty field, or half drawn) &mdash; that is what causes the
+  flicker.</p>
+
+  <p><code>SCENE [ … ]</code> fixes it. Everything drawn inside the block is built in a
+  hidden buffer, and the screen only switches to the new image <em>once the block is
+  finished</em> (double buffering). Wrap the drawing of one frame in <code>SCENE</code>
+  and keep <code>WAIT</code> outside it:</p>
+
+  <pre><code><span class="kw">WHILE</span> [ <span class="kw">NOT</span> <span class="kw">KEY?</span> ] [
+  <span class="kw">SCENE</span> [
+    <span class="kw">CLEAN</span>
+    <span class="cmt">; … redraw the whole background and the turtles …</span>
+  ]
+  <span class="kw">WAIT</span> <span class="num">2</span>              <span class="cmt">; the wait stays outside the block</span>
+]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="data">2. Data</h2>
+
+  <p>In Logo, everything is an <em>object</em>. There are three kinds of object&nbsp;:</p>
+
+  <ul>
+    <li><strong>numbers</strong>&nbsp;: <code>42</code>, <code>3.14</code>,
+      <code>-7</code></li>
+    <li><strong>words</strong>&nbsp;: <code>"HELLO</code>, <code>"RED</code></li>
+    <li><strong>lists</strong>&nbsp;: <code>[ A B C ]</code>,
+      <code>[ 1 2 3 ]</code>, <code>[ [ 1 2 ] [ 3 4 ] ]</code></li>
+  </ul>
+
+  <h3>Numbers</h3>
+
+  <p>Numbers can be whole or decimal (the separator is the dot). The four arithmetic
+  operations are written naturally, with spaces around the operators&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="num">3</span> + <span class="num">4</span>          <span class="cmt">; prints 7</span>
+<span class="kw">PRINT</span> <span class="num">10</span> - <span class="num">3</span>         <span class="cmt">; prints 7</span>
+<span class="kw">PRINT</span> <span class="num">6</span> * <span class="num">7</span>          <span class="cmt">; prints 42</span>
+<span class="kw">PRINT</span> <span class="num">100</span> / <span class="num">4</span>        <span class="cmt">; prints 25</span>
+<span class="kw">PRINT</span> <span class="num">360</span> / <span class="num">8</span>        <span class="cmt">; prints 45</span></code></pre>
+
+  <p>You can also write the long forms&nbsp;: <code>SUM 3 4</code>,
+  <code>DIFFERENCE 10 3</code>, <code>PRODUCT 6 7</code>, <code>QUOTIENT 100 4</code>.</p>
+
+  <p>Useful mathematical functions&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">SQRT</span> <span class="num">16</span>        <span class="cmt">; square root -> 4</span>
+<span class="kw">PRINT</span> <span class="kw">INT</span> <span class="num">3.7</span>        <span class="cmt">; integer part -> 3</span>
+<span class="kw">PRINT</span> <span class="kw">ROUND</span> <span class="num">3.6</span>      <span class="cmt">; nearest integer -> 4</span>
+<span class="kw">PRINT</span> <span class="kw">ABS</span> -<span class="num">5</span>          <span class="cmt">; absolute value -> 5</span>
+<span class="kw">PRINT</span> <span class="kw">RANDOM</span> <span class="num">6</span>       <span class="cmt">; random integer between 0 and 5</span>
+<span class="kw">PRINT</span> <span class="kw">SIN</span> <span class="num">30</span>         <span class="cmt">; sine of 30 degrees -> 0.5</span>
+<span class="kw">PRINT</span> <span class="kw">COS</span> <span class="num">60</span>         <span class="cmt">; cosine of 60 degrees -> 0.5</span>
+<span class="kw">PRINT</span> <span class="kw">PI</span>             <span class="cmt">; the constant pi -> 3.14159...</span></code></pre>
+
+  <h3>Words</h3>
+
+  <p>A word is a string of characters. To write a literal word, you put a quote
+  <code>"</code> in front of it&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="str">"HELLO</span>
+<span class="kw">PRINT</span> <span class="str">"RED</span>
+<span class="kw">PRINT</span> <span class="kw">WORD</span> <span class="str">"HEL</span> <span class="str">"LO</span>    <span class="cmt">; joins them -> HELLO</span></code></pre>
+
+  <p>To query a word&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">COUNT</span> <span class="str">"HELLO</span>       <span class="cmt">; number of characters -> 5</span>
+<span class="kw">PRINT</span> <span class="kw">FIRST</span> <span class="str">"HELLO</span>       <span class="cmt">; first character -> H</span>
+<span class="kw">PRINT</span> <span class="kw">LAST</span> <span class="str">"HELLO</span>        <span class="cmt">; last -> O</span>
+<span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="num">3</span> <span class="str">"HELLO</span>     <span class="cmt">; 3rd character -> L</span>
+<span class="kw">PRINT</span> <span class="kw">BF</span> <span class="str">"HELLO</span>          <span class="cmt">; butfirst -> ELLO</span></code></pre>
+
+  <h3>Lists</h3>
+
+  <p>A list is a group of objects in brackets. The objects can be numbers, words, or
+  other lists&nbsp;:</p>
+
+  <pre><code>[ <span class="num">1</span> <span class="num">2</span> <span class="num">3</span> ]
+[ <span class="str">RED</span> <span class="str">GREEN</span> <span class="str">BLUE</span> ]
+[ <span class="num">100</span> <span class="num">0</span> ]              <span class="cmt">; coordinates</span>
+[ [ <span class="num">1</span> <span class="num">2</span> ] [ <span class="num">3</span> <span class="num">4</span> ] ]   <span class="cmt">; list of lists</span></code></pre>
+
+  <p>To work with lists&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">COUNT</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]          <span class="cmt">; -> 3</span>
+<span class="kw">PRINT</span> <span class="kw">FIRST</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]          <span class="cmt">; -> A</span>
+<span class="kw">PRINT</span> <span class="kw">LAST</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]           <span class="cmt">; -> C</span>
+<span class="kw">PRINT</span> <span class="kw">BF</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]             <span class="cmt">; butfirst -> [B C]</span>
+<span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="num">2</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]        <span class="cmt">; -> B</span>
+<span class="kw">PRINT</span> <span class="kw">FPUT</span> <span class="str">"X</span> [ <span class="str">A</span> <span class="str">B</span> ]          <span class="cmt">; adds at front -> [X A B]</span>
+<span class="kw">PRINT</span> <span class="kw">LPUT</span> <span class="str">"Z</span> [ <span class="str">A</span> <span class="str">B</span> ]          <span class="cmt">; adds at end -> [A B Z]</span>
+<span class="kw">PRINT</span> <span class="kw">SE</span> [ <span class="str">A</span> <span class="str">B</span> ] [ <span class="str">C</span> <span class="str">D</span> ]        <span class="cmt">; sentence (flattens) -> [A B C D]</span>
+<span class="kw">PRINT</span> <span class="kw">LIST</span> <span class="str">"A</span> <span class="str">"B</span>              <span class="cmt">; builds [A B]</span>
+<span class="kw">PRINT</span> <span class="kw">REVERSE</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]        <span class="cmt">; -> [C B A]</span>
+<span class="kw">PRINT</span> <span class="kw">SORT</span> [ <span class="num">3</span> <span class="num">1</span> <span class="num">2</span> ]           <span class="cmt">; -> [1 2 3]</span></code></pre>
+
+  <h3>Printing objects</h3>
+
+  <pre><code><span class="kw">PRINT</span> <span class="str">"HELLO</span>            <span class="cmt">; prints HELLO then a new line</span>
+<span class="kw">TYPE</span> <span class="str">"HELLO</span>             <span class="cmt">; prints HELLO with no new line</span>
+<span class="kw">SHOW</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]          <span class="cmt">; keeps the brackets -> [A B C]</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="variables">3. Variables</h2>
+
+  <p>A <strong>variable</strong> is a name that stands for an object. You create one
+  with <code>MAKE</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"AGE</span> <span class="num">17</span>
+<span class="kw">MAKE</span> <span class="str">"NAME</span> <span class="str">"TINTIN</span>
+<span class="kw">MAKE</span> <span class="str">"COLORS</span> [ <span class="str">RED</span> <span class="str">GREEN</span> <span class="str">BLUE</span> ]</code></pre>
+
+  <p>To read a variable's value, you put a colon in front of its name&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="var">:AGE</span>       <span class="cmt">; -> 17</span>
+<span class="kw">PRINT</span> <span class="var">:NAME</span>      <span class="cmt">; -> TINTIN</span>
+<span class="kw">FD</span> <span class="var">:AGE</span>          <span class="cmt">; forward 17 steps</span></code></pre>
+
+  <p>The notation <code>:AGE</code> is short for <code>THING "AGE</code>. You can change
+  a variable's value simply by giving it again&nbsp;:</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"COUNTER</span> <span class="num">0</span>
+<span class="kw">MAKE</span> <span class="str">"COUNTER</span> <span class="var">:COUNTER</span> + <span class="num">1</span>   <span class="cmt">; add 1</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="procedures">4. Procedures</h2>
+
+  <p>The great idea of Logo is that you can <strong>teach GoLogo new words</strong>.
+  A procedure is exactly that&nbsp;: a command you invent yourself.</p>
+
+  <h3>Defining a simple procedure</h3>
+
+  <p>You define a procedure with <code>TO</code> followed by its name, and end it with
+  <code>END</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SQUARE
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>GoLogo replies <code>SQUARE DEFINED</code> and, from that moment,
+  <code>SQUARE</code> is a command in its own right&nbsp;:</p>
+
+  <pre><code><span class="kw">SQUARE</span>
+<span class="kw">RT</span> <span class="num">30</span>
+<span class="kw">SQUARE</span></code></pre>
+
+  <h3>Procedures with parameters</h3>
+
+  <p>A parameter lets you pass a value to the procedure when you call it. You declare
+  it with a colon on the <code>TO</code> line&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> POLYGON <span class="var">:N</span> <span class="var">:SIDE</span>
+  <span class="kw">REPEAT</span> <span class="var">:N</span> [ <span class="kw">FD</span> <span class="var">:SIDE</span> <span class="kw">RT</span> <span class="num">360</span> / <span class="var">:N</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>You call this procedure by passing its two arguments&nbsp;:</p>
+
+  <pre><code><span class="kw">POLYGON</span> <span class="num">3</span> <span class="num">100</span>    <span class="cmt">; triangle</span>
+<span class="kw">POLYGON</span> <span class="num">4</span> <span class="num">80</span>     <span class="cmt">; square</span>
+<span class="kw">POLYGON</span> <span class="num">6</span> <span class="num">60</span>     <span class="cmt">; hexagon</span>
+<span class="kw">POLYGON</span> <span class="num">12</span> <span class="num">30</span>    <span class="cmt">; dodecagon (looks like a circle)</span></code></pre>
+
+  <h3>Procedures that return a value (operations)</h3>
+
+  <p>A procedure can also compute and return a result with <code>OUTPUT</code>. It then
+  becomes an <em>operation</em>, usable anywhere GoLogo expects a value&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> DOUBLE <span class="var">:N</span>
+  <span class="kw">OUTPUT</span> <span class="var">:N</span> * <span class="num">2</span>
+<span class="kw">END</span>
+
+<span class="kw">PRINT</span> <span class="kw">DOUBLE</span> <span class="num">5</span>       <span class="cmt">; -> 10</span>
+<span class="kw">FD</span> <span class="kw">DOUBLE</span> <span class="num">30</span>          <span class="cmt">; forward 60 steps</span></code></pre>
+
+  <h3>Local variables</h3>
+
+  <p>Inside a procedure, it is often useful to declare local variables, variables that
+  only exist in that procedure and do not affect global variables of the same
+  name&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> APPROX_CIRCLE <span class="var">:R</span>
+  <span class="kw">LOCAL</span> <span class="str">"STEP</span>
+  <span class="kw">MAKE</span> <span class="str">"STEP</span> <span class="num">2</span> * <span class="kw">PI</span> * <span class="var">:R</span> / <span class="num">360</span>
+  <span class="kw">REPEAT</span> <span class="num">360</span> [ <span class="kw">FD</span> <span class="var">:STEP</span> <span class="kw">RT</span> <span class="num">1</span> ]
+<span class="kw">END</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="loops">5. Loops</h2>
+
+  <h3>REPEAT</h3>
+
+  <p><code>REPEAT n [ instructions ]</code> runs the instructions <em>n</em> times. It
+  is the simplest and most-used loop&nbsp;:</p>
+
+  <pre><code><span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]          <span class="cmt">; square</span>
+<span class="kw">REPEAT</span> <span class="num">360</span> [ <span class="kw">FD</span> <span class="num">1</span> <span class="kw">RT</span> <span class="num">1</span> ]          <span class="cmt">; circle</span>
+<span class="kw">REPEAT</span> <span class="num">12</span> [ <span class="kw">SQUARE</span> <span class="kw">RT</span> <span class="num">30</span> ]         <span class="cmt">; rosette</span></code></pre>
+
+  <p>Inside a REPEAT loop, <code>REPCOUNT</code> returns the number of the current
+  iteration (1, 2, 3…)&nbsp;:</p>
+
+  <pre><code><span class="kw">REPEAT</span> <span class="num">5</span> [ <span class="kw">FD</span> <span class="kw">REPCOUNT</span> * <span class="num">20</span> <span class="kw">RT</span> <span class="num">90</span> ]   <span class="cmt">; square spiral</span></code></pre>
+
+  <div class="note">
+    <strong>Lines too long?</strong> A <code>~</code> (tilde) at the end of a line means the
+    instruction <em>continues on the next line</em>, handy for laying out a loop with
+    nested lists. So <code>REPEAT 6 ~</code> followed by the list <code>[ … ]</code> on the
+    next lines is the same as writing it all on one line. (The <code>!</code> character does
+    the same, inherited from the MO5 Logo.)
+  </div>
+
+  <h3>FOR</h3>
+
+  <p><code>FOR</code> is a counting loop&nbsp;: a variable takes the values from start
+  to end, by a step&nbsp;:</p>
+
+  <pre><code><span class="kw">FOR</span> [ I <span class="num">1</span> <span class="num">10</span> ] [ <span class="kw">PRINT</span> <span class="var">:I</span> ]           <span class="cmt">; from 1 to 10</span>
+<span class="kw">FOR</span> [ I <span class="num">0</span> <span class="num">100</span> <span class="num">10</span> ] [ <span class="kw">FD</span> <span class="var">:I</span> <span class="kw">RT</span> <span class="num">90</span> ]   <span class="cmt">; spiral by steps of 10</span></code></pre>
+
+  <h3>WHILE</h3>
+
+  <p><code>WHILE</code> keeps going as long as its condition is true.</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"N</span> <span class="num">1</span>
+<span class="kw">WHILE</span> [ <span class="var">:N</span> &lt; <span class="num">100</span> ] [
+  <span class="kw">FD</span> <span class="var">:N</span>
+  <span class="kw">RT</span> <span class="num">91</span>
+  <span class="kw">MAKE</span> <span class="str">"N</span> <span class="var">:N</span> + <span class="num">1</span>
+]</code></pre>
+
+  <h3>FOREACH</h3>
+
+  <p><code>FOREACH</code> walks through each item of a list. The current item is
+  available under the name <code>:?</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">FOREACH</span> [ <span class="num">1</span> <span class="num">2</span> <span class="num">3</span> <span class="num">4</span> <span class="num">5</span> ] [ <span class="kw">FD</span> <span class="var">:?</span> * <span class="num">10</span> <span class="kw">RT</span> <span class="num">90</span> ]
+
+<span class="kw">FOREACH</span> [ <span class="str">RED</span> <span class="str">GREEN</span> <span class="str">BLUE</span> ] [
+  <span class="kw">PRINT</span> <span class="var">:?</span>
+]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="conditionals">6. Conditionals</h2>
+
+  <h3>IF</h3>
+
+  <p><code>IF</code> runs instructions depending on whether a condition is true or
+  false&nbsp;:</p>
+
+  <pre><code><span class="kw">IF</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">PRINT</span> <span class="str">"POSITIVE</span> ]
+<span class="kw">IF</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">PRINT</span> <span class="str">"POSITIVE</span> ] [ <span class="kw">PRINT</span> <span class="str">"NEGATIVE_OR_ZERO</span> ]</code></pre>
+
+  <p>The two-list form is an if/else. The alias <code>IFELSE</code> says the same thing
+  more explicitly.</p>
+
+  <h3>Predicates</h3>
+
+  <p>A <em>predicate</em> is an operation that returns <code>TRUE</code> or
+  <code>FALSE</code>. All Logo predicates end with <code>?</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">EQUAL?</span> <span class="num">3</span> <span class="num">3</span>            <span class="cmt">; -> TRUE</span>
+<span class="kw">PRINT</span> <span class="kw">LESS?</span> <span class="num">2</span> <span class="num">5</span>             <span class="cmt">; 2 < 5 -> TRUE</span>
+<span class="kw">PRINT</span> <span class="kw">GREATER?</span> <span class="num">8</span> <span class="num">3</span>          <span class="cmt">; 8 > 3 -> TRUE</span>
+<span class="kw">PRINT</span> <span class="kw">EMPTY?</span> [ ]             <span class="cmt">; empty list ? -> TRUE</span>
+<span class="kw">PRINT</span> <span class="kw">NUMBER?</span> <span class="str">"HELLO</span>        <span class="cmt">; is it a number ? -> FALSE</span>
+<span class="kw">PRINT</span> <span class="kw">MEMBER?</span> <span class="str">"B</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]   <span class="cmt">; B in the list ? -> TRUE</span></code></pre>
+
+  <p>The operators <code>AND</code>, <code>OR</code> and <code>NOT</code> combine
+  predicates&nbsp;:</p>
+
+  <pre><code><span class="kw">IF</span> <span class="kw">AND</span> <span class="kw">LESS?</span> <span class="num">0</span> <span class="var">:N</span> <span class="kw">GREATER?</span> <span class="num">100</span> <span class="var">:N</span> [ <span class="kw">PRINT</span> <span class="str">"BETWEEN_0_AND_100</span> ]
+<span class="kw">IF</span> <span class="kw">NOT</span> <span class="kw">EMPTY?</span> <span class="var">:LIST</span> [ <span class="kw">PRINT</span> <span class="kw">FIRST</span> <span class="var">:LIST</span> ]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="recursion">7. Recursion</h2>
+
+  <p>In Logo, a procedure can <em>call itself</em>. This is called <strong>recursion</strong>.
+  It is the ideal tool for structures that repeat at different scales.</p>
+
+  <p>The simplest example is a countdown&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> COUNTDOWN <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> = <span class="num">0</span> [ <span class="kw">PRINT</span> <span class="str">"LIFTOFF</span> <span class="kw">STOP</span> ]
+  <span class="kw">PRINT</span> <span class="var">:N</span>
+  <span class="kw">COUNTDOWN</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">END</span>
+
+<span class="kw">COUNTDOWN</span> <span class="num">5</span></code></pre>
+
+  <p>Recursion is also the natural way to walk through a list&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> PRINT_ALL <span class="var">:LIST</span>
+  <span class="kw">IF</span> <span class="kw">EMPTY?</span> <span class="var">:LIST</span> [ <span class="kw">STOP</span> ]
+  <span class="kw">PRINT</span> <span class="kw">FIRST</span> <span class="var">:LIST</span>
+  <span class="kw">PRINT_ALL</span> <span class="kw">BF</span> <span class="var">:LIST</span>
+<span class="kw">END</span></code></pre>
+
+  <p>And for fractal drawings it is irreplaceable (see the
+  <a href="examples.html">Example programs</a> page).</p>
+
+  <div class="note">
+    <strong>Recursion made easy.</strong> A procedure can call itself a great many times
+    without slowing down or freezing GoLogo. And if a recursive loop runs forever, you
+    can stop it at any time with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="flow">8. Controlling the flow inside a procedure</h2>
+
+  <p>Three instructions let you leave a procedure while it is running&nbsp;:</p>
+
+  <ul>
+    <li><code>STOP</code>&nbsp;: leaves the current procedure (for commands).</li>
+    <li><code>OUTPUT <em>value</em></code>&nbsp;: leaves the procedure and returns a
+      value (for operations).</li>
+    <li><code>TOPLEVEL</code>&nbsp;: full stop, back to the REPL whatever the call
+      depth.</li>
+  </ul>
+
+  <pre><code><span class="kw">TO</span> FORWARD_IF_OK <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> &lt; <span class="num">0</span> [ <span class="kw">STOP</span> ]        <span class="cmt">; do nothing if N is negative</span>
+  <span class="kw">FD</span> <span class="var">:N</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> SIGN <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">OUTPUT</span> <span class="num">1</span> ]
+  <span class="kw">IF</span> <span class="var">:N</span> &lt; <span class="num">0</span> [ <span class="kw">OUTPUT</span> -<span class="num">1</span> ]
+  <span class="kw">OUTPUT</span> <span class="num">0</span>
+<span class="kw">END</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="graphics">9. Advanced graphics</h2>
+
+  <h3>Circle and arc</h3>
+
+  <pre><code><span class="kw">CIRCLE</span> <span class="num">50</span>              <span class="cmt">; circle of radius 50, centred on the turtle</span>
+<span class="kw">ARC</span> <span class="num">60</span> <span class="num">0</span> <span class="num">90</span>           <span class="cmt">; arc of radius 60, from 0 to 90 degrees (a quarter)</span>
+<span class="kw">ARC</span> <span class="num">40</span> <span class="num">45</span> <span class="num">315</span>         <span class="cmt">; arc from 45 to 315 degrees (three quarters)</span></code></pre>
+
+  <p>The turtle does not move&nbsp;: it stays at the centre of the circle or arc.</p>
+
+  <h3>Filling</h3>
+
+  <pre><code><span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]   <span class="cmt">; first draw the shape</span>
+<span class="kw">FILL</span>                          <span class="cmt">; then fill the area that contains the turtle</span></code></pre>
+
+  <p>To choose a fill colour different from the pen colour&nbsp;:</p>
+
+  <pre><code><span class="kw">SETPC</span> <span class="num">7</span>     <span class="cmt">; white pen for the outline</span>
+<span class="kw">SETFC</span> <span class="num">1</span>     <span class="cmt">; red fill</span>
+<span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">FILL</span></code></pre>
+
+  <h3>Line thickness</h3>
+
+  <pre><code><span class="kw">SETPENSIZE</span> <span class="num">5</span>
+<span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">90</span> ]   <span class="cmt">; square with a thick line</span>
+<span class="kw">SETPENSIZE</span> <span class="num">2</span>                  <span class="cmt">; back to normal thickness</span></code></pre>
+
+  <h3>Writing in the graphics field</h3>
+
+  <pre><code><span class="kw">SETPC</span> <span class="num">3</span>
+<span class="kw">LABEL</span> <span class="str">"HELLO</span>               <span class="cmt">; writes at the turtle's position</span></code></pre>
+
+  <h3>Saving the drawing</h3>
+
+  <pre><code><span class="kw">SAVEPNG</span> <span class="str">"MY_DRAWING</span>         <span class="cmt">; saves as MY_DRAWING.PNG</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="text">10. Text area and printing</h2>
+
+  <p>Outside the graphics field, GoLogo has a text area with a grid of 40 columns by
+  25 lines. That is where the <code>PRINT</code> and <code>TYPE</code> commands
+  write.</p>
+
+  <pre><code><span class="kw">SETTEXTLINES</span> <span class="num">5</span>     <span class="cmt">; show 5 text lines below the graphics field</span>
+<span class="kw">SETTEXTLINES</span> <span class="num">25</span>    <span class="cmt">; full text (hides the graphics field)</span>
+<span class="kw">CLEARTEXT</span>          <span class="cmt">; clears the text area</span>
+<span class="kw">SETCURSOR</span> [ <span class="num">10</span> <span class="num">5</span> ] <span class="cmt">; places the text cursor at column 10, line 5</span>
+<span class="kw">SETTEXTCOLOR</span> <span class="num">3</span>      <span class="cmt">; text in yellow</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="keyboard">11. Reading the keyboard and the mouse</h2>
+
+  <h3>Keyboard</h3>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"C</span> <span class="kw">READCHAR</span>        <span class="cmt">; waits for a character, stores it in C</span>
+<span class="kw">MAKE</span> <span class="str">"L</span> <span class="kw">READLIST</span>        <span class="cmt">; waits for a full line -> list of words</span>
+<span class="kw">IF</span> <span class="kw">KEY?</span> [ <span class="kw">PRINT</span> <span class="kw">READCHAR</span> ]   <span class="cmt">; if a key is available, read it</span></code></pre>
+
+  <p>To ask the user a question&nbsp;:</p>
+
+  <pre><code><span class="kw">READ</span> [ WHAT IS YOUR NAME ] <span class="str">"NAME</span>
+( <span class="kw">PRINT</span> <span class="str">"HELLO</span> <span class="var">:NAME</span> )</code></pre>
+
+  <h3>Mouse</h3>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">MOUSEPOS</span>           <span class="cmt">; [x y] if the pointer is in the field</span>
+<span class="kw">IF</span> <span class="kw">MOUSEDOWN?</span> [ <span class="kw">PRINT</span> <span class="str">"CLICK</span> ]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="music">12. Music</h2>
+
+  <p>GoLogo can play notes. Notes are written with their solfège names&nbsp;:</p>
+
+  <pre><code><span class="kw">PLAY</span> <span class="str">"DO</span>
+<span class="kw">PLAY</span> [ <span class="str">DO</span> <span class="str">RE</span> <span class="str">MI</span> <span class="str">FA</span> <span class="str">SOL</span> <span class="str">LA</span> <span class="str">SI</span> ]
+<span class="kw">PLAY</span> [ <span class="str">DO</span> <span class="str">RE#</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">LA</span> ]   <span class="cmt">; with a sharp</span></code></pre>
+
+  <p>You set the octave, duration, tempo and timbre&nbsp;:</p>
+
+  <pre><code><span class="kw">OCTAVE</span> <span class="num">5</span>         <span class="cmt">; high octave (1 to 5, default 4)</span>
+<span class="kw">DURATION</span> <span class="num">12</span>      <span class="cmt">; shorter notes (1 to 96, default 24)</span>
+<span class="kw">TEMPO</span> <span class="num">10</span>         <span class="cmt">; faster (1 to 255, default 5)</span>
+<span class="kw">TIMBRE</span> <span class="num">192</span>       <span class="cmt">; sine sound (0=square, 64=sawtooth, 128=triangle, 192=sine)</span>
+<span class="kw">PLAY</span> [ <span class="str">DO</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">DO</span> ]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="files">13. Files</h2>
+
+  <p>Logo files (<code>.GLG</code>) are stored in the <code>~/Logo/</code> folder on
+  Linux/macOS, or in <code>Documents\Logo\</code> on Windows. There is no need to give
+  the full path.</p>
+
+  <pre><code><span class="kw">SAVE</span> <span class="str">"PROJECT</span> <span class="kw">CONTENTS</span>   <span class="cmt">; saves everything to PROJECT.GLG</span>
+<span class="kw">LOAD</span> <span class="str">"PROJECT</span>            <span class="cmt">; loads and runs PROJECT.GLG</span>
+<span class="kw">EDLOAD</span> <span class="str">"PROJECT</span>          <span class="cmt">; loads into the editor without running</span>
+<span class="kw">CATALOG</span>                   <span class="cmt">; lists the available files</span>
+<span class="kw">ERASEFILE</span> <span class="str">"PROJECT</span>       <span class="cmt">; deletes the file</span></code></pre>
+
+  <h3>The examples shipped with GoLogo</h3>
+
+  <p>GoLogo comes with an <strong>examples</strong> directory of ready-to-load programs.
+  Three commands, ending in <code>EX</code>, work exactly like their counterparts but
+  look in that directory (read-only)&nbsp;:</p>
+
+  <pre><code><span class="kw">CATALOGEX</span>                 <span class="cmt">; lists the available examples (like CATALOG)</span>
+<span class="kw">LOADEX</span> <span class="str">"MANDELBROT</span>        <span class="cmt">; loads and runs an example (like LOAD)</span>
+<span class="kw">EDLOADEX</span> <span class="str">"MANDELBROT</span>      <span class="cmt">; opens an example in the editor (like EDLOAD)</span></code></pre>
+
+  <p>The location of the examples directory depends on the system (it is installed with
+  GoLogo). If the directory or the requested file cannot be found, the command says so.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="workspace">14. Workspace</h2>
+
+  <p>GoLogo keeps in memory all the procedures and variables defined during the
+  session. You can inspect and manage them&nbsp;:</p>
+
+  <pre><code><span class="kw">POALL</span>              <span class="cmt">; prints all the procedures and variables</span>
+<span class="kw">POTS</span>               <span class="cmt">; prints only the procedure titles</span>
+<span class="kw">PO</span> <span class="str">"SQUARE</span>          <span class="cmt">; prints the definition of SQUARE</span>
+<span class="kw">ERASE</span> <span class="str">"SQUARE</span>        <span class="cmt">; erases the procedure SQUARE</span>
+<span class="kw">ERNAME</span> <span class="str">"AGE</span>          <span class="cmt">; erases the variable AGE</span>
+<span class="kw">ERALL</span>              <span class="cmt">; erases everything (procedures and variables)</span>
+<span class="kw">RESET</span>              <span class="cmt">; resets everything (asks for confirmation)</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="messages">15. Common error messages</h2>
+
+  <p>When GoLogo does not understand what you ask, it replies with a clear error
+  message. The messages keep their original French wording&nbsp;; switch to English with
+  the <code>ENGLISH</code> command to read them translated.</p>
+
+  <table>
+    <tr><th>Message (English mode)</th><th>Cause</th></tr>
+    <tr><td><code>I DON'T KNOW HOW TO FORWAD</code></td><td>The command FORWAD does not exist (a typo for FORWARD?)</td></tr>
+    <tr><td><code>NOT ENOUGH INPUTS TO FD</code></td><td>An argument is missing for FD</td></tr>
+    <tr><td><code>YOU DON'T SAY WHAT TO DO WITH 42</code></td><td>An operation returned 42 but nobody uses it</td></tr>
+    <tr><td><code>FD DOESN'T LIKE HELLO</code></td><td>The argument type is wrong</td></tr>
+    <tr><td><code>TURTLE OUT OF BOUNDS</code></td><td>Move outside the field in FENCE mode</td></tr>
+    <tr><td><code>X HAS NO VALUE</code></td><td>The variable X does not exist</td></tr>
+    <tr><td><code>STOPPED!</code></td><td>You pressed Ctrl+C</td></tr>
+  </table>
+
+  <p>On an error, GoLogo also names the procedure at fault&nbsp;:
+  <code>FD DOESN'T LIKE HELLO IN SQUARE</code>. This helps you locate the problem.</p>
+
+</main>
+</body>
+</html>

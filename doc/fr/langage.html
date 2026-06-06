@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le langage Logo · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="tortue GoLogo">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Démarrer</li>
+    <li><a href="index.html">Présentation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Apprendre</li>
+    <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
+    <li><a href="langage.html" class="active">Le langage Logo</a></li>
+    <li><a href="exemples.html">Programmes exemples</a></li>
+    <li class="section-title">Référence</li>
+    <li><a href="interface.html">Interface &amp; raccourcis</a></li>
+    <li><a href="commandes.html">Toutes les commandes</a></li>
+    <li><a href="index-commandes.html">Index des commandes</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Le langage Logo</h1>
+    <p>Introduction complète : données, variables, procédures, boucles, conditions, graphisme</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="tortue">1. La tortue et le champ graphique</h2>
+
+  <p>Au centre de l'écran graphique se trouve une petite flèche&nbsp;: c'est la
+  <strong>tortue</strong>. Elle possède une position (un point sur l'écran), un cap
+  (la direction vers laquelle elle pointe) et un crayon qu'elle peut baisser pour
+  tracer ou lever pour se déplacer sans laisser de trace.</p>
+
+  <p>Le champ graphique est un espace de 1600 pas de large sur 1000 pas de haut.
+  L'origine (le point [0, 0]) est au centre. L'axe x va de −800 à +800
+  (gauche → droite), l'axe y de −500 à +500 (bas → haut). La tortue démarre
+  toujours au centre, pointant vers le haut (cap 0).</p>
+
+  <h3>Déplacer la tortue</h3>
+
+  <pre><code><span class="kw">AV</span> <span class="num">100</span>      <span class="cmt">; avance de 100 pas</span>
+<span class="kw">RE</span> <span class="num">50</span>       <span class="cmt">; recule de 50 pas</span>
+<span class="kw">TD</span> <span class="num">90</span>       <span class="cmt">; tourne à droite de 90 degrés</span>
+<span class="kw">TG</span> <span class="num">45</span>       <span class="cmt">; tourne à gauche de 45 degrés</span></code></pre>
+
+  <p>Le cap suit la convention de la boussole&nbsp;: 0 = nord (haut), 90 = est
+  (droite), 180 = sud (bas), 270 = ouest (gauche). <code>TD</code> ajoute des
+  degrés dans le sens horaire, <code>TG</code> dans le sens anti-horaire.</p>
+
+  <p>Pour placer la tortue directement en un point&nbsp;:</p>
+
+  <pre><code><span class="kw">FPOS</span> [ <span class="num">100</span> <span class="num">50</span> ]   <span class="cmt">; va au point (100, 50) sans changer le cap</span>
+<span class="kw">FCAP</span> <span class="num">180</span>         <span class="cmt">; fixe le cap à 180° (vers le bas)</span>
+<span class="kw">ORIGINE</span>          <span class="cmt">; remet la tortue au centre, cap 0</span></code></pre>
+
+  <h3>Le crayon</h3>
+
+  <p>Par défaut, le crayon est baissé&nbsp;: la tortue trace en avançant. On le
+  lève ou on le baisse avec&nbsp;:</p>
+
+  <pre><code><span class="kw">LC</span>          <span class="cmt">; Lève le Crayon</span>
+<span class="kw">BC</span>          <span class="cmt">; Baisse le Crayon</span>
+<span class="kw">ECRIS BC?</span>   <span class="cmt">; VRAI si le crayon est baissé</span></code></pre>
+
+  <p>La couleur du trait se change avec <code>FCC</code> (Fixe la Couleur du
+  Crayon), en donnant un code de 0 à 15, ou une triplet rouge-vert-bleu&nbsp;:</p>
+
+  <pre><code><span class="kw">FCC</span> <span class="num">6</span>              <span class="cmt">; cyan (couleur par défaut)</span>
+<span class="kw">FCC</span> <span class="num">1</span>              <span class="cmt">; rouge</span>
+<span class="kw">FCC</span> [ <span class="num">255</span> <span class="num">128</span> <span class="num">0</span> ]   <span class="cmt">; orange (couleur libre en RVB)</span></code></pre>
+
+  <div class="palette">
+    <div class="palette-cell" style="background:#000">0 noir</div>
+    <div class="palette-cell" style="background:#c00">1 rouge</div>
+    <div class="palette-cell" style="background:#080">2 vert</div>
+    <div class="palette-cell" style="background:#aa0">3 jaune</div>
+    <div class="palette-cell" style="background:#00c">4 bleu</div>
+    <div class="palette-cell" style="background:#a0a">5 magenta</div>
+    <div class="palette-cell" style="background:#0aa">6 cyan</div>
+    <div class="palette-cell" style="background:#bbb;color:#333">7 blanc</div>
+    <div class="palette-cell" style="background:#555">8 gris</div>
+    <div class="palette-cell" style="background:#f44">9 rouge clair</div>
+    <div class="palette-cell" style="background:#4d4">10 vert clair</div>
+    <div class="palette-cell" style="background:#ee4">11 jaune clair</div>
+    <div class="palette-cell" style="background:#44f">12 bleu clair</div>
+    <div class="palette-cell" style="background:#e4e">13 magenta clair</div>
+    <div class="palette-cell" style="background:#4ee">14 cyan clair</div>
+    <div class="palette-cell" style="background:#e80">15 orange</div>
+  </div>
+
+  <h3>Le fond et le bord</h3>
+
+  <pre><code><span class="kw">FCFG</span> <span class="num">4</span>              <span class="cmt">; fond bleu (par défaut)</span>
+<span class="kw">FCB</span> <span class="num">0</span>               <span class="cmt">; bord noir</span>
+<span class="kw">VE</span>                   <span class="cmt">; vide l'écran et remet tout à l'état initial</span>
+<span class="kw">NETTOIE</span>             <span class="cmt">; efface le dessin sans bouger la tortue</span></code></pre>
+
+  <h3>Modes de champ</h3>
+
+  <p>Que se passe-t-il quand la tortue atteint le bord du champ&nbsp;? Cela dépend
+  du mode choisi&nbsp;:</p>
+
+  <ul>
+    <li><code>CLOS</code> (défaut)&nbsp;: la tortue refuse de sortir et affiche
+      <code>LA TORTUE VA SORTIR</code>.</li>
+    <li><code>ENR</code> (champ enroulé)&nbsp;: la tortue réapparaît du côté opposé,
+      comme un jeu de serpent.</li>
+    <li><code>FEN</code> (fenêtre étendue)&nbsp;: l'espace de déplacement s'étend
+      bien au-delà de ce que l'on voit à l'écran.</li>
+  </ul>
+
+  <pre><code><span class="kw">ENR</span>
+<span class="kw">REPETE</span> <span class="num">200</span> [ <span class="kw">AV</span> <span class="num">10</span> <span class="kw">TD</span> <span class="num">7</span> ]   <span class="cmt">; spirale qui enroule</span></code></pre>
+
+  <h3>Plusieurs tortues</h3>
+
+  <p>Par défaut il n'y a qu'une seule tortue, numérotée <code>0</code>. On peut en
+  faire vivre plusieurs sur le même écran&nbsp;: <code>FIXETORTUE n</code> choisit la
+  tortue active (créée au besoin), et toutes les commandes habituelles (<code>AV</code>,
+  <code>TD</code>, <code>FCC</code>…) agissent ensuite sur elle. Chaque tortue garde
+  sa propre position, son cap et son crayon&nbsp;; le fond, l'échelle et le mode de
+  champ, eux, sont communs à l'écran. Les numéros vont de <code>0</code> à
+  <code>1023</code> (au plus 1024 tortues).</p>
+
+  <pre><code><span class="kw">FIXETORTUE</span> <span class="num">1</span>         <span class="cmt">; crée et sélectionne une 2e tortue</span>
+<span class="kw">FCC</span> <span class="num">1</span> <span class="kw">TD</span> <span class="num">90</span> <span class="kw">AV</span> <span class="num">100</span>  <span class="cmt">; elle dessine en rouge, vers la droite</span>
+<span class="kw">FIXETORTUE</span> <span class="num">0</span>         <span class="cmt">; on revient à la 1re tortue (inchangée)</span></code></pre>
+
+  <p><code>DEMANDE n [ … ]</code> exécute un bloc sur la tortue <code>n</code> (ou sur
+  chaque tortue d'une liste de numéros) puis revient à la tortue active précédente.
+  <code>TORTUE</code> donne le numéro courant, <code>NBTORTUES</code> le nombre de
+  tortues, et <code>DISTORTUE</code> n'en garde qu'une (la n°0).</p>
+
+  <p><code>SPRITE</code> et <code>FCC</code> agissent aussi sur la tortue active&nbsp;:
+  chaque tortue peut donc avoir sa propre forme et sa propre couleur de crayon.</p>
+
+  <pre><code><span class="kw">FIXETORTUE</span> <span class="num">2</span>                 <span class="cmt">; on a maintenant les tortues 0, 1 et 2</span>
+<span class="kw">DEMANDE</span> <span class="num">1</span> [ <span class="kw">TD</span> <span class="num">120</span> ]         <span class="cmt">; chacune regarde dans une direction</span>
+<span class="kw">DEMANDE</span> <span class="num">2</span> [ <span class="kw">TD</span> <span class="num">240</span> ]
+<span class="kw">DEMANDE</span> [ <span class="num">0</span> <span class="num">1</span> <span class="num">2</span> ] [ <span class="kw">AV</span> <span class="num">80</span> ]  <span class="cmt">; les trois rayonnent depuis le centre, puis retour à la n°2</span></code></pre>
+
+  <p><code>COLLISION? [ a b ]</code> retourne <code>VRAI</code> si les tortues
+  <code>a</code> et <code>b</code> existent, sont <strong>visibles</strong> et se
+  chevauchent&nbsp;: pratique pour un petit jeu (toucher une cible, éviter un
+  obstacle…).</p>
+
+  <h3>Dessiner sa propre forme : <code>DEFSPRITE</code></h3>
+
+  <p>À la manière du <code>DEFGR$</code> du BASIC, <code>DEFSPRITE</code> définit une
+  forme de 16×16 pixels « en ASCII »&nbsp;: une liste d'au plus 16 lignes de 16
+  caractères, où <code>.</code> = pixel vide et tout autre caractère (un <code>X</code>
+  par exemple) = pixel plein. La forme reçoit un numéro de <strong>3 à 255</strong>
+  (0, 1, 2 sont les formes intégrées), puis <code>SPRITE</code> la sélectionne. Elle
+  est dessinée dans la couleur du crayon et pivote avec le cap. Les formes
+  survivent à <code>VE</code> (mais pas à <code>RAZ</code>).</p>
+
+  <pre><code><span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+  ......XXXX......
+  ....XXXXXXXX....
+  ...XX.XXXX.XX...
+  ...XXXXXXXXXX...
+  ...XX.XXXX.XX...
+  ....XX.XX.XX....
+  ......XXXX......
+]
+<span class="kw">SPRITE</span> <span class="num">3</span>                  <span class="cmt">; la tortue active prend cette forme</span></code></pre>
+
+  <h3>Animer les tortues : <code>ANIME</code></h3>
+
+  <p><code>ANIME id x y vitesse mode</code> déplace une tortue automatiquement vers
+  un point, <strong>en parallèle</strong> du programme. <code>vitesse</code> est le
+  nombre de pas Logo parcourus à chaque image ; <code>CADENCE</code> fixe le nombre
+  d'images par seconde (défaut 30). Comme la vitesse est exprimée par image, le
+  rapport entre deux vitesses reste le même quelle que soit la cadence.</p>
+
+  <p>Le <code>mode</code> est un mot&nbsp;: <code>"UNEFOIS</code> (va à la cible puis
+  s'arrête), <code>"BOUCLE</code> (revient instantanément au départ et recommence,
+  utile pour un scrolling) ou <code>"PINGPONG</code> (aller-retour continu). Si le
+  crayon est baissé, la tortue laisse une trace&nbsp;; levez-le (<code>LC</code>)
+  pour un déplacement propre. Une commande manuelle (<code>AV</code>,
+  <code>FXY</code>…) sur la tortue arrête son animation, tout comme
+  <code>STOPANIME</code> et <code>Ctrl+C</code>.</p>
+
+  <pre><code><span class="kw">CADENCE</span> <span class="num">60</span>
+<span class="kw">ANIME</span> <span class="num">1</span> <span class="num">300</span> <span class="num">150</span> <span class="num">2</span> <span class="str">"PINGPONG</span>   <span class="cmt">; la tortue 1 fait des allers-retours lents</span>
+<span class="kw">ANIME</span> <span class="num">2</span> <span class="num">-300</span> <span class="num">150</span> <span class="num">8</span> <span class="str">"BOUCLE</span>    <span class="cmt">; la tortue 2 va 4 fois plus vite</span>
+<span class="kw">ATTENDS</span> <span class="num">180</span>                  <span class="cmt">; 3 s : les deux bougent (le programme attend, pas l'animation)</span>
+<span class="kw">STOPANIME</span> <span class="num">1</span>                    <span class="cmt">; arrête la tortue 1 ; la 2 continue. (STOPANIME) les arrête toutes</span></code></pre>
+
+  <p>L'attente est essentielle ici&nbsp;: sans elle, les quatre lignes s'enchaînent
+  en un instant et <code>STOPANIME 1</code> stoppe la tortue 1 avant qu'on ait pu la
+  voir bouger. Pendant <code>ATTENDS</code>, le programme patiente mais les
+  animations, elles, continuent.</p>
+
+  <p>Couplé à <code>COLLISION?</code>, cela suffit pour un petit jeu&nbsp;: une cible
+  se déplace toute seule pendant que la boucle lit la manette pour bouger le joueur,
+  jusqu'au contact. Voici un jeu d'adresse complet, jouable aux flèches du
+  clavier&nbsp;: amène le joueur (en bas) sur la cible qui balaie le haut.</p>
+
+  <pre><code><span class="kw">VE</span>
+<span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">0</span> <span class="num">-200</span>                 <span class="cmt">; le joueur (tortue 0) démarre en bas</span>
+<span class="kw">DEMANDE</span> <span class="num">1</span> [ <span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">-600</span> <span class="num">150</span> ]      <span class="cmt">; la cible (tortue 1) part à gauche</span>
+<span class="kw">ANIME</span> <span class="num">1</span> <span class="num">600</span> <span class="num">150</span> <span class="num">4</span> <span class="str">"PINGPONG</span>     <span class="cmt">; elle balaie le haut en allers-retours</span>
+<span class="kw">TANTQUE</span> [ <span class="kw">NON</span> <span class="kw">COLLISION?</span> [ <span class="num">0</span> <span class="num">1</span> ] ] [
+  <span class="kw">DONNE</span> <span class="str">"D</span> <span class="kw">MANETTE</span> <span class="num">0</span>
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">1</span> [ <span class="kw">FCAP</span> <span class="num">0</span>   <span class="kw">AV</span> <span class="num">20</span> ]      <span class="cmt">; haut</span>
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">5</span> [ <span class="kw">FCAP</span> <span class="num">180</span> <span class="kw">AV</span> <span class="num">20</span> ]      <span class="cmt">; bas</span>
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">FCAP</span> <span class="num">90</span>  <span class="kw">AV</span> <span class="num">20</span> ]      <span class="cmt">; droite</span>
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">FCAP</span> <span class="num">270</span> <span class="kw">AV</span> <span class="num">20</span> ]      <span class="cmt">; gauche</span>
+  <span class="kw">ATTENDS</span> <span class="num">1</span>
+]
+<span class="kw">STOPANIME</span> <span class="num">1</span>
+<span class="kw">ECRIS</span> [ ATTRAPÉE ! ]</code></pre>
+
+  <p>La cible avance seule (moteur d'animation) pendant que la boucle lit la manette
+  et déplace le joueur&nbsp;; dès qu'ils se touchent, <code>COLLISION?</code> devient
+  vraie et la boucle s'arrête. <code>Ctrl+C</code> interrompt la partie (et les
+  animations).</p>
+
+  <h3>SCENE&nbsp;: animer sans clignotement</h3>
+
+  <p>Le moteur <code>ANIME</code> déplace des sprites sans rien effacer. Mais beaucoup
+  de jeux et d'animations redessinent eux-mêmes toute la scène à chaque image&nbsp;:
+  <code>NETTOIE</code>, puis on retrace le décor et les tortues dans une boucle.
+  L'écran risque alors d'être affiché <em>au milieu</em> du redessin (juste après le
+  <code>NETTOIE</code>, champ vide, ou à moitié tracé)&nbsp;: c'est ce qui donne une
+  impression de clignotement.</p>
+
+  <p><code>SCENE [ … ]</code> règle le problème. Tout ce qui est dessiné dans le bloc
+  est construit dans un tampon caché, et l'écran ne bascule sur la nouvelle image
+  qu'<em>une fois le bloc terminé</em> (double tampon). Enveloppez le dessin d'une
+  image dans <code>SCENE</code> et laissez l'<code>ATTENDS</code> à l'extérieur&nbsp;:</p>
+
+  <pre><code><span class="kw">TANTQUE</span> [ <span class="kw">NON</span> <span class="kw">TOUCHE?</span> ] [
+  <span class="kw">SCENE</span> [
+    <span class="kw">NETTOIE</span>
+    <span class="cmt">; … retracer tout le décor et les tortues …</span>
+  ]
+  <span class="kw">ATTENDS</span> <span class="num">2</span>             <span class="cmt">; l'attente reste hors du bloc</span>
+]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="donnees">2. Les données</h2>
+
+  <p>En Logo, tout est <em>objet</em>. Il existe trois sortes d'objets&nbsp;:</p>
+
+  <ul>
+    <li>Les <strong>nombres</strong>&nbsp;: <code>42</code>, <code>3.14</code>,
+      <code>-7</code></li>
+    <li>Les <strong>mots</strong>&nbsp;: <code>"BONJOUR</code>, <code>"ROUGE</code></li>
+    <li>Les <strong>listes</strong>&nbsp;: <code>[ A B C ]</code>,
+      <code>[ 1 2 3 ]</code>, <code>[ [ 1 2 ] [ 3 4 ] ]</code></li>
+  </ul>
+
+  <h3>Les nombres</h3>
+
+  <p>Les nombres peuvent être entiers ou décimaux (séparateur&nbsp;: le point).
+  Les quatre opérations arithmétiques s'écrivent de façon naturelle, avec des espaces
+  autour des opérateurs&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="num">3</span> + <span class="num">4</span>          <span class="cmt">; affiche 7</span>
+<span class="kw">ECRIS</span> <span class="num">10</span> - <span class="num">3</span>         <span class="cmt">; affiche 7</span>
+<span class="kw">ECRIS</span> <span class="num">6</span> * <span class="num">7</span>          <span class="cmt">; affiche 42</span>
+<span class="kw">ECRIS</span> <span class="num">100</span> / <span class="num">4</span>        <span class="cmt">; affiche 25</span>
+<span class="kw">ECRIS</span> <span class="num">360</span> / <span class="num">8</span>        <span class="cmt">; affiche 45</span></code></pre>
+
+  <p>On peut aussi écrire avec les formes longues&nbsp;: <code>SOMME 3 4</code>,
+  <code>DIFF 10 3</code>, <code>PROD 6 7</code>, <code>DIV 100 4</code>.</p>
+
+  <p>Fonctions mathématiques utiles&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">RC</span> <span class="num">16</span>          <span class="cmt">; racine carrée → 4</span>
+<span class="kw">ECRIS</span> <span class="kw">ENT</span> <span class="num">3.7</span>        <span class="cmt">; partie entière → 3</span>
+<span class="kw">ECRIS</span> <span class="kw">ARRONDI</span> <span class="num">3.6</span>   <span class="cmt">; entier le plus proche → 4</span>
+<span class="kw">ECRIS</span> <span class="kw">VALABS</span> -<span class="num">5</span>     <span class="cmt">; valeur absolue → 5</span>
+<span class="kw">ECRIS</span> <span class="kw">HASARD</span> <span class="num">6</span>      <span class="cmt">; entier aléatoire entre 0 et 5</span>
+<span class="kw">ECRIS</span> <span class="kw">SIN</span> <span class="num">30</span>         <span class="cmt">; sinus de 30° → 0.5</span>
+<span class="kw">ECRIS</span> <span class="kw">COS</span> <span class="num">60</span>         <span class="cmt">; cosinus de 60° → 0.5</span>
+<span class="kw">ECRIS</span> <span class="kw">PI</span>             <span class="cmt">; constante π → 3.14159...</span></code></pre>
+
+  <h3>Les mots</h3>
+
+  <p>Un mot est une suite de caractères. Pour écrire un mot littéral, on le
+  fait précéder d'un guillemet <code>"</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="str">"BONJOUR</span>
+<span class="kw">ECRIS</span> <span class="str">"ROUGE</span>
+<span class="kw">ECRIS</span> <span class="kw">MOT</span> <span class="str">"BON</span> <span class="str">"JOUR</span>   <span class="cmt">; concatène → BONJOUR</span></code></pre>
+
+  <p>Pour interroger un mot&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">COMPTE</span> <span class="str">"BONJOUR</span>     <span class="cmt">; nombre de caractères → 7</span>
+<span class="kw">ECRIS</span> <span class="kw">PREM</span> <span class="str">"BONJOUR</span>       <span class="cmt">; premier caractère → B</span>
+<span class="kw">ECRIS</span> <span class="kw">DER</span> <span class="str">"BONJOUR</span>        <span class="cmt">; dernier → R</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="num">3</span> <span class="str">"BONJOUR</span>    <span class="cmt">; 3e caractère → N</span>
+<span class="kw">ECRIS</span> <span class="kw">SP</span> <span class="str">"BONJOUR</span>         <span class="cmt">; sauf le premier → ONJOUR</span></code></pre>
+
+  <h3>Les listes</h3>
+
+  <p>Une liste est un ensemble d'objets entre crochets. Les objets peuvent être
+  des nombres, des mots, ou d'autres listes&nbsp;:</p>
+
+  <pre><code>[ <span class="num">1</span> <span class="num">2</span> <span class="num">3</span> ]
+[ <span class="str">ROUGE</span> <span class="str">VERT</span> <span class="str">BLEU</span> ]
+[ <span class="num">100</span> <span class="num">0</span> ]              <span class="cmt">; coordonnées</span>
+[ [ <span class="num">1</span> <span class="num">2</span> ] [ <span class="num">3</span> <span class="num">4</span> ] ]   <span class="cmt">; liste de listes</span></code></pre>
+
+  <p>Pour travailler avec les listes&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">COMPTE</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]         <span class="cmt">; → 3</span>
+<span class="kw">ECRIS</span> <span class="kw">PREM</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]           <span class="cmt">; → A</span>
+<span class="kw">ECRIS</span> <span class="kw">DER</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]            <span class="cmt">; → C</span>
+<span class="kw">ECRIS</span> <span class="kw">SP</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]             <span class="cmt">; → [B C]</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="num">2</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]        <span class="cmt">; → B</span>
+<span class="kw">ECRIS</span> <span class="kw">MP</span> <span class="str">"X</span> [ <span class="str">A</span> <span class="str">B</span> ]           <span class="cmt">; ajoute en tête → [X A B]</span>
+<span class="kw">ECRIS</span> <span class="kw">MD</span> <span class="str">"Z</span> [ <span class="str">A</span> <span class="str">B</span> ]           <span class="cmt">; ajoute en queue → [A B Z]</span>
+<span class="kw">ECRIS</span> <span class="kw">PH</span> [ <span class="str">A</span> <span class="str">B</span> ] [ <span class="str">C</span> <span class="str">D</span> ]     <span class="cmt">; phrase (aplatit) → [A B C D]</span>
+<span class="kw">ECRIS</span> <span class="kw">LISTE</span> <span class="str">"A</span> <span class="str">"B</span>             <span class="cmt">; construit [A B]</span>
+<span class="kw">ECRIS</span> <span class="kw">INVERSE</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]       <span class="cmt">; → [C B A]</span>
+<span class="kw">ECRIS</span> <span class="kw">TRIE</span> [ <span class="num">3</span> <span class="num">1</span> <span class="num">2</span> ]          <span class="cmt">; → [1 2 3]</span></code></pre>
+
+  <h3>Afficher des objets</h3>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="str">"BONJOUR</span>            <span class="cmt">; affiche BONJOUR puis retour à la ligne</span>
+<span class="kw">TAPE</span> <span class="str">"BONJOUR</span>             <span class="cmt">; affiche BONJOUR sans retour à la ligne</span>
+<span class="kw">MONTRE</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]        <span class="cmt">; conserve les crochets → [A B C]</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="variables">3. Les variables</h2>
+
+  <p>Une <strong>variable</strong> est un nom qui désigne un objet. On la crée avec
+  <code>DONNE</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"AGE</span> <span class="num">17</span>
+<span class="kw">DONNE</span> <span class="str">"PRENOM</span> <span class="str">"TINTIN</span>
+<span class="kw">DONNE</span> <span class="str">"COULEURS</span> [ <span class="str">ROUGE</span> <span class="str">VERT</span> <span class="str">BLEU</span> ]</code></pre>
+
+  <p>Pour lire la valeur d'une variable, on préfixe son nom de deux-points&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="var">:AGE</span>       <span class="cmt">; → 17</span>
+<span class="kw">ECRIS</span> <span class="var">:PRENOM</span>    <span class="cmt">; → TINTIN</span>
+<span class="kw">AV</span> <span class="var">:AGE</span>          <span class="cmt">; avance de 17 pas</span></code></pre>
+
+  <p>La notation <code>:AGE</code> est l'abréviation de <code>CHOSE "AGE</code>.
+  On peut modifier la valeur d'une variable simplement en lui redonnant&nbsp;:</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"COMPTEUR</span> <span class="num">0</span>
+<span class="kw">DONNE</span> <span class="str">"COMPTEUR</span> <span class="var">:COMPTEUR</span> + <span class="num">1</span>   <span class="cmt">; incrémente de 1</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="procedures">4. Les procédures</h2>
+
+  <p>La grande idée de Logo, c'est qu'on peut <strong>apprendre de nouveaux mots</strong>
+  à GoLogo. Une procédure, c'est exactement ça&nbsp;: une commande que vous inventez
+  vous-même.</p>
+
+  <h3>Définir une procédure simple</h3>
+
+  <p>On définit une procédure avec <code>POUR</code> suivi de son nom, et on la
+  termine par <code>FIN</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> CARRE
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>GoLogo répond <code>VOUS VENEZ DE DEFINIR CARRE</code> et, à partir de ce
+  moment, <code>CARRE</code> est une commande à part entière&nbsp;:</p>
+
+  <pre><code><span class="kw">CARRE</span>
+<span class="kw">TD</span> <span class="num">30</span>
+<span class="kw">CARRE</span></code></pre>
+
+  <h3>Procédures avec paramètres</h3>
+
+  <p>Un paramètre permet de passer une valeur à la procédure au moment de l'appel.
+  On le déclare avec un deux-points dans la ligne <code>POUR</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> POLYGONE <span class="var">:N</span> <span class="var">:COTE</span>
+  <span class="kw">REPETE</span> <span class="var">:N</span> [ <span class="kw">AV</span> <span class="var">:COTE</span> <span class="kw">TD</span> <span class="num">360</span> / <span class="var">:N</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>On appelle cette procédure en lui passant ses deux arguments&nbsp;:</p>
+
+  <pre><code><span class="kw">POLYGONE</span> <span class="num">3</span> <span class="num">100</span>    <span class="cmt">; triangle</span>
+<span class="kw">POLYGONE</span> <span class="num">4</span> <span class="num">80</span>     <span class="cmt">; carré</span>
+<span class="kw">POLYGONE</span> <span class="num">6</span> <span class="num">60</span>     <span class="cmt">; hexagone</span>
+<span class="kw">POLYGONE</span> <span class="num">12</span> <span class="num">30</span>    <span class="cmt">; dodécagone (ressemble à un cercle)</span></code></pre>
+
+  <h3>Procédures qui retournent une valeur (opérations)</h3>
+
+  <p>Une procédure peut aussi calculer et retourner un résultat grâce à
+  <code>RENDS</code>. Elle devient alors une <em>opération</em>, utilisable
+  partout où GoLogo attend une valeur&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> DOUBLE <span class="var">:N</span>
+  <span class="kw">RENDS</span> <span class="var">:N</span> * <span class="num">2</span>
+<span class="kw">FIN</span>
+
+<span class="kw">ECRIS</span> <span class="kw">DOUBLE</span> <span class="num">5</span>       <span class="cmt">; → 10</span>
+<span class="kw">AV</span> <span class="kw">DOUBLE</span> <span class="num">30</span>          <span class="cmt">; avance de 60 pas</span></code></pre>
+
+  <h3>Variables locales</h3>
+
+  <p>À l'intérieur d'une procédure, il est souvent utile de déclarer des variables
+  locales, des variables qui n'existent que dans cette procédure et qui n'affectent
+  pas les variables globales du même nom&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> CERCLE_APPROX <span class="var">:R</span>
+  <span class="kw">LOCAL</span> <span class="str">"PAS</span>
+  <span class="kw">DONNE</span> <span class="str">"PAS</span> <span class="num">2</span> * <span class="kw">PI</span> * <span class="var">:R</span> / <span class="num">360</span>
+  <span class="kw">REPETE</span> <span class="num">360</span> [ <span class="kw">AV</span> <span class="var">:PAS</span> <span class="kw">TD</span> <span class="num">1</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="boucles">5. Les boucles</h2>
+
+  <h3>REPETE</h3>
+
+  <p><code>REPETE n [ instructions ]</code> exécute les instructions <em>n</em>
+  fois. C'est la boucle la plus simple et la plus utilisée&nbsp;:</p>
+
+  <pre><code><span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]          <span class="cmt">; carré</span>
+<span class="kw">REPETE</span> <span class="num">360</span> [ <span class="kw">AV</span> <span class="num">1</span> <span class="kw">TD</span> <span class="num">1</span> ]          <span class="cmt">; cercle</span>
+<span class="kw">REPETE</span> <span class="num">12</span> [ <span class="kw">CARRE</span> <span class="kw">TD</span> <span class="num">30</span> ]         <span class="cmt">; rosace</span></code></pre>
+
+  <p>Dans une boucle REPETE, <code>COMPTEUR</code> retourne le numéro de
+  l'itération en cours (1, 2, 3…)&nbsp;:</p>
+
+  <pre><code><span class="kw">REPETE</span> <span class="num">5</span> [ <span class="kw">AV</span> <span class="kw">COMPTEUR</span> * <span class="num">20</span> <span class="kw">TD</span> <span class="num">90</span> ]   <span class="cmt">; spirale carrée</span></code></pre>
+
+  <div class="note">
+    <strong>Lignes trop longues&nbsp;?</strong> Un <code>~</code> (tilde) en fin de ligne
+    indique que l'instruction <em>continue sur la ligne suivante</em>, pratique pour aérer
+    une boucle avec des listes imbriquées. Ainsi <code>REPETE 6 ~</code> suivi de la liste
+    <code>[ … ]</code> sur les lignes suivantes revient à tout écrire sur une seule ligne.
+    (Le caractère <code>!</code> joue le même rôle, hérité du Logo du MO5.)
+  </div>
+
+  <h3>REPETEPOUR</h3>
+
+  <p><code>REPETEPOUR</code> est une boucle <em>pour</em> (for) avec compteur&nbsp;:
+  une variable prend successivement les valeurs de départ à fin, par pas&nbsp;:</p>
+
+  <pre><code><span class="kw">REPETEPOUR</span> [ I <span class="num">1</span> <span class="num">10</span> ] [ <span class="kw">ECRIS</span> <span class="var">:I</span> ]           <span class="cmt">; de 1 à 10</span>
+<span class="kw">REPETEPOUR</span> [ I <span class="num">0</span> <span class="num">100</span> <span class="num">10</span> ] [ <span class="kw">AV</span> <span class="var">:I</span> <span class="kw">TD</span> <span class="num">90</span> ]   <span class="cmt">; spirale par pas de 10</span></code></pre>
+
+  <h3>TANTQUE</h3>
+
+  <p><code>TANTQUE</code> est une boucle <em>tant que</em> (while)&nbsp;: elle
+  continue tant que sa condition est vraie.</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"N</span> <span class="num">1</span>
+<span class="kw">TANTQUE</span> [ <span class="var">:N</span> &lt; <span class="num">100</span> ] [
+  <span class="kw">AV</span> <span class="var">:N</span>
+  <span class="kw">TD</span> <span class="num">91</span>
+  <span class="kw">DONNE</span> <span class="str">"N</span> <span class="var">:N</span> + <span class="num">1</span>
+]</code></pre>
+
+  <h3>POURCHAQUE</h3>
+
+  <p><code>POURCHAQUE</code> parcourt chaque élément d'une liste. L'élément courant
+  est disponible sous le nom <code>:?</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POURCHAQUE</span> [ <span class="num">1</span> <span class="num">2</span> <span class="num">3</span> <span class="num">4</span> <span class="num">5</span> ] [ <span class="kw">AV</span> <span class="var">:?</span> * <span class="num">10</span> <span class="kw">TD</span> <span class="num">90</span> ]
+
+<span class="kw">POURCHAQUE</span> [ <span class="str">ROUGE</span> <span class="str">VERT</span> <span class="str">BLEU</span> ] [
+  <span class="kw">ECRIS</span> <span class="var">:?</span>
+]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="conditions">6. Les conditions</h2>
+
+  <h3>SI</h3>
+
+  <p><code>SI</code> exécute des instructions selon qu'une condition est vraie ou
+  fausse&nbsp;:</p>
+
+  <pre><code><span class="kw">SI</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">ECRIS</span> <span class="str">"POSITIF</span> ]
+<span class="kw">SI</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">ECRIS</span> <span class="str">"POSITIF</span> ] [ <span class="kw">ECRIS</span> <span class="str">"NEGATIF_OU_NUL</span> ]</code></pre>
+
+  <p>La forme à deux listes est équivalente à un si/sinon. L'alias
+  <code>SISINON</code> exprime la même chose de manière plus explicite.</p>
+
+  <h3>Les prédicats</h3>
+
+  <p>Un <em>prédicat</em> est une opération qui retourne <code>VRAI</code> ou
+  <code>FAUX</code>. Tous les prédicats Logo se terminent par <code>?</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">EGAL?</span> <span class="num">3</span> <span class="num">3</span>             <span class="cmt">; → VRAI</span>
+<span class="kw">ECRIS</span> <span class="kw">PLP?</span> <span class="num">2</span> <span class="num">5</span>              <span class="cmt">; 2 < 5 → VRAI</span>
+<span class="kw">ECRIS</span> <span class="kw">PLG?</span> <span class="num">8</span> <span class="num">3</span>              <span class="cmt">; 8 > 3 → VRAI</span>
+<span class="kw">ECRIS</span> <span class="kw">VIDE?</span> [ ]             <span class="cmt">; liste vide ? → VRAI</span>
+<span class="kw">ECRIS</span> <span class="kw">NOMBRE?</span> <span class="str">"BONJOUR</span>     <span class="cmt">; est un nombre ? → FAUX</span>
+<span class="kw">ECRIS</span> <span class="kw">MEMBRE?</span> <span class="str">"B</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ] <span class="cmt">; B dans la liste ? → VRAI</span></code></pre>
+
+  <p>Les opérateurs <code>ET</code>, <code>OU</code> et <code>NON</code> combinent
+  les prédicats&nbsp;:</p>
+
+  <pre><code><span class="kw">SI</span> <span class="kw">ET</span> <span class="kw">PLP?</span> <span class="var">:N</span> <span class="num">0</span> <span class="kw">PLG?</span> <span class="var">:N</span> <span class="num">100</span> [ <span class="kw">ECRIS</span> <span class="str">"ENTRE_0_ET_100</span> ]
+<span class="kw">SI</span> <span class="kw">NON</span> <span class="kw">VIDE?</span> <span class="var">:LISTE</span> [ <span class="kw">ECRIS</span> <span class="kw">PREM</span> <span class="var">:LISTE</span> ]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="recursion">7. La récursion</h2>
+
+  <p>En Logo, une procédure peut <em>s'appeler elle-même</em>. C'est ce qu'on
+  appelle la <strong>récursion</strong>. C'est l'outil idéal pour des structures
+  qui se répètent à différentes échelles.</p>
+
+  <p>L'exemple le plus simple est un compte à rebours&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> COMPTE <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> = <span class="num">0</span> [ <span class="kw">ECRIS</span> <span class="str">"DECOLLAGE</span> <span class="kw">STOP</span> ]
+  <span class="kw">ECRIS</span> <span class="var">:N</span>
+  <span class="kw">COMPTE</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">FIN</span>
+
+<span class="kw">COMPTE</span> <span class="num">5</span></code></pre>
+
+  <p>La récursion est aussi la façon naturelle de parcourir une liste&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> AFFICHE_TOUT <span class="var">:LISTE</span>
+  <span class="kw">SI</span> <span class="kw">VIDE?</span> <span class="var">:LISTE</span> [ <span class="kw">STOP</span> ]
+  <span class="kw">ECRIS</span> <span class="kw">PREM</span> <span class="var">:LISTE</span>
+  <span class="kw">AFFICHE_TOUT</span> <span class="kw">SP</span> <span class="var">:LISTE</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Et pour les dessins fractals, c'est irremplaçable (voir la page
+  <a href="exemples.html">Programmes exemples</a>).</p>
+
+  <div class="note">
+    <strong>Récursion sans souci.</strong> Une procédure peut s'appeler elle-même un
+    très grand nombre de fois sans ralentir ni bloquer GoLogo. Et si une boucle
+    récursive tourne sans fin, on l'arrête à tout moment avec
+    <kbd>Ctrl</kbd>+<kbd>C</kbd>.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="arret">8. Contrôle du flux dans les procédures</h2>
+
+  <p>Trois instructions permettent de quitter une procédure en cours
+  d'exécution&nbsp;:</p>
+
+  <ul>
+    <li><code>STOP</code>&nbsp;: quitte la procédure courante (pour les commandes).</li>
+    <li><code>RENDS <em>valeur</em></code>&nbsp;: quitte la procédure et retourne une
+      valeur (pour les opérations).</li>
+    <li><code>LOGO</code>&nbsp;: arrêt total, remonte au REPL quelle que soit la
+      profondeur de l'appel.</li>
+  </ul>
+
+  <pre><code><span class="kw">POUR</span> AVANCE_SI_OK <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> &lt; <span class="num">0</span> [ <span class="kw">STOP</span> ]        <span class="cmt">; on ne fait rien si N négatif</span>
+  <span class="kw">AV</span> <span class="var">:N</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> SIGNE <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">RENDS</span> <span class="num">1</span> ]
+  <span class="kw">SI</span> <span class="var">:N</span> &lt; <span class="num">0</span> [ <span class="kw">RENDS</span> -<span class="num">1</span> ]
+  <span class="kw">RENDS</span> <span class="num">0</span>
+<span class="kw">FIN</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="graphisme">9. Graphisme avancé</h2>
+
+  <h3>Cercle et arc</h3>
+
+  <pre><code><span class="kw">CERCLE</span> <span class="num">50</span>              <span class="cmt">; cercle de rayon 50, centré sur la tortue</span>
+<span class="kw">ARC</span> <span class="num">60</span> <span class="num">0</span> <span class="num">90</span>           <span class="cmt">; arc de rayon 60, de 0° à 90° (quart de cercle)</span>
+<span class="kw">ARC</span> <span class="num">40</span> <span class="num">45</span> <span class="num">315</span>         <span class="cmt">; arc de 45° à 315° (¾ de cercle)</span></code></pre>
+
+  <p>La tortue ne bouge pas, elle reste au centre du cercle ou de l'arc.</p>
+
+  <h3>Remplissage</h3>
+
+  <pre><code><span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]   <span class="cmt">; on trace d'abord la forme</span>
+<span class="kw">REMPLIS</span>                       <span class="cmt">; puis on remplit la zone qui contient la tortue</span></code></pre>
+
+  <p>Pour choisir une couleur de remplissage différente de la couleur du crayon&nbsp;:</p>
+
+  <pre><code><span class="kw">FCC</span> <span class="num">7</span>     <span class="cmt">; crayon blanc pour le contour</span>
+<span class="kw">FCR</span> <span class="num">1</span>     <span class="cmt">; remplissage rouge</span>
+<span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">REMPLIS</span></code></pre>
+
+  <h3>Épaisseur du trait</h3>
+
+  <pre><code><span class="kw">FIXETAILLECRAYON</span> <span class="num">5</span>
+<span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">90</span> ]   <span class="cmt">; carré avec trait épais</span>
+<span class="kw">FIXETAILLECRAYON</span> <span class="num">2</span>            <span class="cmt">; retour à l'épaisseur normale</span></code></pre>
+
+  <h3>Écrire dans le champ graphique</h3>
+
+  <pre><code><span class="kw">FCC</span> <span class="num">3</span>
+<span class="kw">ETIQUETTE</span> <span class="str">"BONJOUR</span>           <span class="cmt">; écrit à la position de la tortue</span></code></pre>
+
+  <h3>Sauvegarder le dessin</h3>
+
+  <pre><code><span class="kw">SAUVEPNG</span> <span class="str">"MON_DESSIN</span>         <span class="cmt">; sauve en MON_DESSIN.PNG</span>
+<span class="kw">COPIE</span>                        <span class="cmt">; capture d'écran numérotée dans Logo/PRINTER/</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="texte">10. Zone de texte et affichage</h2>
+
+  <p>En dehors du champ graphique, GoLogo dispose d'une zone de texte avec une
+  grille de 40 colonnes sur 25 lignes. C'est là que les commandes <code>ECRIS</code>
+  et <code>TAPE</code> écrivent.</p>
+
+  <pre><code><span class="kw">ME</span> <span class="num">5</span>           <span class="cmt">; montre 5 lignes de texte sous le champ graphique</span>
+<span class="kw">ME</span> <span class="num">25</span>          <span class="cmt">; plein texte (masque le champ graphique)</span>
+<span class="kw">VT</span>             <span class="cmt">; vide la zone de texte</span>
+<span class="kw">FCURS</span> [ <span class="num">10</span> <span class="num">5</span> ] <span class="cmt">; place le curseur texte à la colonne 10, ligne 5</span>
+<span class="kw">FCT</span> <span class="num">3</span>          <span class="cmt">; texte en jaune</span>
+<span class="kw">FCFT</span> <span class="num">0</span>         <span class="cmt">; fond du texte en noir</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="clavier">11. Lire le clavier et la souris</h2>
+
+  <h3>Clavier</h3>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"C</span> <span class="kw">LISCAR</span>          <span class="cmt">; attend un caractère, le range dans C</span>
+<span class="kw">DONNE</span> <span class="str">"L</span> <span class="kw">LL</span>              <span class="cmt">; attend une ligne entière → liste de mots</span>
+<span class="kw">SI</span> <span class="kw">TOUCHE?</span> [ <span class="kw">ECRIS</span> <span class="kw">LISCAR</span> ]   <span class="cmt">; si une touche est disponible, la lit</span></code></pre>
+
+  <p>Pour poser une question à l'utilisateur&nbsp;:</p>
+
+  <pre><code><span class="kw">LIS</span> [ QUEL EST TON PRENOM ] <span class="str">"PRENOM</span>
+<span class="kw">ECRIS</span> <span class="kw">MOT</span> <span class="str">"BONJOUR_</span> <span class="var">:PRENOM</span></code></pre>
+
+  <h3>Souris</h3>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">SOURISPOS</span>           <span class="cmt">; [x y] si le curseur est dans le champ</span>
+<span class="kw">SI</span> <span class="kw">SOURISPRESSEE</span> [ <span class="kw">ECRIS</span> <span class="str">"CLIC</span> ]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="musique">12. Musique</h2>
+
+  <p>GoLogo peut jouer des notes. Les notes s'écrivent avec leurs noms de solfège&nbsp;:</p>
+
+  <pre><code><span class="kw">JOUE</span> <span class="str">"DO</span>
+<span class="kw">JOUE</span> [ <span class="str">DO</span> <span class="str">RE</span> <span class="str">MI</span> <span class="str">FA</span> <span class="str">SOL</span> <span class="str">LA</span> <span class="str">SI</span> ]
+<span class="kw">JOUE</span> [ <span class="str">DO</span> <span class="str">RE#</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">LA</span> ]   <span class="cmt">; avec un dièse</span></code></pre>
+
+  <p>On règle l'octave, la durée, le tempo et le timbre&nbsp;:</p>
+
+  <pre><code><span class="kw">OCTAVE</span> <span class="num">5</span>         <span class="cmt">; octave aiguë (1 à 5, défaut 4)</span>
+<span class="kw">DUREE</span> <span class="num">12</span>         <span class="cmt">; notes plus courtes (1 à 96, défaut 24)</span>
+<span class="kw">TEMPO</span> <span class="num">10</span>         <span class="cmt">; plus rapide (1 à 255, défaut 5)</span>
+<span class="kw">TIMBRE</span> <span class="num">192</span>       <span class="cmt">; son sinusoïdal (0=carré, 64=scie, 128=triangle, 192=sinus)</span>
+<span class="kw">JOUE</span> [ <span class="str">DO</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">DO</span> ]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="fichiers">13. Fichiers</h2>
+
+  <p>Les fichiers Logo (<code>.GLG</code>) sont stockés dans le dossier
+  <code>~/Logo/</code> sous Linux/macOS, ou dans <code>Documents\Logo\</code>
+  sous Windows. Il n'y a pas besoin de préciser le chemin complet.</p>
+
+  <pre><code><span class="kw">SAUVE</span> <span class="str">"PROJET</span> <span class="kw">CONTENU</span>    <span class="cmt">; sauve tout dans PROJET.GLG</span>
+<span class="kw">RAMENE</span> <span class="str">"PROJET</span>            <span class="cmt">; charge et exécute PROJET.GLG</span>
+<span class="kw">CHARGE</span> <span class="str">"PROJET</span>            <span class="cmt">; charge dans l'éditeur sans exécuter</span>
+<span class="kw">CATALOGUE</span>                 <span class="cmt">; liste les fichiers disponibles</span>
+<span class="kw">DETRUIS</span> <span class="str">"PROJET</span>           <span class="cmt">; supprime le fichier</span></code></pre>
+
+  <h3>Les exemples fournis avec GoLogo</h3>
+
+  <p>GoLogo est livré avec un dossier d'<strong>exemples</strong> prêts à charger.
+  Trois commandes, terminées par <code>EX</code>, fonctionnent exactement comme leurs
+  homologues mais vont chercher dans ce dossier (en lecture seule)&nbsp;:</p>
+
+  <pre><code><span class="kw">CATALOGUEEX</span>               <span class="cmt">; liste les exemples disponibles (comme CATALOGUE)</span>
+<span class="kw">RAMENEEX</span> <span class="str">"MANDELBROT</span>      <span class="cmt">; charge et exécute un exemple (comme RAMENE)</span>
+<span class="kw">CHARGEEX</span> <span class="str">"MANDELBROT</span>      <span class="cmt">; ouvre un exemple dans l'éditeur (comme CHARGE)</span></code></pre>
+
+  <p>L'emplacement du dossier d'exemples dépend du système (il est installé avec
+  GoLogo). Si le dossier ou le fichier demandé est introuvable, la commande le signale.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="espacedetravail">14. Espace de travail</h2>
+
+  <p>GoLogo conserve en mémoire toutes les procédures et variables définies pendant
+  la session. On peut les consulter et les gérer&nbsp;:</p>
+
+  <pre><code><span class="kw">IMTOUT</span>             <span class="cmt">; affiche toutes les procédures et variables</span>
+<span class="kw">IMTS</span>               <span class="cmt">; affiche seulement les titres des procédures</span>
+<span class="kw">IM</span> <span class="str">"CARRE</span>           <span class="cmt">; affiche la définition de CARRE</span>
+<span class="kw">EFP</span> <span class="str">"CARRE</span>          <span class="cmt">; efface la procédure CARRE</span>
+<span class="kw">EFN</span> <span class="str">"AGE</span>            <span class="cmt">; efface la variable AGE</span>
+<span class="kw">.EFT</span>               <span class="cmt">; efface tout (procédures et variables)</span>
+<span class="kw">RAZ</span>                <span class="cmt">; remet tout à zéro (demande confirmation)</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="messages">15. Messages d'erreur courants</h2>
+
+  <p>Quand GoLogo ne comprend pas ce qu'on lui demande, il répond avec un
+  message d'erreur explicite&nbsp;:</p>
+
+  <table>
+    <tr><th>Message</th><th>Cause</th></tr>
+    <tr><td><code>COMMENT FAIRE MACHIN</code></td><td>La commande MACHIN n'existe pas (faute de frappe ?)</td></tr>
+    <tr><td><code>PAS ASSEZ DE DONNEES POUR AV</code></td><td>Un argument manque à AV</td></tr>
+    <tr><td><code>QUE FAIRE DE 42</code></td><td>Une opération a retourné 42 mais personne ne l'utilise</td></tr>
+    <tr><td><code>… N'AIME PAS …</code></td><td>Le type de l'argument est incorrect</td></tr>
+    <tr><td><code>LA TORTUE VA SORTIR</code></td><td>Déplacement hors du champ en mode CLOS</td></tr>
+    <tr><td><code>PAS DE CHOSE DONNEE A X</code></td><td>La variable X n'existe pas</td></tr>
+    <tr><td><code>INTERROMPU !</code></td><td>Vous avez appuyé sur Ctrl+C</td></tr>
+  </table>
+
+  <p>En cas d'erreur, GoLogo précise aussi la procédure fautive&nbsp;:
+  <code>… N'AIME PAS 42 DANS CARRE</code>. Cela aide à localiser le problème.</p>
+
+</main>
+</body>
+</html>

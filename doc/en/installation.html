@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoLogo · Installation</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
+    <li><a href="installation.html" class="active">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html">From the square to the arcade</a></li>
+    <li><a href="language.html">The Logo language</a></li>
+    <li><a href="examples.html">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Installation</h1>
+    <p>Download and install GoLogo on Windows, Linux and macOS.</p>
+  </div>
+
+  <p>GoLogo ships as ready-to-use binaries for Windows, Linux and macOS. They are
+  available from the
+  <a href="https://github.com/clamy54/gologo/releases" target="_blank" rel="noopener">Releases</a>
+  section of the GitHub repository. Pick the file that matches your system, then
+  follow the steps below.</p>
+
+  <div class="attention">
+    <strong>Unsigned binaries.</strong> On Windows and macOS the executables are not
+    digitally signed. The first time you run the program, your operating system may
+    show a security warning&nbsp;: this is normal. How to handle it is explained below,
+    under <a href="#security">Security warnings</a>.
+  </div>
+
+  <h2>Windows</h2>
+
+  <p>A standard installer is provided.</p>
+
+  <ol>
+    <li>From the Releases page, download the Windows installer
+        (<code>GoLogo-Setup-<em>x.x</em>.exe</code>).</li>
+    <li>Double-click it and follow the wizard (install folder, optional desktop
+        shortcut).</li>
+    <li>GoLogo then appears in the Start menu. The example programs are installed
+        next to the executable.</li>
+  </ol>
+
+  <p>On the very first launch, see the
+  <a href="#security-windows">Windows SmartScreen</a> note below.</p>
+
+  <h2>Linux (Debian / Ubuntu)</h2>
+
+  <p>A <code>.deb</code> package is provided for Debian-based distributions (Debian,
+  Ubuntu, Linux Mint...), 64-bit architecture (amd64).</p>
+
+  <ol>
+    <li>From the Releases page, download the package
+        (<code>gologo_<em>x.x</em>_amd64.deb</code>).</li>
+    <li>Install it with <code>apt</code>, which handles dependencies
+        automatically&nbsp;:
+      <pre><code>sudo apt install ./gologo_<em>x.x</em>_amd64.deb</code></pre>
+    </li>
+    <li>Run <code>gologo</code> from a terminal or from the applications menu. The
+        example programs are installed in
+        <code>/usr/share/doc/gologo/examples</code>.</li>
+  </ol>
+
+  <p>The Linux package is not affected by the signing warnings&nbsp;: it installs
+  normally.</p>
+
+  <h2>macOS (Apple Silicon)</h2>
+
+  <div class="attention">
+    <strong>Apple Silicon only.</strong> The macOS build runs only on Apple Silicon
+    Macs (M1 and later&nbsp;: M1, M2, M3...). Intel-based Macs are not supported.
+  </div>
+
+  <ol>
+    <li>From the Releases page, download the macOS archive and unzip it.</li>
+    <li>Drag <code>GoLogo.app</code> into your <strong>Applications</strong> folder.</li>
+    <li>On the first launch, see the
+        <a href="#security-macos">macOS Gatekeeper</a> note below.</li>
+  </ol>
+
+  <h2 id="security">Security warnings</h2>
+
+  <p>GoLogo is free software. The executables are <strong>not digitally signed</strong>
+  (code signing certificates are expensive and not justified for a free application).
+  Because of this, your operating system may display a security warning the first time
+  you run the program. This is normal and expected&nbsp;: here is how to handle it on
+  each platform.</p>
+
+  <h3 id="security-windows">Windows</h3>
+
+  <p>When you run GoLogo for the first time, Windows SmartScreen may show a blue
+  warning window saying &ldquo;Windows protected your PC&rdquo;.</p>
+
+  <ol>
+    <li>Click <strong>More info</strong> (the link below the warning text).</li>
+    <li>Click <strong>Run anyway</strong>.</li>
+  </ol>
+
+  <p>This warning only appears once. After that, Windows remembers your choice and
+  won't ask again.</p>
+
+  <h3 id="security-macos">macOS</h3>
+
+  <p>macOS Gatekeeper blocks applications from unidentified developers by default. When
+  you try to open GoLogo for the first time, you will see a message saying the app
+  &ldquo;can't be opened because it is from an unidentified developer&rdquo; (or
+  &ldquo;Apple cannot check it for malicious software&rdquo;).</p>
+
+  <ol>
+    <li>Close the warning dialog.</li>
+    <li>Open <strong>System Settings</strong> (Apple menu &gt; System Settings).</li>
+    <li>Go to <strong>Privacy &amp; Security</strong>.</li>
+    <li>Scroll down&nbsp;: you will see a message saying GoLogo was blocked. Click
+        <strong>Open Anyway</strong>.</li>
+    <li>Enter your password or use Touch ID to confirm.</li>
+    <li>A new dialog appears&nbsp;: click <strong>Open</strong>.</li>
+  </ol>
+
+  <p>This authorization only needs to be done once. After that, macOS lets you open
+  GoLogo normally.</p>
+
+</main>
+</body>
+</html>

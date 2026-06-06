@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Du carré au jeu vidéo · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="tortue GoLogo">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Démarrer</li>
+    <li><a href="index.html">Présentation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Apprendre</li>
+    <li><a href="parcours.html" class="active">Du carré au jeu vidéo</a></li>
+    <li><a href="langage.html">Le langage Logo</a></li>
+    <li><a href="exemples.html">Programmes exemples</a></li>
+    <li class="section-title">Référence</li>
+    <li><a href="interface.html">Interface &amp; raccourcis</a></li>
+    <li><a href="commandes.html">Toutes les commandes</a></li>
+    <li><a href="index-commandes.html">Index des commandes</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Du carré au jeu vidéo</h1>
+    <p>Un parcours pas à pas : tu commences par un trait, tu finis par ton propre jeu</p>
+  </div>
+
+  <p>Ce parcours est fait pour être suivi dans l'ordre, du début à la fin. Chaque
+  étape débloque un nouveau pouvoir et se termine par un petit défi <em>« à toi de
+  jouer »</em>. Tu n'as besoin de rien connaître au départ. À l'arrivée, tu auras
+  programmé un vrai petit jeu, un casse-brique, en assemblant tout ce que tu auras
+  appris en chemin.</p>
+
+  <div class="conseil">
+    Recopie chaque programme dans l'éditeur (<code>ED</code>), valide avec
+    <kbd>Ctrl</kbd>+<kbd>S</kbd> (sur Mac&nbsp;: <kbd>⌘</kbd>+<kbd>S</kbd>), puis lance
+    la commande depuis l'invite <code>?</code>. Change les nombres, observe&nbsp;: c'est
+    en bricolant qu'on comprend.
+  </div>
+
+  <p>Les étapes&nbsp;:
+    <a href="#e1">1. Le premier trait</a> ·
+    <a href="#e2">2. La paresse intelligente</a> ·
+    <a href="#e3">3. Inventer ses mots</a> ·
+    <a href="#e4">4. Assembler des briques</a> ·
+    <a href="#e5">5. Ta première erreur</a> ·
+    <a href="#e6">6. Décider</a> ·
+    <a href="#e7">7. Se souvenir</a> ·
+    <a href="#e8">8. L'effet waouh</a> ·
+    <a href="#e9">9. Ça bouge</a> ·
+    <a href="#e10">10. Dessine tes formes</a> ·
+    <a href="#e11">11. La balle qui rebondit</a> ·
+    <a href="#e12">12. Ton jeu</a>
+  </p>
+
+  <!-- ============================================================ -->
+  <h2 id="e1">Étape 1. Le premier trait</h2>
+
+  <p>Au lancement, tape <code>MT</code> (Montre Tortue) pour faire apparaître la zone
+  graphique. La tortue est là, au centre, pointée vers le haut. Donne-lui un ordre&nbsp;:</p>
+
+  <pre><code>? <span class="kw">AVANCE</span> <span class="num">100</span>
+? <span class="kw">TD</span> <span class="num">90</span>
+? <span class="kw">AVANCE</span> <span class="num">100</span></code></pre>
+
+  <p>Elle avance, tourne à droite, avance encore. <code>AVANCE</code> (ou <code>AV</code>)
+  déplace, <code>TD</code> tourne à droite, <code>TG</code> tourne à gauche. Avec ça
+  seul, tu peux déjà tracer un carré, côté par côté.</p>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> termine le carré à la main (quatre
+  <code>AV</code> et quatre <code>TD 90</code>).</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e2">Étape 2. La paresse intelligente</h2>
+
+  <p>Quatre fois la même chose, c'est pénible à taper. Un bon programmeur est
+  paresseux&nbsp;: il fait répéter la machine. C'est le rôle de <code>REPETE</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">90</span> ]</code></pre>
+
+  <p>Le carré en une ligne. Change le <code>4</code> et l'angle pour d'autres
+  polygones&nbsp;: l'angle vaut toujours 360 divisé par le nombre de côtés.</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">3</span> [ <span class="kw">AV</span> <span class="num">120</span> <span class="kw">TD</span> <span class="num">120</span> ]   <span class="cmt">; triangle</span>
+? <span class="kw">REPETE</span> <span class="num">6</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">60</span> ]    <span class="cmt">; hexagone</span></code></pre>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> fais un cercle. Indice&nbsp;: beaucoup de
+  petits pas et de tout petits virages, par exemple <code>REPETE 360 [ AV 5 TD 1 ]</code>.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e3">Étape 3. Inventer ses mots</h2>
+
+  <p>Tu vas vouloir réutiliser ton carré sans le retaper. Alors apprends ce mot
+  nouveau à la tortue, avec <code>POUR</code> … <code>FIN</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> CARRE
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>GoLogo répond <code>VOUS VENEZ DE DEFINIR CARRE</code>. Désormais
+  <code>CARRE</code> est une commande comme les autres. Et pour choisir la taille,
+  ajoute un <em>paramètre</em>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> CARRE <span class="var">:COTE</span>
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="var">:COTE</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <pre><code>? <span class="kw">CARRE</span> <span class="num">50</span>
+? <span class="kw">CARRE</span> <span class="num">150</span></code></pre>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> écris <code>POLYGONE :N :COTE</code> qui
+  trace un polygone à <code>:N</code> côtés. (Rappel&nbsp;: l'angle est
+  <code>360 / :N</code>.)</p>
+
+  <img class="shot" src="../images/ex-rosace.png" alt="rosace de carrés">
+  <p class="shot-cap">Douze appels à CARRE en tournant un peu à chaque fois&nbsp;: une rosace.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e4">Étape 4. Assembler des briques</h2>
+
+  <p>Un gros programme, c'est juste des petits programmes mis bout à bout. Définis un
+  mur et un toit, puis une maison qui s'en sert&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> MUR
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> TOIT
+  <span class="kw">REPETE</span> <span class="num">3</span> [ <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">120</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> MAISON
+  <span class="kw">VE</span> <span class="kw">MUR</span> <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">30</span> <span class="kw">TOIT</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Voilà l'idée la plus importante de la programmation&nbsp;: découper un gros
+  problème en petits morceaux qu'on sait résoudre.</p>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> ajoute une <code>PORTE</code> à la maison.
+  Pense à lever le crayon (<code>LC</code>) pour déplacer la tortue sans tracer, et à
+  le baisser (<code>BC</code>) avant de dessiner.</p>
+
+  <img class="shot" src="../images/ex-maison.png" alt="maison">
+  <p class="shot-cap">MAISON&nbsp;: un mur carré surmonté d'un toit triangulaire.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e5">Étape 5. Ta première erreur</h2>
+
+  <p>C'est ici que tu apprends quelque chose que les blocs colorés ne t'apprendront
+  jamais&nbsp;: <strong>lire une erreur et la corriger</strong>. Tape exprès une
+  bêtise&nbsp;:</p>
+
+  <pre><code>? <span class="kw">AVANCE</span> <span class="str">BONJOUR</span></code></pre>
+
+  <p>GoLogo proteste&nbsp;: <code>AVANCE N'AIME PAS BONJOUR</code>. Il ne te dit pas
+  « non » bêtement&nbsp;: il t'explique. <code>AVANCE</code> attend un nombre, pas un
+  mot. Autre classique&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CARRR</span> <span class="num">50</span>
+<span class="cmt">COMMENT FAIRE CARRR ?</span></code></pre>
+
+  <p>Une faute de frappe&nbsp;: GoLogo ne connaît pas <code>CARRR</code>. Tu corriges,
+  tu réessaies. <strong>C'est ça, programmer pour de vrai</strong>&nbsp;: on se trompe,
+  on lit le message, on corrige. Ce réflexe te servira dans tous les langages, plus
+  tard.</p>
+
+  <div class="note">
+    Les messages d'erreur de GoLogo sont écrits pour être compris. Si un jour tu
+    bloques, relis le message&nbsp;: il nomme presque toujours la commande fautive.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="e6">Étape 6. Décider</h2>
+
+  <p>Un programme intéressant ne fait pas toujours la même chose&nbsp;: il
+  <em>décide</em>. La commande <code>SI</code> exécute des instructions seulement si
+  une condition est vraie&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SI</span> <span class="num">3</span> > <span class="num">2</span> [ <span class="kw">ECRIS</span> <span class="str">"PLUS_GRAND</span> ]</code></pre>
+
+  <p>Une condition, c'est une question à laquelle on répond par oui ou par non (en
+  Logo&nbsp;: <code>VRAI</code> ou <code>FAUX</code>). Ces questions finissent toujours
+  par un <code>?</code>&nbsp;: <code>EGAL?</code> (est égal&nbsp;?), <code>PLG?</code>
+  (plus grand&nbsp;?), <code>PLP?</code> (plus petit&nbsp;?). On peut aussi écrire les
+  comparaisons avec les signes <code>=</code>, <code>&gt;</code>, <code>&lt;</code>,
+  comme en maths. Avec une <em>deuxième</em> liste, <code>SI</code> fait «&nbsp;sinon&nbsp;»&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> SIGNE <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">ECRIS</span> <span class="str">"POSITIF</span> ] [ <span class="kw">ECRIS</span> <span class="str">"NEGATIF_OU_NUL</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> écris une procédure qui dit
+  <code>PAIR</code> ou <code>IMPAIR</code> selon le nombre. Indice&nbsp;:
+  <code>RESTE :N 2</code> vaut 0 quand <code>:N</code> est pair.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e7">Étape 7. Se souvenir</h2>
+
+  <p>Pour compter des points, retenir une position, la tortue a besoin de
+  <em>mémoire</em>. Une <strong>variable</strong> est un nom qui retient une valeur.
+  On la crée avec <code>DONNE</code> et on la relit avec deux-points&nbsp;:</p>
+
+  <pre><code>? <span class="kw">DONNE</span> <span class="str">"SCORE</span> <span class="num">0</span>
+? <span class="kw">DONNE</span> <span class="str">"SCORE</span> <span class="var">:SCORE</span> + <span class="num">1</span>
+? <span class="kw">ECRIS</span> <span class="var">:SCORE</span>            <span class="cmt">; affiche 1</span></code></pre>
+
+  <p>« Prends le score, ajoute 1, range-le dans le score. » C'est exactement ainsi
+  qu'on tient un compteur de points dans un jeu. Garde ce mot <code>SCORE</code> en
+  tête&nbsp;: tu vas t'en resservir à la fin.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e8">Étape 8. L'effet waouh</h2>
+
+  <p>Voici une idée surprenante&nbsp;: une procédure a le droit de <em>s'appeler
+  elle-même</em>. C'est comme une poupée russe qui contient une poupée plus petite, qui
+  en contient une encore plus petite… On appelle ça la <strong>récursion</strong>, et
+  c'est parfait pour les dessins qui se répètent en plus petit. Un arbre, par
+  exemple&nbsp;: un tronc, puis deux branches plus petites, et chaque branche est elle
+  aussi un petit arbre&nbsp;! Il faut juste une règle pour s'arrêter, sinon ça continue
+  à l'infini&nbsp;: ici, on arrête quand la branche devient minuscule.</p>
+
+  <pre><code><span class="kw">POUR</span> ARBRE <span class="var">:T</span>
+  <span class="kw">SI</span> <span class="var">:T</span> &lt; <span class="num">10</span> [ <span class="kw">STOP</span> ]      <span class="cmt">; branche trop petite : on arrête</span>
+  <span class="kw">AV</span> <span class="var">:T</span>
+  <span class="kw">TG</span> <span class="num">30</span> <span class="kw">ARBRE</span> <span class="var">:T</span> * <span class="num">0.7</span>
+  <span class="kw">TD</span> <span class="num">60</span> <span class="kw">ARBRE</span> <span class="var">:T</span> * <span class="num">0.7</span>
+  <span class="kw">TG</span> <span class="num">30</span>
+  <span class="kw">RE</span> <span class="var">:T</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> DESSINE_ARBRE
+  <span class="kw">VE</span> <span class="kw">FEN</span> <span class="kw">FCAP</span> <span class="num">0</span> <span class="kw">RE</span> <span class="num">150</span> <span class="kw">ARBRE</span> <span class="num">120</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Lance <code>DESSINE_ARBRE</code>. Quelques lignes, et un arbre entier apparaît.
+  C'est souvent le moment où on attrape le virus.</p>
+
+  <img class="shot" src="../images/ex-arbre.png" alt="arbre fractal">
+  <p class="shot-cap">Chaque branche se divise en deux branches plus petites.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e9">Étape 9. Ça bouge</h2>
+
+  <p>Jusqu'ici la tortue dessinait. Maintenant elle va <em>bouger</em> dans le temps.
+  Deux ingrédients&nbsp;: <code>ATTENDS</code> fait une petite pause (en soixantièmes
+  de seconde), et une boucle répète le mouvement. Voici un sprite qu'on déplace avec
+  les flèches du clavier (la <code>MANETTE 0</code> est émulée par les flèches)&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> PROMENADE
+  <span class="kw">VE</span> <span class="kw">FEN</span>
+  <span class="kw">SPRITE</span> <span class="num">2</span>
+  <span class="kw">TANTQUE</span> [ <span class="kw">NON</span> <span class="kw">BOUTON?</span> <span class="num">0</span> ] [
+    <span class="kw">DONNE</span> <span class="str">"D</span> <span class="kw">MANETTE</span> <span class="num">0</span>
+    <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">1</span> [ <span class="kw">FCAP</span> <span class="num">0</span> <span class="kw">AV</span> <span class="num">10</span> ]     <span class="cmt">; haut</span>
+    <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">5</span> [ <span class="kw">FCAP</span> <span class="num">180</span> <span class="kw">AV</span> <span class="num">10</span> ]   <span class="cmt">; bas</span>
+    <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">FCAP</span> <span class="num">90</span> <span class="kw">AV</span> <span class="num">10</span> ]    <span class="cmt">; droite</span>
+    <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">FCAP</span> <span class="num">270</span> <span class="kw">AV</span> <span class="num">10</span> ]   <span class="cmt">; gauche</span>
+    <span class="kw">ATTENDS</span> <span class="num">2</span>
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Lance <code>PROMENADE</code> et pilote la voiture aux flèches. Appuie sur la barre
+  d'espace (le bouton de tir) pour t'arrêter. <code>TANTQUE</code> répète le bloc
+  <em>tant que</em> sa condition est vraie&nbsp;: ici, tant que le bouton n'est pas
+  pressé.</p>
+
+  <div class="note">
+    Le champ <code>FEN</code> (fenêtre) laisse la tortue se promener sans buter sur les
+    bords. C'est le mode qu'on utilise pour les jeux.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="e10">Étape 10. Dessine tes propres formes</h2>
+
+  <p>Jusqu'ici la tortue avait une forme toute faite. Mais tu peux lui en dessiner une
+  toi-même&nbsp;! La commande <code>DEFSPRITE</code> te laisse créer une forme sur une
+  petite grille de 16 cases sur 16, un peu comme du pixel art. Chaque ligne est une
+  suite de caractères&nbsp;: un point <code>.</code> pour une case vide, une lettre
+  (par exemple <code>X</code>) pour une case pleine. Dessinons une balle ronde et une
+  brique&nbsp;:</p>
+
+  <pre><code><span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+  ..XXXX..
+  .XXXXXX.
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  .XXXXXX.
+  ..XXXX..
+]
+
+<span class="kw">DEFSPRITE</span> <span class="num">4</span> [
+  XXXXXXXXXXXXXX
+  XXXXXXXXXXXXXX
+  XXXXXXXXXXXXXX
+  XXXXXXXXXXXXXX
+]</code></pre>
+
+  <p>Regarde bien la première&nbsp;: si tu plisses les yeux, les <code>X</code>
+  dessinent un rond. La forme numéro 3 est maintenant ta balle ronde, la numéro 4 ta
+  brique. Tu les choisis avec <code>SPRITE</code>, comme les formes toutes faites&nbsp;:</p>
+
+  <pre><code><span class="kw">VE</span> <span class="kw">MT</span>
+<span class="kw">SPRITE</span> <span class="num">3</span>     <span class="cmt">; la tortue devient une balle ronde</span>
+<span class="kw">FCC</span> <span class="num">1</span>        <span class="cmt">; en rouge (la forme prend la couleur du crayon)</span></code></pre>
+
+  <p>Deux choses à retenir&nbsp;: les numéros de tes formes commencent à <strong>3</strong>
+  (0, 1 et 2 sont les formes intégrées, triangle, tortue et voiture), et ta forme prend
+  la <strong>couleur du crayon</strong> (<code>FCC</code>) et tourne avec la tortue.</p>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> dessine ta propre forme, un vaisseau, un
+  cœur, un bonhomme. Tu pourras t'en servir dans le jeu, à la fin&nbsp;: une vraie balle
+  ronde (<code>SPRITE 3</code>) et de vraies briques (<code>SPRITE 4</code>), c'est tout
+  de suite plus joli que des triangles.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e11">Étape 11. La balle qui rebondit</h2>
+
+  <p>Avant de faire un jeu, il manque une brique essentielle&nbsp;: une balle qui
+  <strong>rebondit sur les bords</strong>. Ça a l'air compliqué, mais l'idée est toute
+  simple.</p>
+
+  <p>Imagine que la balle avance par petits pas, image après image. À chaque pas, elle
+  se décale&nbsp;: un peu vers la droite, un peu vers le haut. On range ces deux
+  décalages dans deux variables&nbsp;: <code>:DX</code> (de combien on va vers la
+  <strong>d</strong>roite en <strong>x</strong>) et <code>:DY</code> (de combien on
+  monte en <strong>y</strong>). Tant qu'on ne touche rien, on répète&nbsp;: avance de
+  <code>:DX</code> et de <code>:DY</code>, encore et encore.</p>
+
+  <p>Maintenant, le rebond. Pense à une vraie balle que tu lances contre le mur de
+  droite&nbsp;: elle repart vers la gauche. Son déplacement vertical ne change pas,
+  c'est seulement son déplacement horizontal qui <strong>s'inverse</strong>. En Logo,
+  inverser un nombre, c'est faire <code>0 - :DX</code> (si <code>:DX</code> valait 9,
+  ça donne −9&nbsp;; la balle ira maintenant vers la gauche). Pareil en haut et en
+  bas, mais c'est <code>:DY</code> qui s'inverse. Voilà&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> INITBALLE
+  <span class="kw">VE</span> <span class="kw">FEN</span>
+  <span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+  ..XXXX..
+  .XXXXXX.
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  .XXXXXX.
+  ..XXXX..
+  ]
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">SPRITE</span> <span class="num">3</span> <span class="kw">FCC</span> <span class="num">7</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">0</span> <span class="num">0</span>   <span class="cmt">; on reprend la balle ronde (forme 3) de l'étape 10, en blanc</span>
+  <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">9</span> <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">6</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> REBOND
+  <span class="kw">SI</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> > <span class="num">780</span> [ <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">SI</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> &lt; -<span class="num">780</span> [ <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">SI</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> > <span class="num">480</span> [ <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">SI</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> &lt; -<span class="num">480</span> [ <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">FXY</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> <span class="kw">YCOR</span> + <span class="var">:DY</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> ANIMEBALLE
+  <span class="kw">INITBALLE</span>
+  <span class="kw">REPETE</span> <span class="num">300</span> [ <span class="kw">REBOND</span> <span class="kw">ATTENDS</span> <span class="num">1</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Lance <code>ANIMEBALLE</code>&nbsp;: la balle file en diagonale et rebondit dans
+  tous les coins. Décortiquons <code>REBOND</code>, ligne par ligne&nbsp;:</p>
+
+  <ul>
+    <li><code>XCOR</code> te donne la position gauche-droite de la balle,
+      <code>YCOR</code> sa position bas-haut. Le bord droit de l'écran est à
+      <code>800</code>, le gauche à <code>-800</code>, le haut à <code>500</code>, le
+      bas à <code>-500</code>.</li>
+    <li><code>XCOR + :DX</code>, c'est l'endroit où la balle <em>serait</em> au prochain
+      pas. La 1<sup>re</sup> ligne dit&nbsp;: «&nbsp;si au prochain pas la balle dépasse
+      <code>780</code> (presque le bord droit), alors inverse <code>:DX</code>&nbsp;».
+      Elle repartira vers la gauche au lieu de sortir.</li>
+    <li>Les trois lignes suivantes font pareil pour le bord gauche, le haut et le bas.</li>
+    <li><code>FXY XCOR + :DX YCOR + :DY</code> déplace enfin la balle de son pas (avec
+      la vitesse éventuellement inversée).</li>
+  </ul>
+
+  <p>On vérifie le bord <em>avant</em> de bouger, comme ça la balle ne dépasse jamais.
+  C'est exactement le truc qu'on réutilisera dans le jeu.</p>
+
+  <p><strong>À toi de jouer&nbsp;:</strong> change <code>:DX</code> et <code>:DY</code>
+  pour une balle plus rapide ou plus lente. Mets <code>FIXETAILLECRAYON 6</code> avant
+  et baisse le crayon (<code>BC</code>) pour qu'elle laisse une trace.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e12">Étape 12. Ton jeu : le casse-brique</h2>
+
+  <p>Tu as tout ce qu'il faut. Un casse-brique, ce n'est qu'un assemblage de choses que
+  tu connais déjà&nbsp;: des carrés (les briques), une boucle, des <code>SI</code>, un
+  score, et la balle qui rebondit.</p>
+
+  <p>La nouveauté, c'est qu'on va avoir <strong>plusieurs tortues à l'écran en même
+  temps</strong>, une par objet du jeu. Chaque tortue porte un numéro&nbsp;: la
+  <strong>tortue 0</strong> sera la balle, la <strong>tortue 1</strong> la raquette, et
+  les <strong>tortues 2 à 15</strong> les quatorze briques. Pour donner des ordres à
+  une tortue précise, on tape <code>FIXETORTUE</code> suivi de son numéro&nbsp;: ensuite,
+  les commandes (avancer, se placer, se cacher…) s'adressent à celle-là.</p>
+
+  <h3>Dessiner les formes du jeu</h3>
+
+  <p>On a appris à dessiner ses propres sprites à l'étape 10. Servons-nous-en pour
+  donner de vraies formes à nos objets&nbsp;: une balle ronde (forme 3), une raquette
+  toute en largeur (forme 4) et une brique (forme 5).</p>
+
+  <pre><code><span class="kw">POUR</span> FORMES
+  <span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+    ..XXXX..
+    .XXXXXX.
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    .XXXXXX.
+    ..XXXX..
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">4</span> [
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">5</span> [
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>On choisit ensuite ces formes avec <code>SPRITE 3</code>, <code>SPRITE 4</code>,
+  <code>SPRITE 5</code>, et chaque forme prend la couleur du crayon de sa tortue
+  (<code>FCC</code>)&nbsp;: on fera la balle blanche, la raquette grise et les briques
+  rouges, juste après.</p>
+
+  <h3>Poser les briques</h3>
+
+  <p><code>FIXETORTUE :B</code> choisit la tortue numéro <code>:B</code> (et la crée si
+  elle n'existe pas encore). On veut ranger les 14 briques en grille&nbsp;: 7 colonnes,
+  2 rangées. La boucle <code>REPETEPOUR [ B 2 15 ]</code> fait passer <code>:B</code>
+  par tous les numéros de 2 à 15, une brique à chaque tour&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> POSEBRIQUES
+  <span class="kw">REPETEPOUR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">DONNE</span> <span class="str">"I</span> <span class="var">:B</span> - <span class="num">2</span>
+    <span class="kw">DONNE</span> <span class="str">"COL</span> <span class="kw">RESTE</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">DONNE</span> <span class="str">"LIG</span> <span class="kw">QUOT</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">DONNE</span> <span class="str">"BX</span> <span class="num">100</span> * <span class="var">:COL</span> - <span class="num">300</span>
+    <span class="kw">DONNE</span> <span class="str">"BY</span> <span class="num">70</span> * <span class="var">:LIG</span> + <span class="num">250</span>
+    <span class="kw">FIXETORTUE</span> <span class="var">:B</span> <span class="kw">SPRITE</span> <span class="num">5</span> <span class="kw">FCC</span> <span class="num">1</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="var">:BX</span> <span class="var">:BY</span>
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Chaque brique prend la forme 5 (<code>SPRITE 5</code>) en rouge (<code>FCC 1</code>).
+  Le calcul du milieu peut sembler mystérieux, mais c'est juste de l'arithmétique de
+  grille. On range d'abord la brique à partir de 0 (<code>:I</code> vaut 0 pour la
+  première, 1 pour la deuxième…). Ensuite&nbsp;:</p>
+
+  <ul>
+    <li><code>RESTE :I 7</code> donne la <strong>colonne</strong> (0 à 6)&nbsp;: c'est
+      le reste quand on divise par 7. Pour la 8<sup>e</sup> brique (<code>:I</code> = 7),
+      le reste est 0&nbsp;: on repart à la colonne de gauche.</li>
+    <li><code>QUOT :I 7</code> donne la <strong>rangée</strong> (0 ou 1)&nbsp;: c'est le
+      nombre de fois que 7 rentre dans <code>:I</code>. Les 7 premières briques sont
+      rangée 0, les suivantes rangée 1.</li>
+    <li><code>:BX</code> et <code>:BY</code> transforment colonne et rangée en vraie
+      position à l'écran&nbsp;: on écarte les colonnes de 100 pas et on monte les rangées
+      de 70 pas.</li>
+  </ul>
+
+  <p>Pas besoin de tout retenir&nbsp;: l'important, c'est de voir qu'avec une boucle et
+  un petit calcul, on place 14 briques sans écrire 14 fois la même chose.</p>
+
+  <h3>Préparer la partie</h3>
+
+  <p>On dessine les formes (<code>FORMES</code>), on prépare l'écran, puis on place la
+  balle blanche au centre-bas et la raquette grise tout en bas&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> INITJEU
+  <span class="kw">FORMES</span>
+  <span class="kw">VE</span> <span class="kw">FEN</span> <span class="kw">CT</span>
+  <span class="kw">DONNE</span> <span class="str">"SCORE</span> <span class="num">0</span>
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">SPRITE</span> <span class="num">3</span> <span class="kw">FCC</span> <span class="num">7</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">0</span> -<span class="num">100</span>   <span class="cmt">; la balle, blanche</span>
+  <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">8</span>
+  <span class="kw">FIXETORTUE</span> <span class="num">1</span> <span class="kw">SPRITE</span> <span class="num">4</span> <span class="kw">FCC</span> <span class="num">8</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">0</span> -<span class="num">400</span>   <span class="cmt">; la raquette, grise</span>
+  <span class="kw">POSEBRIQUES</span>
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Casser les briques</h3>
+
+  <p>On passe en revue les 14 briques et, pour chacune, on demande à GoLogo&nbsp;:
+  «&nbsp;est-ce que la balle la touche&nbsp;?&nbsp;» C'est le rôle de
+  <code>COLLISION?</code>&nbsp;: <code>COLLISION? LISTE 0 :B</code> rend
+  <code>VRAI</code> si la tortue 0 (la balle) et la tortue <code>:B</code> (la brique)
+  se chevauchent à l'écran. (<code>LISTE 0 :B</code> fabrique juste la petite liste des
+  deux numéros, par exemple <code>[ 0 5 ]</code>.)</p>
+
+  <p>Quand ça touche, on fait trois choses&nbsp;:</p>
+  <ul>
+    <li><code>DEMANDE :B [ CT ]</code> &nbsp;: on s'adresse à la brique
+      <code>:B</code> le temps d'un ordre et on lui dit <code>CT</code> (Cache
+      Tortue). La brique disparaît. Et comme une tortue cachée ne peut plus toucher
+      personne, cette brique ne sera plus jamais comptée&nbsp;: elle est «&nbsp;cassée&nbsp;»
+      pour de bon.</li>
+    <li><code>DONNE "DY 0 - :DY</code> &nbsp;: la balle rebondit (on inverse son
+      déplacement vertical, comme contre un mur).</li>
+    <li><code>DONNE "SCORE :SCORE + 1</code> &nbsp;: un point de plus.</li>
+  </ul>
+
+  <pre><code><span class="kw">POUR</span> TESTEBRIQUES
+  <span class="kw">REPETEPOUR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">SI</span> <span class="kw">COLLISION?</span> <span class="kw">LISTE</span> <span class="num">0</span> <span class="var">:B</span> [
+      <span class="kw">DEMANDE</span> <span class="var">:B</span> [ <span class="kw">CT</span> ]
+      <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span>
+      <span class="kw">DONNE</span> <span class="str">"SCORE</span> <span class="var">:SCORE</span> + <span class="num">1</span>
+    ]
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Une image du jeu</h3>
+
+  <p>Une « image », c'est tout ce qui se passe en un instant du jeu. Cette fois, on ne
+  rebondit que sur <strong>trois</strong> murs&nbsp;: gauche, droite et haut. Le bas
+  n'est plus un mur&nbsp;! On déplace la balle, puis&nbsp;:</p>
+  <ul>
+    <li><code>SI COLLISION? LISTE 0 1 [ … ]</code> &nbsp;: si la balle touche la
+      raquette, elle repart vers le haut. <code>VALABS :DY</code> rend le déplacement
+      vertical toujours positif (vers le haut), pour qu'elle remonte à coup sûr.</li>
+    <li><code>SI YCOR &lt; -480 [ BALLEPERDUE ]</code> &nbsp;: si la balle est passée
+      tout en bas sans être rattrapée par la raquette, elle est perdue (on voit
+      <code>BALLEPERDUE</code> juste après).</li>
+    <li><code>TESTEBRIQUES</code> &nbsp;: on casse les briques touchées.</li>
+  </ul>
+
+  <p>Un jeu, au fond, ce n'est que ça&nbsp;: une image, répétée très vite, encore et
+  encore.</p>
+
+  <pre><code><span class="kw">POUR</span> FRAME
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span>
+  <span class="kw">SI</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> > <span class="num">780</span> [ <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">SI</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> &lt; -<span class="num">780</span> [ <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">SI</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> > <span class="num">480</span> [ <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">FXY</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> <span class="kw">YCOR</span> + <span class="var">:DY</span>
+  <span class="kw">SI</span> <span class="kw">COLLISION?</span> <span class="kw">LISTE</span> <span class="num">0</span> <span class="num">1</span> [ <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="kw">VALABS</span> <span class="var">:DY</span> ]
+  <span class="kw">SI</span> <span class="kw">YCOR</span> &lt; -<span class="num">480</span> [ <span class="kw">BALLEPERDUE</span> ]
+  <span class="kw">TESTEBRIQUES</span>
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Quand la balle est perdue</h3>
+
+  <p>Si la balle file en bas sans que la raquette la rattrape, elle est perdue. On joue
+  un petit son pour le signaler, puis on la <strong>relance de sa position de
+  départ</strong>, prête à repartir&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> BALLEPERDUE
+  <span class="kw">JOUE</span> <span class="str">"DO</span>                    <span class="cmt">; petit « bip » de balle perdue</span>
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">FXY</span> <span class="num">0</span> -<span class="num">100</span>      <span class="cmt">; on remet la balle au départ</span>
+  <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">8</span>   <span class="cmt">; et elle repart vers le haut</span>
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Regarde-le jouer tout seul</h3>
+
+  <p>Avant même d'ajouter les commandes, lance ça&nbsp;: la balle rebondit partout et
+  casse les briques toute seule. Si tu vois les briques disparaître une à une, <strong>ton
+  moteur de jeu fonctionne</strong>.</p>
+
+  <pre><code><span class="kw">POUR</span> DEMO
+  <span class="kw">INITJEU</span>
+  <span class="kw">REPETE</span> <span class="num">500</span> [ <span class="kw">FRAME</span> <span class="kw">ATTENDS</span> <span class="num">1</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <h3>À toi de jouer, pour de vrai</h3>
+
+  <p>Il ne reste qu'à prendre les commandes. Ajoute la raquette pilotée aux
+  flèches&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> BOUGERAQUETTE
+  <span class="kw">FIXETORTUE</span> <span class="num">1</span>
+  <span class="kw">DONNE</span> <span class="str">"D</span> <span class="kw">MANETTE</span> <span class="num">0</span>
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">SI</span> <span class="kw">XCOR</span> > -<span class="num">700</span> [ <span class="kw">FXY</span> <span class="kw">XCOR</span> - <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">SI</span> <span class="kw">XCOR</span> &lt; <span class="num">700</span> [ <span class="kw">FXY</span> <span class="kw">XCOR</span> + <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> PARTIE
+  <span class="kw">INITJEU</span>
+  <span class="kw">TANTQUE</span> [ <span class="var">:SCORE</span> &lt; <span class="num">14</span> ] [
+    <span class="kw">BOUGERAQUETTE</span>
+    <span class="kw">FRAME</span>
+    <span class="kw">ATTENDS</span> <span class="num">1</span>
+  ]
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">CT</span> <span class="kw">ETIQUETTE</span> [ GAGNE ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>On appelle la procédure <code>PARTIE</code>. Lance donc
+  <code>PARTIE</code> et déplace la raquette aux flèches. Quand les 14 briques sont
+  cassées, tu as gagné. <strong>Bravo&nbsp;: tu viens de programmer un jeu vidéo.</strong></p>
+
+  <div class="conseil">
+    <strong>Pour aller plus loin</strong>, à toi d'inventer&nbsp;:
+    <ul>
+      <li>compter les <strong>vies</strong>&nbsp;: chaque balle perdue en coûte une, et
+        après 3 balles perdues la partie est finie (affiche <code>PERDU</code>). Tu as
+        déjà <code>BALLEPERDUE</code>&nbsp;: il ne reste qu'à compter avec une
+        variable&nbsp;;</li>
+      <li>afficher le score avec <code>ETIQUETTE :SCORE</code>&nbsp;;</li>
+      <li>accélérer la balle à chaque brique cassée&nbsp;;</li>
+      <li>plus de briques, plusieurs rangées de couleurs (<code>FCC</code>).</li>
+    </ul>
+    Tu sais déjà tout faire. Le reste, c'est ton imagination.
+  </div>
+
+  <h3>Le programme complet</h3>
+
+  <p>Voici le jeu entier, d'un seul tenant. Recopie tout ça dans l'éditeur
+  (<code>ED</code>), valide avec <kbd>Ctrl</kbd>+<kbd>S</kbd>, puis tape
+  <code>PARTIE</code> pour jouer&nbsp;:</p>
+
+  <pre><code><span class="cmt">; --- Dessiner les formes : balle (3), raquette (4), brique (5) ---</span>
+<span class="kw">POUR</span> FORMES
+  <span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+    ..XXXX..
+    .XXXXXX.
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    .XXXXXX.
+    ..XXXX..
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">4</span> [
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">5</span> [
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+  ]
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Poser les 14 briques rouges en grille (tortues 2 a 15) ---</span>
+<span class="kw">POUR</span> POSEBRIQUES
+  <span class="kw">REPETEPOUR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">DONNE</span> <span class="str">"I</span> <span class="var">:B</span> - <span class="num">2</span>
+    <span class="kw">DONNE</span> <span class="str">"COL</span> <span class="kw">RESTE</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">DONNE</span> <span class="str">"LIG</span> <span class="kw">QUOT</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">DONNE</span> <span class="str">"BX</span> <span class="num">100</span> * <span class="var">:COL</span> - <span class="num">300</span>
+    <span class="kw">DONNE</span> <span class="str">"BY</span> <span class="num">70</span> * <span class="var">:LIG</span> + <span class="num">250</span>
+    <span class="kw">FIXETORTUE</span> <span class="var">:B</span> <span class="kw">SPRITE</span> <span class="num">5</span> <span class="kw">FCC</span> <span class="num">1</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="var">:BX</span> <span class="var">:BY</span>
+  ]
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Preparer la partie : balle blanche (0), raquette grise (1), briques ---</span>
+<span class="kw">POUR</span> INITJEU
+  <span class="kw">FORMES</span>
+  <span class="kw">VE</span> <span class="kw">FEN</span> <span class="kw">CT</span>
+  <span class="kw">DONNE</span> <span class="str">"SCORE</span> <span class="num">0</span>
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">SPRITE</span> <span class="num">3</span> <span class="kw">FCC</span> <span class="num">7</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">0</span> -<span class="num">100</span>
+  <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">8</span>
+  <span class="kw">FIXETORTUE</span> <span class="num">1</span> <span class="kw">SPRITE</span> <span class="num">4</span> <span class="kw">FCC</span> <span class="num">8</span> <span class="kw">MT</span> <span class="kw">LC</span> <span class="kw">FXY</span> <span class="num">0</span> -<span class="num">400</span>
+  <span class="kw">POSEBRIQUES</span>
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Deplacer la raquette avec les fleches ---</span>
+<span class="kw">POUR</span> BOUGERAQUETTE
+  <span class="kw">FIXETORTUE</span> <span class="num">1</span>
+  <span class="kw">DONNE</span> <span class="str">"D</span> <span class="kw">MANETTE</span> <span class="num">0</span>
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">SI</span> <span class="kw">XCOR</span> > -<span class="num">700</span> [ <span class="kw">FXY</span> <span class="kw">XCOR</span> - <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+  <span class="kw">SI</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">SI</span> <span class="kw">XCOR</span> &lt; <span class="num">700</span> [ <span class="kw">FXY</span> <span class="kw">XCOR</span> + <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Casser les briques touchees par la balle ---</span>
+<span class="kw">POUR</span> TESTEBRIQUES
+  <span class="kw">REPETEPOUR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">SI</span> <span class="kw">COLLISION?</span> <span class="kw">LISTE</span> <span class="num">0</span> <span class="var">:B</span> [
+      <span class="kw">DEMANDE</span> <span class="var">:B</span> [ <span class="kw">CT</span> ]
+      <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span>
+      <span class="kw">DONNE</span> <span class="str">"SCORE</span> <span class="var">:SCORE</span> + <span class="num">1</span>
+    ]
+  ]
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Balle perdue (passee en bas) : son + relance au depart ---</span>
+<span class="kw">POUR</span> BALLEPERDUE
+  <span class="kw">JOUE</span> <span class="str">"DO</span>
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">FXY</span> <span class="num">0</span> -<span class="num">100</span>
+  <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">8</span>
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Une image : bouger la balle, rebonds, raquette, briques ---</span>
+<span class="kw">POUR</span> FRAME
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span>
+  <span class="kw">SI</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> > <span class="num">780</span> [ <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">SI</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> &lt; -<span class="num">780</span> [ <span class="kw">DONNE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">SI</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> > <span class="num">480</span> [ <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">FXY</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> <span class="kw">YCOR</span> + <span class="var">:DY</span>
+  <span class="kw">SI</span> <span class="kw">COLLISION?</span> <span class="kw">LISTE</span> <span class="num">0</span> <span class="num">1</span> [ <span class="kw">DONNE</span> <span class="str">"DY</span> <span class="kw">VALABS</span> <span class="var">:DY</span> ]
+  <span class="kw">SI</span> <span class="kw">YCOR</span> &lt; -<span class="num">480</span> [ <span class="kw">BALLEPERDUE</span> ]
+  <span class="kw">TESTEBRIQUES</span>
+<span class="kw">FIN</span>
+
+<span class="cmt">; --- Lancer une partie (tape PARTIE) ---</span>
+<span class="kw">POUR</span> PARTIE
+  <span class="kw">INITJEU</span>
+  <span class="kw">TANTQUE</span> [ <span class="var">:SCORE</span> &lt; <span class="num">14</span> ] [
+    <span class="kw">BOUGERAQUETTE</span>
+    <span class="kw">FRAME</span>
+    <span class="kw">ATTENDS</span> <span class="num">1</span>
+  ]
+  <span class="kw">FIXETORTUE</span> <span class="num">0</span> <span class="kw">CT</span> <span class="kw">ETIQUETTE</span> [ GAGNE ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Et maintenant&nbsp;? Explore les <a href="exemples.html">programmes exemples</a>,
+  feuillette la <a href="commandes.html">référence des commandes</a>, et continue à
+  bricoler. Tu n'es plus en train d'apprendre à programmer&nbsp;: tu programmes.</p>
+
+</main>
+</body>
+</html>

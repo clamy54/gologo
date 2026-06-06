@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prise en main · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="tortue GoLogo">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Démarrer</li>
+    <li><a href="index.html">Présentation</a></li>
+    <li><a href="prise-en-main.html" class="active">Prise en main</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Apprendre</li>
+    <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
+    <li><a href="langage.html">Le langage Logo</a></li>
+    <li><a href="exemples.html">Programmes exemples</a></li>
+    <li class="section-title">Référence</li>
+    <li><a href="interface.html">Interface &amp; raccourcis</a></li>
+    <li><a href="commandes.html">Toutes les commandes</a></li>
+    <li><a href="index-commandes.html">Index des commandes</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Prise en main</h1>
+    <p>Les premières minutes avec GoLogo : le REPL, la tortue, l'éditeur</p>
+  </div>
+
+  <h2>Lancer GoLogo</h2>
+
+  <p>Au démarrage, GoLogo occupe tout l'écran et affiche l'invite <code>?</code>&nbsp;:
+  l'écran est en mode texte, c'est là que vous tapez vos instructions. La zone
+  graphique n'apparaît pas encore.</p>
+
+  <p>Pour la faire apparaître, tapez <code>MT</code> (Montre Tortue)&nbsp;: le champ
+  graphique bleu s'affiche, avec la tortue en son centre, une petite flèche pointée
+  vers le haut, prête à partir. (La zone graphique apparaît aussi d'elle-même dès la
+  première commande de tracé, comme <code>AVANCE</code>.)</p>
+
+  <div class="conseil">
+    Les utilisateurs néanmoins désireux de lancer GoLogo en mode fenêtré peuvent
+    ajouter l'argument <code>-w</code> sur la ligne de commande. Pour quitter GoLogo,
+    tapez <kbd>Ctrl</kbd>+<kbd>Q</kbd> ou la commande <code>QUITTE</code>.
+  </div>
+
+  <h2>Le REPL : tapez une instruction, obtenez un résultat</h2>
+
+  <p>GoLogo fonctionne en dialogue direct. Vous tapez une instruction, vous appuyez
+  sur <kbd>Entrée</kbd>, GoLogo l'exécute immédiatement. C'est ce qu'on appelle le
+  <em>REPL</em> (Read–Eval–Print Loop, ou boucle de lecture-évaluation-affichage).</p>
+
+  <p>Essayez&nbsp;:</p>
+
+  <pre><code>? <span class="kw">AVANCE</span> <span class="num">100</span></code></pre>
+
+  <p>La tortue avance de 100 pas et trace un trait derrière elle. Essayez maintenant
+  de la faire tourner&nbsp;:</p>
+
+  <pre><code>? <span class="kw">TD</span> <span class="num">90</span></code></pre>
+
+  <p>Elle a pivoté de 90 degrés vers la droite. Enchaînez quelques instructions
+  pour tracer un carré à la main&nbsp;:</p>
+
+  <pre><code>? <span class="kw">AV</span> <span class="num">80</span>
+? <span class="kw">TD</span> <span class="num">90</span>
+? <span class="kw">AV</span> <span class="num">80</span>
+? <span class="kw">TD</span> <span class="num">90</span>
+? <span class="kw">AV</span> <span class="num">80</span>
+? <span class="kw">TD</span> <span class="num">90</span>
+? <span class="kw">AV</span> <span class="num">80</span>
+? <span class="kw">TD</span> <span class="num">90</span></code></pre>
+
+  <p>Bon, c'est un peu long. Logo a une bien meilleure façon de faire ça.</p>
+
+  <h2>REPETE : la première structure de contrôle</h2>
+
+  <p>Quand on répète la même chose plusieurs fois, on utilise <code>REPETE</code>
+  suivi du nombre de répétitions, puis des instructions entre crochets&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]</code></pre>
+
+  <p>Un carré en une ligne. Voilà l'idée centrale de Logo&nbsp;: exprimer clairement
+  ce qu'on veut faire, sans répétition inutile.</p>
+
+  <p>Remettons l'écran à zéro avant de continuer&nbsp;:</p>
+
+  <pre><code>? <span class="kw">VE</span></code></pre>
+
+  <p><code>VE</code> (Vide l'Écran) remet la tortue au centre et efface tous les
+  tracés. C'est une commande qu'on utilise souvent.</p>
+
+  <h2>Les premières commandes de la tortue</h2>
+
+  <p>La tortue comprend quatre instructions de base pour se déplacer&nbsp;:</p>
+
+  <table>
+    <tr><th>Instruction</th><th>Forme courte</th><th>Effet</th></tr>
+    <tr><td><code>AVANCE n</code></td><td><code>AV n</code></td><td>Avance de n pas</td></tr>
+    <tr><td><code>RECULE n</code></td><td><code>RE n</code></td><td>Recule de n pas</td></tr>
+    <tr><td><code>TOURNEDROITE n</code></td><td><code>TD n</code></td><td>Tourne à droite de n degrés</td></tr>
+    <tr><td><code>TOURNEGAUCHE n</code></td><td><code>TG n</code></td><td>Tourne à gauche de n degrés</td></tr>
+  </table>
+
+  <p>Avec seulement ces quatre-là, on peut déjà faire beaucoup. Un triangle
+  équilatéral, par exemple&nbsp;: trois côtés, trois virages de 120 degrés.</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">3</span> [ <span class="kw">AV</span> <span class="num">100</span> <span class="kw">TD</span> <span class="num">120</span> ]</code></pre>
+
+  <p>Un hexagone à six côtés, six virages de 60 degrés&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">6</span> [ <span class="kw">AV</span> <span class="num">60</span> <span class="kw">TD</span> <span class="num">60</span> ]</code></pre>
+
+  <p>En général, pour un polygone régulier à N côtés, l'angle de virage vaut
+  360 ÷ N. Logo sait calculer&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">8</span> [ <span class="kw">AV</span> <span class="num">50</span> <span class="kw">TD</span> <span class="num">360</span> / <span class="num">8</span> ]</code></pre>
+
+  <h2>Le crayon</h2>
+
+  <p>La tortue peut déplacer son crayon pour ne pas laisser de trace&nbsp;:</p>
+
+  <pre><code>? <span class="kw">LC</span>        <span class="cmt">; Lève le Crayon</span>
+? <span class="kw">AV</span> <span class="num">50</span>    <span class="cmt">; se déplace sans tracer</span>
+? <span class="kw">BC</span>        <span class="cmt">; Baisse le Crayon</span>
+? <span class="kw">AV</span> <span class="num">50</span>    <span class="cmt">; trace de nouveau</span></code></pre>
+
+  <p>Et on peut changer la couleur du trait&nbsp;:</p>
+
+  <pre><code>? <span class="kw">FCC</span> <span class="num">1</span>    <span class="cmt">; rouge</span>
+? <span class="kw">AV</span> <span class="num">60</span>
+? <span class="kw">FCC</span> <span class="num">2</span>    <span class="cmt">; vert</span>
+? <span class="kw">AV</span> <span class="num">60</span></code></pre>
+
+  <p>Les codes de couleur vont de 0 (noir) à 15 (orange). Voir la
+  <a href="commandes.html#couleurs">palette complète</a>.</p>
+
+  <div class="note">
+    Le point-virgule <code>;</code> débute un commentaire&nbsp;: tout ce qui suit
+    sur la même ligne est ignoré par GoLogo. Le dièse <code>#</code> joue le même
+    rôle (GoLogo accepte les deux, par souci de compatibilité avec un maximum de Logo
+    existants). Pratique pour annoter son code.
+  </div>
+
+  <h2>Définir sa propre commande avec POUR</h2>
+
+  <p>Pour l'instant, on tape tout directement dans le REPL. Mais si on veut
+  dessiner plusieurs carrés, on n'a pas envie de tout retaper. La solution&nbsp;:
+  créer sa propre commande avec <code>POUR</code>.</p>
+
+  <p>Tapez ceci (en appuyant sur <kbd>Entrée</kbd> après chaque ligne)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">POUR</span> CARRE
+> <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]
+> <span class="kw">FIN</span></code></pre>
+
+  <p>GoLogo répond&nbsp;: <code>VOUS VENEZ DE DEFINIR CARRE</code>. À partir de ce
+  moment, la commande <code>CARRE</code> existe et vous pouvez l'utiliser&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CARRE</span></code></pre>
+
+  <p>Vous pouvez maintenant dessiner plusieurs carrés, chacun dans une
+  orientation différente&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">12</span> [ <span class="kw">CARRE</span> <span class="kw">TD</span> <span class="num">30</span> ]</code></pre>
+
+  <p>Une rosace de 12 carrés en une ligne, grâce à la commande qu'on vient de créer.</p>
+
+  <h2>Ajouter des paramètres</h2>
+
+  <p>Notre <code>CARRE</code> trace toujours des carrés de 80 pas. Ce serait mieux
+  de pouvoir choisir la taille. Pour ça, on utilise un <em>paramètre</em>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">POUR</span> CARRE <span class="var">:COTE</span>
+> <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="var">:COTE</span> <span class="kw">TD</span> <span class="num">90</span> ]
+> <span class="kw">FIN</span></code></pre>
+
+  <p>Le <code>:COTE</code> après le nom de la commande est un paramètre.
+  À l'intérieur de la procédure, <code>:COTE</code> prend la valeur
+  qu'on lui passe à l'appel&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CARRE</span> <span class="num">50</span>
+? <span class="kw">CARRE</span> <span class="num">100</span>
+? <span class="kw">CARRE</span> <span class="num">150</span></code></pre>
+
+  <p>Trois carrés de tailles différentes, avec la même commande. C'est la puissance
+  des procédures paramétrées.</p>
+
+  <h2>L'éditeur : écrire des programmes complets</h2>
+
+  <p>Taper des procédures ligne par ligne dans le REPL, c'est pratique pour
+  des définitions courtes. Mais pour un programme de plusieurs procédures,
+  mieux vaut utiliser l'éditeur intégré.</p>
+
+  <p>Tapez <code>ED</code> au REPL (ou appuyez sur <kbd>Ctrl</kbd>+<kbd>E</kbd>
+  si la ligne de saisie est vide)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ED</span></code></pre>
+
+  <p>L'écran bascule en mode éditeur&nbsp;: fond bleu, texte cyan, barre de statut
+  en bas. Vous pouvez y écrire un programme complet sur plusieurs lignes.</p>
+
+  <p>Voici un exemple à taper dans l'éditeur&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> POLYGONE <span class="var">:N</span> <span class="var">:COTE</span>
+  <span class="kw">REPETE</span> <span class="var">:N</span> [ <span class="kw">AV</span> <span class="var">:COTE</span> <span class="kw">TD</span> <span class="num">360</span> / <span class="var">:N</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> ROSACE
+  <span class="kw">VE</span>
+  <span class="kw">REPETE</span> <span class="num">6</span> [ POLYGONE <span class="num">5</span> <span class="num">60</span> <span class="kw">TD</span> <span class="num">60</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Une fois votre programme saisi, appuyez sur <kbd>Ctrl</kbd>+<kbd>S</kbd>
+  pour quitter l'éditeur en validant. GoLogo interprète vos procédures et revient
+  au REPL&nbsp;; les commandes que vous venez de définir sont aussitôt utilisables&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ROSACE</span></code></pre>
+
+  <div class="attention">
+    <strong>Attention, <kbd>Ctrl</kbd>+<kbd>S</kbd> ne sauve qu'en mémoire.</strong>
+    Vos procédures sont rangées dans la mémoire de GoLogo (l'<em>espace de
+    travail</em>), où elles restent disponibles tant que la session est ouverte.
+    Mais <strong>si vous quittez GoLogo et le relancez, tout ce contenu est
+    perdu</strong>. Pour conserver durablement votre programme, il faut
+    l'enregistrer dans un fichier sur le disque avec la commande
+    <code>SAUVE</code>, voir la section <a href="#fichiers">Garder ses programmes
+    sur le disque</a> juste après.
+  </div>
+
+  <div class="note">
+    Pour quitter l'éditeur <em>sans</em> valider vos modifications, appuyez
+    sur <kbd>Ctrl</kbd>+<kbd>X</kbd>. Le texte saisi est alors abandonné.
+  </div>
+
+  <div class="note">
+    <strong>Sur Mac</strong>, remplacez <kbd>Ctrl</kbd> par <kbd>⌘</kbd> (Command)
+    dans tous les raccourcis&nbsp;: ici <kbd>⌘</kbd>+<kbd>S</kbd> et
+    <kbd>⌘</kbd>+<kbd>X</kbd>. La barre d'état en bas de l'éditeur affiche toujours le
+    bon symbole.
+  </div>
+
+  <h2>L'aide intégrée</h2>
+
+  <p>GoLogo dispose d'un navigateur d'aide complet, accessible à tout moment
+  avec la touche <kbd>F1</kbd> ou la commande <code>AIDE</code>.</p>
+
+  <pre><code>? <span class="kw">AIDE</span>               <span class="cmt">; liste toutes les commandes</span>
+? <span class="kw">AIDE</span> <span class="kw">REPETE</span>        <span class="cmt">; aide sur REPETE en particulier</span></code></pre>
+
+  <p>Dans le navigateur d'aide&nbsp;:</p>
+  <ul>
+    <li>Les flèches et <kbd>Entrée</kbd> naviguent dans la liste.</li>
+    <li><kbd>Ctrl</kbd>+<kbd>F</kbd> ou <kbd>/</kbd> ouvre un champ de recherche.</li>
+    <li><kbd>Ctrl</kbd>+<kbd>L</kbd> bascule entre le français et l'anglais.</li>
+    <li><kbd>Ctrl</kbd>+<kbd>I</kbd> insère la commande sélectionnée dans le REPL.</li>
+    <li><kbd>Q</kbd> ou <kbd>Échap</kbd> ferme l'aide.</li>
+  </ul>
+
+  <h2 id="fichiers">Garder ses programmes sur le disque</h2>
+
+  <p>Comme on vient de le voir, tout ce que vous définissez (procédures et
+  variables) vit dans la <strong>mémoire</strong> de GoLogo le temps de la session.
+  Pour ne pas tout reperdre en quittant, il faut enregistrer cette mémoire dans un
+  <strong>fichier</strong> sur le disque dur. Ces fichiers portent l'extension
+  <code>.GLG</code> et sont rangés dans un dossier <code>Logo</code>&nbsp;:</p>
+
+  <ul>
+    <li>sous Linux et macOS&nbsp;: <code>~/Logo/</code> (dans votre dossier personnel)&nbsp;;</li>
+    <li>sous Windows&nbsp;: <code>Documents\Logo\</code>.</li>
+  </ul>
+
+  <p>Vous n'avez jamais besoin d'indiquer le chemin complet&nbsp;: GoLogo cherche
+  et écrit toujours dans ce dossier. Vous donnez simplement le nom du fichier,
+  sans l'extension.</p>
+
+  <h3>Sauvegarder le programme en mémoire</h3>
+
+  <p>La commande <code>SAUVE</code> prend le nom du fichier (précédé d'un guillemet
+  <code>"</code>) et la liste de ce qu'on veut enregistrer. Le plus simple est
+  d'utiliser <code>CONTENU</code>, qui désigne <em>tout</em> l'espace de travail&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SAUVE</span> <span class="str">"MESDESSINS</span> <span class="kw">CONTENU</span></code></pre>
+
+  <p>Ce guillemet <code>"</code> est important. Placé devant un nom, il veut dire
+  «&nbsp;ceci est un mot, à prendre tel quel&nbsp;»&nbsp;: c'est le nom du fichier, pas
+  une commande. Sans lui, GoLogo croirait que <code>MESDESSINS</code> est une
+  instruction à exécuter. Et ce n'est pas une paire de guillemets comme dans d'autres
+  langages&nbsp;: on n'en met <strong>qu'un seul</strong>, au début, et on ne le ferme
+  jamais. Le mot s'arrête tout seul au premier espace. On retrouve ce même
+  <code>"</code> devant tous les noms de fichiers (<code>RAMENE "MESDESSINS</code>,
+  <code>CHARGE "MESDESSINS</code>...).</p>
+
+  <p>Cela crée le fichier <code>MESDESSINS.GLG</code>. Toutes vos procédures et
+  variables y sont écrites&nbsp;: cette fois, c'est durable. Vous pouvez fermer
+  GoLogo, éteindre l'ordinateur, le fichier reste sur le disque.</p>
+
+  <div class="conseil">
+    Prenez l'habitude de faire <code>SAUVE "MONPROG CONTENU</code> régulièrement
+    pendant que vous travaillez, comme on enregistre un document. C'est la seule
+    façon de mettre votre travail à l'abri.
+  </div>
+
+  <h3>Lister les fichiers disponibles</h3>
+
+  <p>Pour voir quels fichiers <code>.GLG</code> sont enregistrés dans votre dossier
+  Logo, utilisez <code>CATALOGUE</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CATALOGUE</span></code></pre>
+
+  <p>GoLogo affiche la liste des fichiers présents, avec leur taille. Pratique
+  pour retrouver le nom exact d'un programme sauvegardé lors d'une session
+  précédente.</p>
+
+  <h3>Recharger un programme</h3>
+
+  <p>Pour récupérer un programme sauvegardé et s'en servir tout de suite, utilisez
+  <code>RAMENE</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">RAMENE</span> <span class="str">"MESDESSINS</span></code></pre>
+
+  <p>GoLogo relit le fichier et redéfinit immédiatement tout son contenu dans
+  l'espace de travail. Chaque procédure rechargée affiche
+  <code>VOUS VENEZ DE DEFINIR …</code>. Vos commandes sont de nouveau utilisables 
+  rien d'autre à faire&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ROSACE</span></code></pre>
+
+  <div class="note">
+    Il existe aussi <code>CHARGE "MESDESSINS</code>, qui place le contenu du fichier
+    dans l'<strong>éditeur</strong> sans l'exécuter, pour <em>relire</em> ou
+    <em>retoucher</em> un programme avant de le valider. À retenir&nbsp;:
+    <code>RAMENE</code> sert à <strong>se servir</strong> d'un programme,
+    <code>CHARGE</code> à le <strong>retravailler</strong>.
+  </div>
+
+  <h3>Supprimer un fichier</h3>
+
+  <p>Pour effacer définitivement un fichier du disque&nbsp;:</p>
+
+  <pre><code>? <span class="kw">DETRUIS</span> <span class="str">"MESDESSINS</span></code></pre>
+
+  <h3>En résumé : mémoire ou disque ?</h3>
+
+  <table>
+    <tr><th>Vous voulez…</th><th>Commande</th><th>Portée</th></tr>
+    <tr><td>Définir une procédure (éditeur)</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Mémoire (perdue en quittant)</td></tr>
+    <tr><td>Enregistrer durablement</td><td><code>SAUVE "NOM CONTENU</code></td><td>Disque (fichier .GLG)</td></tr>
+    <tr><td>Voir les fichiers enregistrés</td><td><code>CATALOGUE</code></td><td>Disque</td></tr>
+    <tr><td>Récupérer et utiliser un fichier</td><td><code>RAMENE "NOM</code></td><td>Disque → mémoire</td></tr>
+    <tr><td>Récupérer pour retoucher</td><td><code>CHARGE "NOM</code></td><td>Disque → éditeur</td></tr>
+    <tr><td>Effacer un fichier</td><td><code>DETRUIS "NOM</code></td><td>Disque</td></tr>
+  </table>
+
+  <h2 id="exemples-fournis">Explorer les exemples fournis</h2>
+
+  <p>GoLogo est livré avec une collection d'exemples un peu plus ambitieux, prêts à
+  l'emploi&nbsp;: des figures, de la génération d'images, et même de vrais petits jeux.
+  C'est une mine d'idées à regarder tourner, puis à bricoler.</p>
+
+  <p>Pour voir la liste de ces exemples, tapez <code>CATALOGUEEX</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CATALOGUEEX</span></code></pre>
+
+  <p>Pour en charger un, utilisez <code>RAMENEEX</code> suivi de son nom (entre
+  guillemets, sans l'extension <code>.GLG</code>)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">RAMENEEX</span> <span class="str">"LOGOTRIX</span></code></pre>
+
+  <p>Tous les exemples se lancent de la même manière&nbsp;: une fois l'exemple
+  chargé, tapez <code>START</code> pour le démarrer.</p>
+
+  <pre><code>? <span class="kw">START</span></code></pre>
+
+  <div class="gallery">
+    <figure><img src="../images/ex-droite.png" alt="DROITE : tracé d'une droite"><figcaption>DROITE&nbsp;: la droite y = ax + b</figcaption></figure>
+    <figure><img src="../images/ex-raytrace.png" alt="RAYTRACE : boule métallique"><figcaption>RAYTRACE&nbsp;: une boule métallique sur un damier</figcaption></figure>
+    <figure><img src="../images/ex-logotrix.png" alt="LOGOTRIX : clone de Tetris"><figcaption>LOGOTRIX&nbsp;: empilez des formes et faites des lignes</figcaption></figure>
+    <figure><img src="../images/ex-nebulax.png" alt="NEBULAX : clone de Space Invaders"><figcaption>NEBULAX&nbsp;: détruisez les aliens</figcaption></figure>
+    <figure><img src="../images/ex-race.png" alt="RACE : esquiver le trafic"><figcaption>RACE&nbsp;: esquiver le trafic</figcaption></figure>
+    <figure><img src="../images/ex-vorax.png" alt="VORAX : le jeu du serpent"><figcaption>VORAX&nbsp;: un serpent vorace</figcaption></figure>
+  </div>
+
+  <h3>Modifier un exemple sans abîmer l'original</h3>
+
+  <p>Une fois l'exemple ramené, ouvrez-le dans l'éditeur en tapant <code>ED</code>&nbsp;:
+  son code complet s'y affiche, prêt à être exploré et modifié.</p>
+
+  <pre><code>? <span class="kw">ED</span></code></pre>
+
+  <p>Quand vous avez changé quelque chose qui vous plaît, enregistrez <em>votre</em>
+  version dans votre dossier personnel avec <code>SAUVE</code>, sous un nom à vous&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SAUVE</span> <span class="str">"MONLOGOTRIX</span> <span class="kw">CONTENU</span></code></pre>
+
+  <p>Vous rechargerez cette copie plus tard avec <code>RAMENE</code> (pour l'utiliser)
+  ou <code>CHARGE</code> (pour la retravailler dans l'éditeur)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">RAMENE</span> <span class="str">"MONLOGOTRIX</span></code></pre>
+
+  <div class="note">
+    Ainsi vous ne touchez jamais aux exemples d'origine&nbsp;: ils restent intacts.
+    Vous gardez autant de copies de travail que vous voulez dans votre dossier
+    personnel, sans risquer de casser les originaux.
+  </div>
+
+  <h2>Résumé des commandes essentielles</h2>
+
+  <table>
+    <tr><th>Commande</th><th>Effet</th></tr>
+    <tr><td><code>AV n</code></td><td>Avance de n pas</td></tr>
+    <tr><td><code>RE n</code></td><td>Recule de n pas</td></tr>
+    <tr><td><code>TD n</code></td><td>Tourne à droite de n degrés</td></tr>
+    <tr><td><code>TG n</code></td><td>Tourne à gauche de n degrés</td></tr>
+    <tr><td><code>LC</code> / <code>BC</code></td><td>Lève / Baisse le crayon</td></tr>
+    <tr><td><code>FCC n</code></td><td>Fixe la couleur du crayon (0–15)</td></tr>
+    <tr><td><code>VE</code></td><td>Vide l'écran, remet la tortue au centre</td></tr>
+    <tr><td><code>REPETE n [ ... ]</code></td><td>Répète les instructions n fois</td></tr>
+    <tr><td><code>POUR NOM ... FIN</code></td><td>Définit une nouvelle commande</td></tr>
+    <tr><td><code>ED</code></td><td>Ouvre l'éditeur</td></tr>
+    <tr><td><code>AIDE</code></td><td>Ouvre le navigateur d'aide</td></tr>
+    <tr><td><code>SAUVE "NOM CONTENU</code></td><td>Sauvegarde sur le disque</td></tr>
+    <tr><td><code>RAMENE "NOM</code></td><td>Recharge un fichier sauvegardé</td></tr>
+    <tr><td><code>QUITTE</code></td><td>Quitte GoLogo</td></tr>
+  </table>
+
+  <p>La suite (variables, conditions, récursion, musique, et bien plus) est
+  décrite dans <a href="langage.html">Le langage Logo</a>.</p>
+
+</main>
+</body>
+</html>

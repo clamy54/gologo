@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From the square to the arcade · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html" class="active">From the square to the arcade</a></li>
+    <li><a href="language.html">The Logo language</a></li>
+    <li><a href="examples.html">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>From the square to the arcade</h1>
+    <p>A step-by-step journey: you start with a single line, you finish with your own game</p>
+  </div>
+
+  <p>This journey is meant to be followed in order, from start to finish. Each step
+  unlocks a new power and ends with a small <em>« your turn »</em> challenge. You need
+  to know nothing to begin. By the end, you will have programmed a real little game, a
+  brick-breaker, by putting together everything you learned along the way.</p>
+
+  <div class="conseil">
+    Copy each program into the editor (<code>EDIT</code>), validate with
+    <kbd>Ctrl</kbd>+<kbd>S</kbd> (on a Mac&nbsp;: <kbd>⌘</kbd>+<kbd>S</kbd>), then run
+    the command from the <code>?</code> prompt. Change the numbers, watch what
+    happens&nbsp;: tinkering is how you understand.
+  </div>
+
+  <p>The steps&nbsp;:
+    <a href="#e1">1. The first line</a> ·
+    <a href="#e2">2. Smart laziness</a> ·
+    <a href="#e3">3. Inventing your own words</a> ·
+    <a href="#e4">4. Building with bricks</a> ·
+    <a href="#e5">5. Your first error</a> ·
+    <a href="#e6">6. Deciding</a> ·
+    <a href="#e7">7. Remembering</a> ·
+    <a href="#e8">8. The wow effect</a> ·
+    <a href="#e9">9. Making it move</a> ·
+    <a href="#e10">10. Draw your own shapes</a> ·
+    <a href="#e11">11. The bouncing ball</a> ·
+    <a href="#e12">12. Your game</a>
+  </p>
+
+  <!-- ============================================================ -->
+  <h2 id="e1">Step 1. The first line</h2>
+
+  <p>When GoLogo starts, type <code>ST</code> (SHOWTURTLE) to bring up the graphics
+  area. The turtle is there, in the centre, pointing up. Give it an order&nbsp;:</p>
+
+  <pre><code>? <span class="kw">FORWARD</span> <span class="num">100</span>
+? <span class="kw">RT</span> <span class="num">90</span>
+? <span class="kw">FORWARD</span> <span class="num">100</span></code></pre>
+
+  <p>It moves, turns right, moves again. <code>FORWARD</code> (or <code>FD</code>)
+  moves, <code>RT</code> turns right, <code>LT</code> turns left. With just these, you
+  can already draw a square, side by side.</p>
+
+  <p><strong>Your turn&nbsp;:</strong> finish the square by hand (four <code>FD</code>
+  and four <code>RT 90</code>).</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e2">Step 2. Smart laziness</h2>
+
+  <p>Doing the same thing four times is tedious to type. A good programmer is
+  lazy&nbsp;: they make the machine repeat. That is what <code>REPEAT</code> is
+  for&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">90</span> ]</code></pre>
+
+  <p>The square in one line. Change the <code>4</code> and the angle for other
+  polygons&nbsp;: the angle is always 360 divided by the number of sides.</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">3</span> [ <span class="kw">FD</span> <span class="num">120</span> <span class="kw">RT</span> <span class="num">120</span> ]   <span class="cmt">; triangle</span>
+? <span class="kw">REPEAT</span> <span class="num">6</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">60</span> ]    <span class="cmt">; hexagon</span></code></pre>
+
+  <p><strong>Your turn&nbsp;:</strong> make a circle. Hint&nbsp;: lots of small steps
+  and tiny turns, for instance <code>REPEAT 360 [ FD 5 RT 1 ]</code>.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e3">Step 3. Inventing your own words</h2>
+
+  <p>You will want to reuse your square without retyping it. So teach the turtle this
+  new word, with <code>TO</code> … <code>END</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SQUARE
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>GoLogo replies <code>SQUARE DEFINED</code>. From now on <code>SQUARE</code> is a
+  command like any other. And to choose the size, add a <em>parameter</em>&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SQUARE <span class="var">:SIDE</span>
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="var">:SIDE</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span></code></pre>
+
+  <pre><code>? <span class="kw">SQUARE</span> <span class="num">50</span>
+? <span class="kw">SQUARE</span> <span class="num">150</span></code></pre>
+
+  <p><strong>Your turn&nbsp;:</strong> write <code>POLYGON :N :SIDE</code> that draws a
+  polygon with <code>:N</code> sides. (Reminder&nbsp;: the angle is
+  <code>360 / :N</code>.)</p>
+
+  <img class="shot" src="../images/ex-rosace.png" alt="rosette of squares">
+  <p class="shot-cap">Twelve calls to SQUARE, turning a little each time&nbsp;: a rosette.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e4">Step 4. Building with bricks</h2>
+
+  <p>A big program is just small programs placed end to end. Define a wall and a roof,
+  then a house that uses them&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> WALL
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> ROOF
+  <span class="kw">REPEAT</span> <span class="num">3</span> [ <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">120</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> HOUSE
+  <span class="kw">CS</span> <span class="kw">WALL</span> <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">30</span> <span class="kw">ROOF</span>
+<span class="kw">END</span></code></pre>
+
+  <p>This is the single most important idea in programming&nbsp;: break a big problem
+  into small pieces you know how to solve.</p>
+
+  <p><strong>Your turn&nbsp;:</strong> add a <code>DOOR</code> to the house. Remember to
+  lift the pen (<code>PU</code>) to move the turtle without drawing, and to lower it
+  (<code>PD</code>) before drawing.</p>
+
+  <img class="shot" src="../images/ex-maison.png" alt="house">
+  <p class="shot-cap">HOUSE&nbsp;: a square wall topped by a triangular roof.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e5">Step 5. Your first error</h2>
+
+  <p>Here you learn something the coloured blocks will never teach you&nbsp;: <strong>to
+  read an error and fix it</strong>. Type something silly on purpose&nbsp;:</p>
+
+  <pre><code>? <span class="kw">FORWARD</span> <span class="str">HELLO</span></code></pre>
+
+  <p>GoLogo objects&nbsp;: <code>FORWARD DOESN'T LIKE HELLO</code>. It does not just say
+  «&nbsp;no&nbsp;»&nbsp;: it explains. <code>FORWARD</code> expects a number, not a word.
+  Another classic&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SQUAR</span> <span class="num">50</span>
+<span class="cmt">I DON'T KNOW HOW TO SQUAR</span></code></pre>
+
+  <p>A typo&nbsp;: GoLogo does not know <code>SQUAR</code>. You fix it, you try again.
+  <strong>That is what programming for real is</strong>&nbsp;: you make mistakes, you
+  read the message, you fix them. This reflex will serve you in every language, later
+  on.</p>
+
+  <div class="note">
+    GoLogo's error messages are written to be understood. If one day you get stuck,
+    read the message again&nbsp;: it almost always names the command at fault.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="e6">Step 6. Deciding</h2>
+
+  <p>An interesting program does not always do the same thing&nbsp;: it
+  <em>decides</em>. The <code>IF</code> command runs instructions only if a condition
+  is true&nbsp;:</p>
+
+  <pre><code>? <span class="kw">IF</span> <span class="num">3</span> > <span class="num">2</span> [ <span class="kw">PRINT</span> <span class="str">"BIGGER</span> ]</code></pre>
+
+  <p>A condition is a question you answer yes or no (in Logo&nbsp;: <code>TRUE</code> or
+  <code>FALSE</code>). These questions always end with a <code>?</code>&nbsp;:
+  <code>EQUAL?</code> (equal&nbsp;?), <code>GREATER?</code> (bigger&nbsp;?),
+  <code>LESS?</code> (smaller&nbsp;?). You can also write comparisons with the signs
+  <code>=</code>, <code>&gt;</code>, <code>&lt;</code>, like in maths. With a
+  <em>second</em> list, <code>IF</code> does «&nbsp;otherwise&nbsp;»&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SIGN <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> > <span class="num">0</span> [ <span class="kw">PRINT</span> <span class="str">"POSITIVE</span> ] [ <span class="kw">PRINT</span> <span class="str">"NEGATIVE_OR_ZERO</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p><strong>Your turn&nbsp;:</strong> write a procedure that says <code>EVEN</code> or
+  <code>ODD</code> depending on the number. Hint&nbsp;: <code>REMAINDER :N 2</code> is 0
+  when <code>:N</code> is even.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e7">Step 7. Remembering</h2>
+
+  <p>To count points or remember a position, the turtle needs <em>memory</em>. A
+  <strong>variable</strong> is a name that holds a value. You create it with
+  <code>MAKE</code> and read it back with a colon&nbsp;:</p>
+
+  <pre><code>? <span class="kw">MAKE</span> <span class="str">"SCORE</span> <span class="num">0</span>
+? <span class="kw">MAKE</span> <span class="str">"SCORE</span> <span class="var">:SCORE</span> + <span class="num">1</span>
+? <span class="kw">PRINT</span> <span class="var">:SCORE</span>            <span class="cmt">; prints 1</span></code></pre>
+
+  <p>« Take the score, add 1, put it back in the score. » That is exactly how you keep
+  a point counter in a game. Keep this word <code>SCORE</code> in mind&nbsp;: you will
+  use it again at the end.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e8">Step 8. The wow effect</h2>
+
+  <p>Here is a surprising idea&nbsp;: a procedure is allowed to <em>call itself</em>.
+  It is like a Russian doll that contains a smaller doll, which contains a smaller one
+  still… We call this <strong>recursion</strong>, and it is perfect for drawings that
+  repeat at smaller scales. A tree, for instance&nbsp;: a trunk, then two smaller
+  branches, and each branch is itself a little tree! You just need a rule to stop, or
+  it would go on forever&nbsp;: here, we stop when the branch becomes tiny.</p>
+
+  <pre><code><span class="kw">TO</span> TREE <span class="var">:T</span>
+  <span class="kw">IF</span> <span class="var">:T</span> &lt; <span class="num">10</span> [ <span class="kw">STOP</span> ]      <span class="cmt">; branch too small: we stop</span>
+  <span class="kw">FD</span> <span class="var">:T</span>
+  <span class="kw">LT</span> <span class="num">30</span> <span class="kw">TREE</span> <span class="var">:T</span> * <span class="num">0.7</span>
+  <span class="kw">RT</span> <span class="num">60</span> <span class="kw">TREE</span> <span class="var">:T</span> * <span class="num">0.7</span>
+  <span class="kw">LT</span> <span class="num">30</span>
+  <span class="kw">BK</span> <span class="var">:T</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> DRAWTREE
+  <span class="kw">CS</span> <span class="kw">WINDOW</span> <span class="kw">SETH</span> <span class="num">0</span> <span class="kw">BK</span> <span class="num">150</span> <span class="kw">TREE</span> <span class="num">120</span>
+<span class="kw">END</span></code></pre>
+
+  <p>Run <code>DRAWTREE</code>. A few lines, and a whole tree appears. This is often the
+  moment you catch the bug.</p>
+
+  <img class="shot" src="../images/ex-arbre.png" alt="fractal tree">
+  <p class="shot-cap">Each branch splits into two smaller branches.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e9">Step 9. Making it move</h2>
+
+  <p>So far the turtle was drawing. Now it will <em>move</em> over time. Two
+  ingredients&nbsp;: <code>WAIT</code> makes a small pause (in sixtieths of a second),
+  and a loop repeats the movement. Here is a sprite you steer with the arrow keys
+  (<code>JOYSTICK 0</code> is emulated by the arrows)&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> DRIVE
+  <span class="kw">CS</span> <span class="kw">WINDOW</span>
+  <span class="kw">SPRITE</span> <span class="num">2</span>
+  <span class="kw">WHILE</span> [ <span class="kw">NOT</span> <span class="kw">BUTTON?</span> <span class="num">0</span> ] [
+    <span class="kw">MAKE</span> <span class="str">"D</span> <span class="kw">JOYSTICK</span> <span class="num">0</span>
+    <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">1</span> [ <span class="kw">SETH</span> <span class="num">0</span> <span class="kw">FD</span> <span class="num">10</span> ]     <span class="cmt">; up</span>
+    <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">5</span> [ <span class="kw">SETH</span> <span class="num">180</span> <span class="kw">FD</span> <span class="num">10</span> ]   <span class="cmt">; down</span>
+    <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">SETH</span> <span class="num">90</span> <span class="kw">FD</span> <span class="num">10</span> ]    <span class="cmt">; right</span>
+    <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">SETH</span> <span class="num">270</span> <span class="kw">FD</span> <span class="num">10</span> ]   <span class="cmt">; left</span>
+    <span class="kw">WAIT</span> <span class="num">2</span>
+  ]
+<span class="kw">END</span></code></pre>
+
+  <p>Run <code>DRIVE</code> and steer the car with the arrows. Press the space bar (the
+  fire button) to stop. <code>WHILE</code> repeats the block <em>as long as</em> its
+  condition is true&nbsp;: here, as long as the button is not pressed.</p>
+
+  <div class="note">
+    The <code>WINDOW</code> field lets the turtle roam without hitting the edges. It is
+    the mode we use for games.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="e10">Step 10. Draw your own shapes</h2>
+
+  <p>So far the turtle had a ready-made shape. But you can draw it one yourself! The
+  <code>DEFSPRITE</code> command lets you create a shape on a small grid of 16 by 16,
+  a bit like pixel art. Each line is a string of characters&nbsp;: a dot <code>.</code>
+  for an empty cell, a letter (for example <code>X</code>) for a filled cell. Let us
+  draw a round ball and a brick&nbsp;:</p>
+
+  <pre><code><span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+  ..XXXX..
+  .XXXXXX.
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  .XXXXXX.
+  ..XXXX..
+]
+
+<span class="kw">DEFSPRITE</span> <span class="num">4</span> [
+  XXXXXXXXXXXXXX
+  XXXXXXXXXXXXXX
+  XXXXXXXXXXXXXX
+  XXXXXXXXXXXXXX
+]</code></pre>
+
+  <p>Look closely at the first one&nbsp;: if you squint, the <code>X</code>s draw a
+  round shape. Shape number 3 is now your round ball, number 4 your brick. You pick
+  them with <code>SPRITE</code>, like the ready-made shapes&nbsp;:</p>
+
+  <pre><code><span class="kw">CS</span> <span class="kw">ST</span>
+<span class="kw">SPRITE</span> <span class="num">3</span>     <span class="cmt">; the turtle becomes a round ball</span>
+<span class="kw">SETPC</span> <span class="num">1</span>     <span class="cmt">; in red (the shape takes the pen colour)</span></code></pre>
+
+  <p>Two things to remember&nbsp;: the numbers of your shapes start at <strong>3</strong>
+  (0, 1 and 2 are the built-in shapes: triangle, turtle and car), and your shape takes
+  the <strong>pen colour</strong> (<code>SETPC</code>) and turns with the turtle.</p>
+
+  <p><strong>Your turn&nbsp;:</strong> draw your own shape, a spaceship, a heart, a
+  little person. You will be able to use it in the game, at the end&nbsp;: a real round
+  ball (<code>SPRITE 3</code>) and real bricks looks a lot nicer than triangles.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e11">Step 11. The bouncing ball</h2>
+
+  <p>Before making a game, one essential brick is missing&nbsp;: a ball that
+  <strong>bounces off the edges</strong>. It looks complicated, but the idea is very
+  simple.</p>
+
+  <p>Imagine the ball moving in small steps, frame after frame. At each step it shifts&nbsp;:
+  a bit to the right, a bit up. We store these two shifts in two variables&nbsp;:
+  <code>:DX</code> (how far right in <strong>x</strong>) and <code>:DY</code> (how far
+  up in <strong>y</strong>). As long as we hit nothing, we repeat&nbsp;: move by
+  <code>:DX</code> and <code>:DY</code>, over and over.</p>
+
+  <p>Now, the bounce. Think of a real ball you throw at the right-hand wall&nbsp;: it
+  comes back to the left. Its vertical motion does not change, only its horizontal
+  motion <strong>flips</strong>. In Logo, flipping a number is <code>0 - :DX</code> (if
+  <code>:DX</code> was 9, that gives −9&nbsp;; the ball will now go left). Same at the
+  top and bottom, but there it is <code>:DY</code> that flips. Here goes&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> INITBALL
+  <span class="kw">CS</span> <span class="kw">WINDOW</span>
+  <span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+  ..XXXX..
+  .XXXXXX.
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  XXXXXXXX
+  .XXXXXX.
+  ..XXXX..
+  ]
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">SPRITE</span> <span class="num">3</span> <span class="kw">SETPC</span> <span class="num">7</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">0</span> <span class="num">0</span>   <span class="cmt">; reuse the round ball (shape 3) from step 10, in white</span>
+  <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">9</span> <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">6</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> BOUNCE
+  <span class="kw">IF</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> > <span class="num">780</span> [ <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">IF</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> &lt; -<span class="num">780</span> [ <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">IF</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> > <span class="num">480</span> [ <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">IF</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> &lt; -<span class="num">480</span> [ <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">SETXY</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> <span class="kw">YCOR</span> + <span class="var">:DY</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> BOUNCEBALL
+  <span class="kw">INITBALL</span>
+  <span class="kw">REPEAT</span> <span class="num">300</span> [ <span class="kw">BOUNCE</span> <span class="kw">WAIT</span> <span class="num">1</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>Run <code>BOUNCEBALL</code>&nbsp;: the ball shoots off diagonally and bounces in
+  every corner. Let us break down <code>BOUNCE</code>, line by line&nbsp;:</p>
+
+  <ul>
+    <li><code>XCOR</code> gives the ball's left-right position, <code>YCOR</code> its
+      bottom-top position. The right edge is at <code>800</code>, the left at
+      <code>-800</code>, the top at <code>500</code>, the bottom at <code>-500</code>.</li>
+    <li><code>XCOR + :DX</code> is where the ball <em>would be</em> at the next step.
+      The first line says&nbsp;: «&nbsp;if at the next step the ball passes
+      <code>780</code> (almost the right edge), then flip <code>:DX</code>&nbsp;». It
+      will go back left instead of leaving.</li>
+    <li>The next three lines do the same for the left edge, the top and the bottom.</li>
+    <li><code>SETXY XCOR + :DX YCOR + :DY</code> finally moves the ball by its step
+      (with the possibly-flipped speed).</li>
+  </ul>
+
+  <p>We check the edge <em>before</em> moving, so the ball never overshoots. This is
+  exactly the trick we reuse in the game.</p>
+
+  <p><strong>Your turn&nbsp;:</strong> change <code>:DX</code> and <code>:DY</code> for
+  a faster or slower ball. Put <code>SETPENSIZE 6</code> first and lower the pen
+  (<code>PD</code>) so it leaves a trail.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="e12">Step 12. Your game: the brick-breaker</h2>
+
+  <p>You have everything you need. A brick-breaker is just an assembly of things you
+  already know&nbsp;: squares (the bricks), a loop, some <code>IF</code>s, a score, and
+  the bouncing ball.</p>
+
+  <p>What is new is that we will have <strong>several turtles on screen at the same
+  time</strong>, one per game object. Each turtle has a number&nbsp;: <strong>turtle
+  0</strong> will be the ball, <strong>turtle 1</strong> the paddle, and <strong>turtles
+  2 to 15</strong> the fourteen bricks. To give orders to one precise turtle, you type
+  <code>SETTURTLE</code> followed by its number&nbsp;: after that, the commands (move,
+  place, hide…) talk to that one.</p>
+
+  <h3>Drawing the game shapes</h3>
+
+  <p>We learned to draw our own sprites in step 10. Let us use that to give real shapes
+  to our objects&nbsp;: a round ball (shape 3), a wide paddle (shape 4) and a brick
+  (shape 5).</p>
+
+  <pre><code><span class="kw">TO</span> SHAPES
+  <span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+    ..XXXX..
+    .XXXXXX.
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    .XXXXXX.
+    ..XXXX..
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">4</span> [
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">5</span> [
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+  ]
+<span class="kw">END</span></code></pre>
+
+  <p>We pick these shapes with <code>SPRITE 3</code>, <code>SPRITE 4</code>,
+  <code>SPRITE 5</code>, and each one takes its turtle's pen colour
+  (<code>SETPC</code>)&nbsp;: we will make the ball white, the paddle gray and the
+  bricks red, right after.</p>
+
+  <h3>Placing the bricks</h3>
+
+  <p><code>SETTURTLE :B</code> selects turtle number <code>:B</code> (and creates it if
+  it does not exist yet). We want to arrange the 14 bricks in a grid&nbsp;: 7 columns,
+  2 rows. The loop <code>FOR [ B 2 15 ]</code> runs <code>:B</code> through every number
+  from 2 to 15, one brick per turn&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SETBRICKS
+  <span class="kw">FOR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">MAKE</span> <span class="str">"I</span> <span class="var">:B</span> - <span class="num">2</span>
+    <span class="kw">MAKE</span> <span class="str">"COL</span> <span class="kw">REMAINDER</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">MAKE</span> <span class="str">"ROW</span> <span class="kw">INTQUOTIENT</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">MAKE</span> <span class="str">"BX</span> <span class="num">100</span> * <span class="var">:COL</span> - <span class="num">300</span>
+    <span class="kw">MAKE</span> <span class="str">"BY</span> <span class="num">70</span> * <span class="var">:ROW</span> + <span class="num">250</span>
+    <span class="kw">SETTURTLE</span> <span class="var">:B</span> <span class="kw">SPRITE</span> <span class="num">5</span> <span class="kw">SETPC</span> <span class="num">1</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="var">:BX</span> <span class="var">:BY</span>
+  ]
+<span class="kw">END</span></code></pre>
+
+  <p>Each brick takes shape 5 (<code>SPRITE 5</code>) in red (<code>SETPC 1</code>). The
+  middle calculation may look mysterious, but it is just grid arithmetic. We first
+  number the brick from 0 (<code>:I</code> is 0 for the first, 1 for the second…). Then&nbsp;:</p>
+
+  <ul>
+    <li><code>REMAINDER :I 7</code> gives the <strong>column</strong> (0 to 6)&nbsp;:
+      it is the remainder when you divide by 7. For the 8<sup>th</sup> brick
+      (<code>:I</code> = 7), the remainder is 0&nbsp;: we go back to the left column.</li>
+    <li><code>INTQUOTIENT :I 7</code> gives the <strong>row</strong> (0 or 1)&nbsp;: it
+      is how many times 7 fits into <code>:I</code>. The first 7 bricks are row 0, the
+      rest row 1.</li>
+    <li><code>:BX</code> and <code>:BY</code> turn column and row into a real
+      position&nbsp;: we space the columns by 100 steps and raise the rows by 70 steps.</li>
+  </ul>
+
+  <h3>Setting up the game</h3>
+
+  <p>We draw the shapes (<code>SHAPES</code>), prepare the screen, then place the white
+  ball at the centre-bottom and the gray paddle at the bottom&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SETUP
+  <span class="kw">SHAPES</span>
+  <span class="kw">CS</span> <span class="kw">WINDOW</span> <span class="kw">HT</span>
+  <span class="kw">MAKE</span> <span class="str">"SCORE</span> <span class="num">0</span>
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">SPRITE</span> <span class="num">3</span> <span class="kw">SETPC</span> <span class="num">7</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">0</span> -<span class="num">100</span>   <span class="cmt">; the ball, white</span>
+  <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">8</span>
+  <span class="kw">SETTURTLE</span> <span class="num">1</span> <span class="kw">SPRITE</span> <span class="num">4</span> <span class="kw">SETPC</span> <span class="num">8</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">0</span> -<span class="num">400</span>   <span class="cmt">; the paddle, gray</span>
+  <span class="kw">SETBRICKS</span>
+<span class="kw">END</span></code></pre>
+
+  <h3>Breaking the bricks</h3>
+
+  <p>We go through the 14 bricks and, for each, we ask GoLogo&nbsp;: «&nbsp;does the ball
+  touch it?&nbsp;» That is the job of <code>COLLIDE?</code>&nbsp;:
+  <code>COLLIDE? LIST 0 :B</code> is <code>TRUE</code> if turtle 0 (the ball) and turtle
+  <code>:B</code> (the brick) overlap on screen. (<code>LIST 0 :B</code> just builds the
+  little list of the two numbers, for example <code>[ 0 5 ]</code>.)</p>
+
+  <p>When it touches, we do three things&nbsp;:</p>
+  <ul>
+    <li><code>ASK :B [ HT ]</code> &nbsp;: we talk to brick <code>:B</code> for one
+      order and tell it <code>HT</code> (Hide Turtle). The brick disappears. And since a
+      hidden turtle can no longer touch anyone, this brick will never be counted
+      again&nbsp;: it is «&nbsp;broken&nbsp;» for good.</li>
+    <li><code>MAKE "DY 0 - :DY</code> &nbsp;: the ball bounces (we flip its vertical
+      motion, as off a wall).</li>
+    <li><code>MAKE "SCORE :SCORE + 1</code> &nbsp;: one more point.</li>
+  </ul>
+
+  <pre><code><span class="kw">TO</span> HITBRICKS
+  <span class="kw">FOR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">IF</span> <span class="kw">COLLIDE?</span> <span class="kw">LIST</span> <span class="num">0</span> <span class="var">:B</span> [
+      <span class="kw">ASK</span> <span class="var">:B</span> [ <span class="kw">HT</span> ]
+      <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span>
+      <span class="kw">MAKE</span> <span class="str">"SCORE</span> <span class="var">:SCORE</span> + <span class="num">1</span>
+    ]
+  ]
+<span class="kw">END</span></code></pre>
+
+  <h3>One frame of the game</h3>
+
+  <p>A « frame » is everything that happens in one instant of the game. This time we
+  only bounce off <strong>three</strong> walls&nbsp;: left, right and top. The bottom is
+  no longer a wall! We move the ball, then&nbsp;:</p>
+  <ul>
+    <li><code>IF COLLIDE? LIST 0 1 [ … ]</code> &nbsp;: if the ball touches the paddle,
+      it goes back up. <code>ABS :DY</code> makes the vertical motion always positive
+      (upward), so it climbs for sure.</li>
+    <li><code>IF YCOR &lt; -480 [ BALLLOST ]</code> &nbsp;: if the ball went all the way
+      to the bottom without being caught by the paddle, it is lost (we see
+      <code>BALLLOST</code> right after).</li>
+    <li><code>HITBRICKS</code> &nbsp;: we break the bricks it touched.</li>
+  </ul>
+
+  <p>A game, deep down, is just that&nbsp;: one frame, repeated very fast, over and
+  over.</p>
+
+  <pre><code><span class="kw">TO</span> FRAME
+  <span class="kw">SETTURTLE</span> <span class="num">0</span>
+  <span class="kw">IF</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> > <span class="num">780</span> [ <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">IF</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> &lt; -<span class="num">780</span> [ <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">IF</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> > <span class="num">480</span> [ <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">SETXY</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> <span class="kw">YCOR</span> + <span class="var">:DY</span>
+  <span class="kw">IF</span> <span class="kw">COLLIDE?</span> <span class="kw">LIST</span> <span class="num">0</span> <span class="num">1</span> [ <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="kw">ABS</span> <span class="var">:DY</span> ]
+  <span class="kw">IF</span> <span class="kw">YCOR</span> &lt; -<span class="num">480</span> [ <span class="kw">BALLLOST</span> ]
+  <span class="kw">HITBRICKS</span>
+<span class="kw">END</span></code></pre>
+
+  <h3>When the ball is lost</h3>
+
+  <p>If the ball shoots to the bottom without the paddle catching it, it is lost. We
+  play a small sound to signal it, then we <strong>relaunch it from its starting
+  position</strong>, ready to go again&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> BALLLOST
+  <span class="kw">PLAY</span> <span class="str">"DO</span>                    <span class="cmt">; little « beep » of a lost ball</span>
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">SETXY</span> <span class="num">0</span> -<span class="num">100</span>      <span class="cmt">; put the ball back at the start</span>
+  <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">8</span>   <span class="cmt">; and it heads up again</span>
+<span class="kw">END</span></code></pre>
+
+  <h3>Watch it play itself</h3>
+
+  <p>Even before adding the controls, run this&nbsp;: the ball bounces everywhere and
+  breaks the bricks all by itself. If you see the bricks disappear one by one,
+  <strong>your game engine works</strong>.</p>
+
+  <pre><code><span class="kw">TO</span> DEMO
+  <span class="kw">SETUP</span>
+  <span class="kw">REPEAT</span> <span class="num">500</span> [ <span class="kw">FRAME</span> <span class="kw">WAIT</span> <span class="num">1</span> ]
+<span class="kw">END</span></code></pre>
+
+  <h3>Your turn, for real</h3>
+
+  <p>All that is left is to take the controls. Add the paddle steered by the
+  arrows&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> MOVEPADDLE
+  <span class="kw">SETTURTLE</span> <span class="num">1</span>
+  <span class="kw">MAKE</span> <span class="str">"D</span> <span class="kw">JOYSTICK</span> <span class="num">0</span>
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">IF</span> <span class="kw">XCOR</span> > -<span class="num">700</span> [ <span class="kw">SETXY</span> <span class="kw">XCOR</span> - <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">IF</span> <span class="kw">XCOR</span> &lt; <span class="num">700</span> [ <span class="kw">SETXY</span> <span class="kw">XCOR</span> + <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> PLAYGAME
+  <span class="kw">SETUP</span>
+  <span class="kw">WHILE</span> [ <span class="var">:SCORE</span> &lt; <span class="num">14</span> ] [
+    <span class="kw">MOVEPADDLE</span>
+    <span class="kw">FRAME</span>
+    <span class="kw">WAIT</span> <span class="num">1</span>
+  ]
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">HT</span> <span class="kw">LABEL</span> [ YOUWIN ]
+<span class="kw">END</span></code></pre>
+
+  <p>We call the procedure <code>PLAYGAME</code>. So run <code>PLAYGAME</code>
+  and move the paddle with the arrows. When the 14 bricks are broken, you win.
+  <strong>Well done&nbsp;: you have just programmed a video game.</strong></p>
+
+  <div class="conseil">
+    <strong>To go further</strong>, it is your turn to invent&nbsp;:
+    <ul>
+      <li>count <strong>lives</strong>&nbsp;: each lost ball costs one, and after 3 lost
+        balls the game is over (show <code>LOST</code>). You already have
+        <code>BALLLOST</code>&nbsp;: all that is left is to count with a variable&nbsp;;</li>
+      <li>show the score with <code>LABEL :SCORE</code>&nbsp;;</li>
+      <li>speed the ball up with every brick broken&nbsp;;</li>
+      <li>more bricks, several rows of colours (<code>SETPC</code>).</li>
+    </ul>
+    You already know how to do everything. The rest is your imagination.
+  </div>
+
+  <h3>The complete program</h3>
+
+  <p>Here is the whole game, in one piece. Copy all of it into the editor
+  (<code>EDIT</code>), validate with <kbd>Ctrl</kbd>+<kbd>S</kbd>, then type
+  <code>PLAYGAME</code> to play&nbsp;:</p>
+
+  <pre><code><span class="cmt">; --- Draw the shapes: ball (3), paddle (4), brick (5) ---</span>
+<span class="kw">TO</span> SHAPES
+  <span class="kw">DEFSPRITE</span> <span class="num">3</span> [
+    ..XXXX..
+    .XXXXXX.
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    XXXXXXXX
+    .XXXXXX.
+    ..XXXX..
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">4</span> [
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+    XXXXXXXXXXXXXXXX
+  ]
+  <span class="kw">DEFSPRITE</span> <span class="num">5</span> [
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+    XXXXXXXXXXXXXX
+  ]
+<span class="kw">END</span>
+
+<span class="cmt">; --- Place the 14 red bricks in a grid (turtles 2 to 15) ---</span>
+<span class="kw">TO</span> SETBRICKS
+  <span class="kw">FOR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">MAKE</span> <span class="str">"I</span> <span class="var">:B</span> - <span class="num">2</span>
+    <span class="kw">MAKE</span> <span class="str">"COL</span> <span class="kw">REMAINDER</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">MAKE</span> <span class="str">"ROW</span> <span class="kw">INTQUOTIENT</span> <span class="var">:I</span> <span class="num">7</span>
+    <span class="kw">MAKE</span> <span class="str">"BX</span> <span class="num">100</span> * <span class="var">:COL</span> - <span class="num">300</span>
+    <span class="kw">MAKE</span> <span class="str">"BY</span> <span class="num">70</span> * <span class="var">:ROW</span> + <span class="num">250</span>
+    <span class="kw">SETTURTLE</span> <span class="var">:B</span> <span class="kw">SPRITE</span> <span class="num">5</span> <span class="kw">SETPC</span> <span class="num">1</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="var">:BX</span> <span class="var">:BY</span>
+  ]
+<span class="kw">END</span>
+
+<span class="cmt">; --- Set up the game: white ball (0), gray paddle (1), bricks ---</span>
+<span class="kw">TO</span> SETUP
+  <span class="kw">SHAPES</span>
+  <span class="kw">CS</span> <span class="kw">WINDOW</span> <span class="kw">HT</span>
+  <span class="kw">MAKE</span> <span class="str">"SCORE</span> <span class="num">0</span>
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">SPRITE</span> <span class="num">3</span> <span class="kw">SETPC</span> <span class="num">7</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">0</span> -<span class="num">100</span>
+  <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">8</span>
+  <span class="kw">SETTURTLE</span> <span class="num">1</span> <span class="kw">SPRITE</span> <span class="num">4</span> <span class="kw">SETPC</span> <span class="num">8</span> <span class="kw">ST</span> <span class="kw">PU</span> <span class="kw">SETXY</span> <span class="num">0</span> -<span class="num">400</span>
+  <span class="kw">SETBRICKS</span>
+<span class="kw">END</span>
+
+<span class="cmt">; --- Move the paddle with the arrows ---</span>
+<span class="kw">TO</span> MOVEPADDLE
+  <span class="kw">SETTURTLE</span> <span class="num">1</span>
+  <span class="kw">MAKE</span> <span class="str">"D</span> <span class="kw">JOYSTICK</span> <span class="num">0</span>
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">7</span> [ <span class="kw">IF</span> <span class="kw">XCOR</span> > -<span class="num">700</span> [ <span class="kw">SETXY</span> <span class="kw">XCOR</span> - <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+  <span class="kw">IF</span> <span class="var">:D</span> = <span class="num">3</span> [ <span class="kw">IF</span> <span class="kw">XCOR</span> &lt; <span class="num">700</span> [ <span class="kw">SETXY</span> <span class="kw">XCOR</span> + <span class="num">20</span> <span class="kw">YCOR</span> ] ]
+<span class="kw">END</span>
+
+<span class="cmt">; --- Break the bricks the ball touches ---</span>
+<span class="kw">TO</span> HITBRICKS
+  <span class="kw">FOR</span> [ B <span class="num">2</span> <span class="num">15</span> ] [
+    <span class="kw">IF</span> <span class="kw">COLLIDE?</span> <span class="kw">LIST</span> <span class="num">0</span> <span class="var">:B</span> [
+      <span class="kw">ASK</span> <span class="var">:B</span> [ <span class="kw">HT</span> ]
+      <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span>
+      <span class="kw">MAKE</span> <span class="str">"SCORE</span> <span class="var">:SCORE</span> + <span class="num">1</span>
+    ]
+  ]
+<span class="kw">END</span>
+
+<span class="cmt">; --- Lost ball (reached the bottom): sound + relaunch from the start ---</span>
+<span class="kw">TO</span> BALLLOST
+  <span class="kw">PLAY</span> <span class="str">"DO</span>
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">SETXY</span> <span class="num">0</span> -<span class="num">100</span>
+  <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">8</span> <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">8</span>
+<span class="kw">END</span>
+
+<span class="cmt">; --- One frame: move the ball, bounces, paddle, bricks ---</span>
+<span class="kw">TO</span> FRAME
+  <span class="kw">SETTURTLE</span> <span class="num">0</span>
+  <span class="kw">IF</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> > <span class="num">780</span> [ <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">IF</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> &lt; -<span class="num">780</span> [ <span class="kw">MAKE</span> <span class="str">"DX</span> <span class="num">0</span> - <span class="var">:DX</span> ]
+  <span class="kw">IF</span> <span class="kw">YCOR</span> + <span class="var">:DY</span> > <span class="num">480</span> [ <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="num">0</span> - <span class="var">:DY</span> ]
+  <span class="kw">SETXY</span> <span class="kw">XCOR</span> + <span class="var">:DX</span> <span class="kw">YCOR</span> + <span class="var">:DY</span>
+  <span class="kw">IF</span> <span class="kw">COLLIDE?</span> <span class="kw">LIST</span> <span class="num">0</span> <span class="num">1</span> [ <span class="kw">MAKE</span> <span class="str">"DY</span> <span class="kw">ABS</span> <span class="var">:DY</span> ]
+  <span class="kw">IF</span> <span class="kw">YCOR</span> &lt; -<span class="num">480</span> [ <span class="kw">BALLLOST</span> ]
+  <span class="kw">HITBRICKS</span>
+<span class="kw">END</span>
+
+<span class="cmt">; --- Start a game (type PLAYGAME) ---</span>
+<span class="kw">TO</span> PLAYGAME
+  <span class="kw">SETUP</span>
+  <span class="kw">WHILE</span> [ <span class="var">:SCORE</span> &lt; <span class="num">14</span> ] [
+    <span class="kw">MOVEPADDLE</span>
+    <span class="kw">FRAME</span>
+    <span class="kw">WAIT</span> <span class="num">1</span>
+  ]
+  <span class="kw">SETTURTLE</span> <span class="num">0</span> <span class="kw">HT</span> <span class="kw">LABEL</span> [ YOUWIN ]
+<span class="kw">END</span></code></pre>
+
+  <p>And now? Explore the <a href="examples.html">example programs</a>, browse the
+  <a href="commands.html">command reference</a>, and keep tinkering. You are no longer
+  learning to program&nbsp;: you are programming.</p>
+
+</main>
+</body>
+</html>

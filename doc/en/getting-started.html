@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Getting started · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="getting-started.html" class="active">Getting started</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html">From the square to the arcade</a></li>
+    <li><a href="language.html">The Logo language</a></li>
+    <li><a href="examples.html">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Getting started</h1>
+    <p>Your first minutes with GoLogo: the REPL, the turtle, the editor</p>
+  </div>
+
+  <h2>Launching GoLogo</h2>
+
+  <p>At startup, GoLogo fills the whole screen and shows the <code>?</code> prompt&nbsp;:
+  the screen is in text mode, where you type your instructions. The graphics area is
+  not shown yet.</p>
+
+  <p>GoLogo starts up in French. Type <code>ENGLISH</code> and press Enter to switch its
+  messages and help to English (<code>FRANCAIS</code> switches back). The commands work
+  in either language regardless.</p>
+
+  <p>To bring it up, type <code>ST</code> (SHOWTURTLE)&nbsp;: the blue graphics field
+  appears, with the turtle at its centre, a little arrow pointing upward, ready to set
+  off. (The graphics area also appears on its own as soon as the first drawing command,
+  such as <code>FORWARD</code>, runs.)</p>
+
+  <div class="conseil">
+    Users who nonetheless wish to run GoLogo in a window can add the <code>-w</code>
+    argument on the command line. To quit GoLogo, press <kbd>Ctrl</kbd>+<kbd>Q</kbd>
+    or use the <code>BYE</code> command.
+  </div>
+
+  <h2>The REPL: type an instruction, get a result</h2>
+
+  <p>GoLogo works as a direct dialogue. You type an instruction, you press
+  <kbd>Enter</kbd>, GoLogo runs it at once. This is what we call the <em>REPL</em>
+  (Read-Eval-Print Loop).</p>
+
+  <p>Try this&nbsp;:</p>
+
+  <pre><code>? <span class="kw">FORWARD</span> <span class="num">100</span></code></pre>
+
+  <p>The turtle moves forward 100 steps and draws a line behind it. Now make it
+  turn&nbsp;:</p>
+
+  <pre><code>? <span class="kw">RT</span> <span class="num">90</span></code></pre>
+
+  <p>It has turned 90 degrees to the right. Chain a few instructions to draw a square
+  by hand&nbsp;:</p>
+
+  <pre><code>? <span class="kw">FD</span> <span class="num">80</span>
+? <span class="kw">RT</span> <span class="num">90</span>
+? <span class="kw">FD</span> <span class="num">80</span>
+? <span class="kw">RT</span> <span class="num">90</span>
+? <span class="kw">FD</span> <span class="num">80</span>
+? <span class="kw">RT</span> <span class="num">90</span>
+? <span class="kw">FD</span> <span class="num">80</span>
+? <span class="kw">RT</span> <span class="num">90</span></code></pre>
+
+  <p>That is a bit long. Logo has a much better way of doing it.</p>
+
+  <h2>REPEAT: the first control structure</h2>
+
+  <p>When you repeat the same thing several times, you use <code>REPEAT</code>
+  followed by the number of repetitions, then the instructions in brackets&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]</code></pre>
+
+  <p>A square in one line. This is the central idea of Logo&nbsp;: say clearly what
+  you want to do, without needless repetition.</p>
+
+  <p>Let us clear the screen before going on&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CS</span></code></pre>
+
+  <p><code>CS</code> (CLEARSCREEN) puts the turtle back in the centre and erases all
+  the drawing. It is a command you will use often.</p>
+
+  <h2>The turtle's first commands</h2>
+
+  <p>The turtle understands four basic instructions for moving&nbsp;:</p>
+
+  <table>
+    <tr><th>Instruction</th><th>Short form</th><th>Effect</th></tr>
+    <tr><td><code>FORWARD n</code></td><td><code>FD n</code></td><td>Moves forward n steps</td></tr>
+    <tr><td><code>BACK n</code></td><td><code>BK n</code></td><td>Moves back n steps</td></tr>
+    <tr><td><code>RIGHT n</code></td><td><code>RT n</code></td><td>Turns right by n degrees</td></tr>
+    <tr><td><code>LEFT n</code></td><td><code>LT n</code></td><td>Turns left by n degrees</td></tr>
+  </table>
+
+  <p>With just these four, you can already do a lot. An equilateral triangle, for
+  instance&nbsp;: three sides, three turns of 120 degrees.</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">3</span> [ <span class="kw">FD</span> <span class="num">100</span> <span class="kw">RT</span> <span class="num">120</span> ]</code></pre>
+
+  <p>A hexagon with six sides, six turns of 60 degrees&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">6</span> [ <span class="kw">FD</span> <span class="num">60</span> <span class="kw">RT</span> <span class="num">60</span> ]</code></pre>
+
+  <p>In general, for a regular polygon with N sides, the turn is 360 divided by N.
+  Logo can do the arithmetic&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">8</span> [ <span class="kw">FD</span> <span class="num">50</span> <span class="kw">RT</span> <span class="num">360</span> / <span class="num">8</span> ]</code></pre>
+
+  <h2>The pen</h2>
+
+  <p>The turtle can lift its pen so as not to leave a trail&nbsp;:</p>
+
+  <pre><code>? <span class="kw">PU</span>        <span class="cmt">; Pen Up</span>
+? <span class="kw">FD</span> <span class="num">50</span>    <span class="cmt">; moves without drawing</span>
+? <span class="kw">PD</span>        <span class="cmt">; Pen Down</span>
+? <span class="kw">FD</span> <span class="num">50</span>    <span class="cmt">; draws again</span></code></pre>
+
+  <p>And you can change the colour of the line&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SETPC</span> <span class="num">1</span>    <span class="cmt">; red</span>
+? <span class="kw">FD</span> <span class="num">60</span>
+? <span class="kw">SETPC</span> <span class="num">2</span>    <span class="cmt">; green</span>
+? <span class="kw">FD</span> <span class="num">60</span></code></pre>
+
+  <p>Colour codes run from 0 (black) to 15 (orange). See the
+  <a href="commands.html#crayon">full palette</a>.</p>
+
+  <div class="note">
+    A semicolon <code>;</code> starts a comment&nbsp;: everything after it on the same
+    line is ignored by GoLogo. The hash <code>#</code> does the same (GoLogo accepts
+    both, for compatibility with as many existing Logos as possible). Handy for
+    annotating your code.
+  </div>
+
+  <h2>Defining your own command with TO</h2>
+
+  <p>So far we type everything straight into the REPL. But if you want to draw several
+  squares, you do not want to retype it all. The answer&nbsp;: create your own command
+  with <code>TO</code>.</p>
+
+  <p>Type this (pressing <kbd>Enter</kbd> after each line)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">TO</span> SQUARE
+> <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]
+> <span class="kw">END</span></code></pre>
+
+  <p>GoLogo replies&nbsp;: <code>SQUARE DEFINED</code>. From now on, the
+  <code>SQUARE</code> command exists and you can use it&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SQUARE</span></code></pre>
+
+  <p>You can now draw several squares, each in a different orientation&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">12</span> [ <span class="kw">SQUARE</span> <span class="kw">RT</span> <span class="num">30</span> ]</code></pre>
+
+  <p>A rosette of 12 squares in one line, thanks to the command we just created.</p>
+
+  <h2>Adding parameters</h2>
+
+  <p>Our <code>SQUARE</code> always draws squares 80 steps wide. It would be better to
+  choose the size. For that we use a <em>parameter</em>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">TO</span> SQUARE <span class="var">:SIDE</span>
+> <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="var">:SIDE</span> <span class="kw">RT</span> <span class="num">90</span> ]
+> <span class="kw">END</span></code></pre>
+
+  <p>The <code>:SIDE</code> after the command name is a parameter. Inside the
+  procedure, <code>:SIDE</code> takes whatever value you pass when you call it&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SQUARE</span> <span class="num">50</span>
+? <span class="kw">SQUARE</span> <span class="num">100</span>
+? <span class="kw">SQUARE</span> <span class="num">150</span></code></pre>
+
+  <p>Three squares of different sizes, with the same command. This is the power of
+  parameterised procedures.</p>
+
+  <h2>The editor: writing whole programs</h2>
+
+  <p>Typing procedures line by line in the REPL is fine for short definitions. But for
+  a program made of several procedures, the built-in editor is the better tool.</p>
+
+  <p>Type <code>EDIT</code> at the REPL (or press <kbd>Ctrl</kbd>+<kbd>E</kbd> when the
+  input line is empty)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">EDIT</span></code></pre>
+
+  <p>The screen switches to editor mode&nbsp;: blue background, cyan text, a status bar
+  at the bottom. There you can write a whole program over several lines.</p>
+
+  <p>Here is an example to type in the editor&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> POLYGON <span class="var">:N</span> <span class="var">:SIDE</span>
+  <span class="kw">REPEAT</span> <span class="var">:N</span> [ <span class="kw">FD</span> <span class="var">:SIDE</span> <span class="kw">RT</span> <span class="num">360</span> / <span class="var">:N</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> ROSETTE
+  <span class="kw">CS</span>
+  <span class="kw">REPEAT</span> <span class="num">6</span> [ POLYGON <span class="num">5</span> <span class="num">60</span> <span class="kw">RT</span> <span class="num">60</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>Once your program is typed, press <kbd>Ctrl</kbd>+<kbd>S</kbd> to leave the editor
+  and validate. GoLogo interprets your procedures and returns to the REPL&nbsp;; the
+  commands you just defined are immediately usable&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ROSETTE</span></code></pre>
+
+  <div class="attention">
+    <strong>Careful, <kbd>Ctrl</kbd>+<kbd>S</kbd> only saves in memory.</strong>
+    Your procedures are stored in GoLogo's memory (the <em>workspace</em>), where they
+    stay available for as long as the session is open. But <strong>if you quit GoLogo
+    and restart it, all that content is lost</strong>. To keep your program for good,
+    you must store it in a file on disk with the <code>SAVE</code> command. See the
+    <a href="#files">Keeping your programs on disk</a> section just below.
+  </div>
+
+  <div class="note">
+    To leave the editor <em>without</em> validating your changes, press
+    <kbd>Ctrl</kbd>+<kbd>X</kbd>. The text you typed is then discarded.
+  </div>
+
+  <div class="note">
+    <strong>On a Mac</strong>, use <kbd>⌘</kbd> (Command) instead of <kbd>Ctrl</kbd>
+    in every shortcut&nbsp;: here <kbd>⌘</kbd>+<kbd>S</kbd> and <kbd>⌘</kbd>+<kbd>X</kbd>.
+    The status bar at the bottom of the editor always shows the right symbol.
+  </div>
+
+  <h2>The built-in help</h2>
+
+  <p>GoLogo has a full help browser, available at any time with the <kbd>F1</kbd> key
+  or the <code>HELP</code> command.</p>
+
+  <pre><code>? <span class="kw">HELP</span>               <span class="cmt">; lists all the commands</span>
+? <span class="kw">HELP</span> <span class="kw">REPEAT</span>        <span class="cmt">; help on REPEAT in particular</span></code></pre>
+
+  <p>In the help browser&nbsp;:</p>
+  <ul>
+    <li>The arrows and <kbd>Enter</kbd> move through the list.</li>
+    <li><kbd>Ctrl</kbd>+<kbd>F</kbd> or <kbd>/</kbd> opens a search field.</li>
+    <li><kbd>Ctrl</kbd>+<kbd>L</kbd> switches between English and French.</li>
+    <li><kbd>Ctrl</kbd>+<kbd>I</kbd> inserts the selected command into the REPL.</li>
+    <li><kbd>Q</kbd> or <kbd>Esc</kbd> closes the help.</li>
+  </ul>
+
+  <h2 id="files">Keeping your programs on disk</h2>
+
+  <p>As we just saw, everything you define (procedures and variables) lives in
+  GoLogo's <strong>memory</strong> for the length of the session. To avoid losing it
+  all when you quit, you have to save that memory to a <strong>file</strong> on the
+  hard disk. These files have the <code>.GLG</code> extension and are kept in a
+  <code>Logo</code> folder&nbsp;:</p>
+
+  <ul>
+    <li>on Linux and macOS&nbsp;: <code>~/Logo/</code> (in your home folder)&nbsp;;</li>
+    <li>on Windows&nbsp;: <code>Documents\Logo\</code>.</li>
+  </ul>
+
+  <p>You never need to give the full path&nbsp;: GoLogo always looks in and writes to
+  that folder. You simply give the file name, without the extension.</p>
+
+  <h3>Saving the program in memory</h3>
+
+  <p>The <code>SAVE</code> command takes the file name (preceded by a quote
+  <code>"</code>) and the list of what you want to store. The simplest is to use
+  <code>CONTENTS</code>, which means <em>all</em> of the workspace&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SAVE</span> <span class="str">"MYDRAWING</span> <span class="kw">CONTENTS</span></code></pre>
+
+  <p>That quote <code>"</code> matters. Placed before a name, it means
+  &ldquo;this is a word, taken literally&rdquo;&nbsp;: it is the file name, not a
+  command. Without it, GoLogo would think <code>MYDRAWING</code> is an instruction to
+  run. And it is not a pair of quotes like in other languages&nbsp;: you write
+  <strong>only one</strong>, at the start, and you never close it. The word simply
+  ends at the first space. You will find this same <code>"</code> before every file
+  name (<code>LOAD "MYDRAWING</code>, <code>EDLOAD "MYDRAWING</code>...).</p>
+
+  <p>This creates the file <code>MYDRAWING.GLG</code>. All your procedures and
+  variables are written into it&nbsp;: this time it is permanent. You can close
+  GoLogo, switch off the computer, and the file stays on disk.</p>
+
+  <div class="conseil">
+    Get into the habit of running <code>SAVE "MYPROG CONTENTS</code> regularly while
+    you work, the way you would save a document. It is the only way to keep your work
+    safe.
+  </div>
+
+  <h3>Listing the available files</h3>
+
+  <p>To see which <code>.GLG</code> files are stored in your Logo folder, use
+  <code>CATALOG</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CATALOG</span></code></pre>
+
+  <p>GoLogo shows the list of files present, with their size. Handy for finding the
+  exact name of a program saved in an earlier session.</p>
+
+  <h3>Reloading a program</h3>
+
+  <p>To bring back a saved program and use it right away, use <code>LOAD</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">LOAD</span> <span class="str">"MYDRAWING</span></code></pre>
+
+  <p>GoLogo re-reads the file and immediately redefines everything in it into the
+  workspace. Each reloaded procedure prints <code>… DEFINED</code>. Your commands are
+  usable again, nothing else to do&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ROSETTE</span></code></pre>
+
+  <div class="note">
+    There is also <code>EDLOAD "MYDRAWING</code>, which puts the file's content into
+    the <strong>editor</strong> without running it, so you can <em>read</em> or
+    <em>rework</em> a program before validating it. To remember&nbsp;: <code>LOAD</code>
+    is to <strong>use</strong> a program, <code>EDLOAD</code> is to <strong>rework</strong> it.
+  </div>
+
+  <h3>Deleting a file</h3>
+
+  <p>To permanently remove a file from disk&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ERASEFILE</span> <span class="str">"MYDRAWING</span></code></pre>
+
+  <h3>In short: memory or disk?</h3>
+
+  <table>
+    <tr><th>You want to…</th><th>Command</th><th>Scope</th></tr>
+    <tr><td>Define a procedure (editor)</td><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Memory (lost on quit)</td></tr>
+    <tr><td>Store it permanently</td><td><code>SAVE "NAME CONTENTS</code></td><td>Disk (.GLG file)</td></tr>
+    <tr><td>See the saved files</td><td><code>CATALOG</code></td><td>Disk</td></tr>
+    <tr><td>Bring back and use a file</td><td><code>LOAD "NAME</code></td><td>Disk to memory</td></tr>
+    <tr><td>Bring back to rework</td><td><code>EDLOAD "NAME</code></td><td>Disk to editor</td></tr>
+    <tr><td>Delete a file</td><td><code>ERASEFILE "NAME</code></td><td>Disk</td></tr>
+  </table>
+
+  <h2 id="bundled-examples">Exploring the bundled examples</h2>
+
+  <p>GoLogo ships with a collection of more ambitious ready-to-run examples&nbsp;:
+  figures, image generation, and even real little games. A treasure trove of ideas to
+  watch run, then tinker with.</p>
+
+  <p>To see the list of these examples, type <code>CATALOGEX</code>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">CATALOGEX</span></code></pre>
+
+  <p>To load one, use <code>LOADEX</code> followed by its name (in quotes, without the
+  <code>.GLG</code> extension)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">LOADEX</span> <span class="str">"LOGOTRIX</span></code></pre>
+
+  <p>Every example starts the same way&nbsp;: once it is loaded, type
+  <code>START</code> to run it.</p>
+
+  <pre><code>? <span class="kw">START</span></code></pre>
+
+  <div class="gallery">
+    <figure><img src="../images/ex-droite.png" alt="DROITE: plotting a line"><figcaption>DROITE&nbsp;: the line y = ax + b</figcaption></figure>
+    <figure><img src="../images/ex-raytrace.png" alt="RAYTRACE: a metal ball"><figcaption>RAYTRACE&nbsp;: a metal ball on a checkerboard</figcaption></figure>
+    <figure><img src="../images/ex-logotrix.png" alt="LOGOTRIX: a Tetris clone"><figcaption>LOGOTRIX&nbsp;: stack the shapes and clear lines</figcaption></figure>
+    <figure><img src="../images/ex-nebulax.png" alt="NEBULAX: a Space Invaders clone"><figcaption>NEBULAX&nbsp;: destroy the aliens</figcaption></figure>
+    <figure><img src="../images/ex-race.png" alt="RACE: dodge the traffic"><figcaption>RACE&nbsp;: dodge the traffic</figcaption></figure>
+    <figure><img src="../images/ex-vorax.png" alt="VORAX: the snake game"><figcaption>VORAX&nbsp;: a voracious snake</figcaption></figure>
+  </div>
+
+  <h3>Editing an example without breaking the original</h3>
+
+  <p>Once an example is loaded, open it in the editor by typing <code>ED</code>&nbsp;:
+  its full code appears there, ready to explore and change.</p>
+
+  <pre><code>? <span class="kw">ED</span></code></pre>
+
+  <p>When you have changed something you like, save <em>your</em> version to your
+  personal folder with <code>SAVE</code>, under a name of your own&nbsp;:</p>
+
+  <pre><code>? <span class="kw">SAVE</span> <span class="str">"MYLOGOTRIX</span> <span class="kw">CONTENTS</span></code></pre>
+
+  <p>You will reload your copy later with <code>LOAD</code> (to use it) or
+  <code>EDLOAD</code> (to rework it in the editor)&nbsp;:</p>
+
+  <pre><code>? <span class="kw">LOAD</span> <span class="str">"MYLOGOTRIX</span></code></pre>
+
+  <div class="note">
+    This way you never touch the original examples&nbsp;: they stay intact. You keep
+    as many working copies as you like in your personal folder, with no risk of
+    breaking the originals.
+  </div>
+
+  <h2>Essential commands at a glance</h2>
+
+  <table>
+    <tr><th>Command</th><th>Effect</th></tr>
+    <tr><td><code>FD n</code></td><td>Moves forward n steps</td></tr>
+    <tr><td><code>BK n</code></td><td>Moves back n steps</td></tr>
+    <tr><td><code>RT n</code></td><td>Turns right by n degrees</td></tr>
+    <tr><td><code>LT n</code></td><td>Turns left by n degrees</td></tr>
+    <tr><td><code>PU</code> / <code>PD</code></td><td>Pen Up / Pen Down</td></tr>
+    <tr><td><code>SETPC n</code></td><td>Sets the pen colour (0-15)</td></tr>
+    <tr><td><code>CS</code></td><td>Clears the screen, turtle back to centre</td></tr>
+    <tr><td><code>REPEAT n [ ... ]</code></td><td>Repeats the instructions n times</td></tr>
+    <tr><td><code>TO NAME ... END</code></td><td>Defines a new command</td></tr>
+    <tr><td><code>EDIT</code></td><td>Opens the editor</td></tr>
+    <tr><td><code>HELP</code></td><td>Opens the help browser</td></tr>
+    <tr><td><code>SAVE "NAME CONTENTS</code></td><td>Saves to disk</td></tr>
+    <tr><td><code>LOAD "NAME</code></td><td>Reloads a saved file</td></tr>
+    <tr><td><code>BYE</code></td><td>Quits GoLogo</td></tr>
+  </table>
+
+  <p>What comes next, variables, conditionals, recursion, music and much more, is
+  described in <a href="language.html">The Logo language</a>.</p>
+
+</main>
+</body>
+</html>

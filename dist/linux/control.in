@@ -1,0 +1,11 @@
+Package: gologo
+Version: @VERSION@
+Section: education
+Priority: optional
+Architecture: @ARCH@
+Maintainer: Cyril Lamy <cyril.lamy@gmail.com>
+Depends: libc6, libx11-6, libxkbcommon0, libgl1, libegl1, libwayland-client0, libwayland-egl1, libxcursor1
+Description: GoLogo - bilingual Logo interpreter
+ A modern, cross-platform re-creation of the French Logo from the 1984
+ Thomson MO5 (SOLI) cartridge: turtle graphics, built-in bilingual help,
+ ready-to-run examples and little games. Free software under GPL v2.

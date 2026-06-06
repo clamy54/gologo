@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoLogo · Installation</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="tortue GoLogo">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Démarrer</li>
+    <li><a href="index.html">Présentation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
+    <li><a href="installation.html" class="active">Installation</a></li>
+    <li class="section-title">Apprendre</li>
+    <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
+    <li><a href="langage.html">Le langage Logo</a></li>
+    <li><a href="exemples.html">Programmes exemples</a></li>
+    <li class="section-title">Référence</li>
+    <li><a href="interface.html">Interface &amp; raccourcis</a></li>
+    <li><a href="commandes.html">Toutes les commandes</a></li>
+    <li><a href="index-commandes.html">Index des commandes</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Installation</h1>
+    <p>Télécharger et installer GoLogo sous Windows, Linux et macOS.</p>
+  </div>
+
+  <p>GoLogo est distribué sous forme de binaires prêts à l'emploi pour Windows,
+  Linux et macOS. Ils sont disponibles dans la section
+  <a href="https://github.com/clamy54/gologo/releases" target="_blank" rel="noopener">Releases</a>
+  du dépôt GitHub. Choisissez le fichier correspondant à votre système, puis suivez
+  la procédure ci-dessous.</p>
+
+  <div class="attention">
+    <strong>Binaires non signés.</strong> Sous Windows et macOS, les exécutables ne
+    sont pas signés numériquement. Au premier lancement, le système peut afficher un
+    avertissement de sécurité&nbsp;: c'est normal. La marche à suivre est décrite plus
+    bas, dans <a href="#securite">Avertissements de sécurité</a>.
+  </div>
+
+  <h2>Windows</h2>
+
+  <p>Un programme d'installation classique est fourni.</p>
+
+  <ol>
+    <li>Depuis la page Releases, téléchargez le fichier d'installation Windows
+        (<code>GoLogo-Setup-<em>x.x</em>.exe</code>).</li>
+    <li>Double-cliquez dessus et suivez l'assistant (choix du dossier, raccourci sur
+        le bureau en option).</li>
+    <li>GoLogo apparaît ensuite dans le menu Démarrer. Les programmes d'exemple sont
+        installés à côté de l'exécutable.</li>
+  </ol>
+
+  <p>Au tout premier lancement, voir l'avertissement
+  <a href="#securite-windows">Windows SmartScreen</a> plus bas.</p>
+
+  <h2>Linux (Debian / Ubuntu)</h2>
+
+  <p>Un paquet <code>.deb</code> est fourni pour les distributions à base de Debian
+  (Debian, Ubuntu, Linux Mint...), architecture 64&nbsp;bits (amd64).</p>
+
+  <ol>
+    <li>Depuis la page Releases, téléchargez le paquet
+        (<code>gologo_<em>x.x</em>_amd64.deb</code>).</li>
+    <li>Installez-le avec <code>apt</code>, qui gère automatiquement les
+        dépendances&nbsp;:
+      <pre><code>sudo apt install ./gologo_<em>x.x</em>_amd64.deb</code></pre>
+    </li>
+    <li>Lancez <code>gologo</code> depuis un terminal ou depuis le menu des
+        applications. Les programmes d'exemple sont installés dans
+        <code>/usr/share/doc/gologo/examples</code>.</li>
+  </ol>
+
+  <p>Le paquet Linux n'est pas concerné par les avertissements de signature&nbsp;:
+  il s'installe normalement.</p>
+
+  <h2>macOS (Apple Silicon)</h2>
+
+  <div class="attention">
+    <strong>Apple Silicon uniquement.</strong> La version macOS fonctionne seulement
+    sur les Mac à puce Apple Silicon (M1 et ultérieurs&nbsp;: M1, M2, M3...). Les Mac
+    à processeur Intel ne sont pas pris en charge.
+  </div>
+
+  <ol>
+    <li>Depuis la page Releases, téléchargez l'archive macOS et décompressez-la.</li>
+    <li>Glissez <code>GoLogo.app</code> dans votre dossier <strong>Applications</strong>.</li>
+    <li>Au premier lancement, voir l'avertissement
+        <a href="#securite-macos">macOS Gatekeeper</a> plus bas.</li>
+  </ol>
+
+  <h2 id="securite">Avertissements de sécurité</h2>
+
+  <p>GoLogo est un logiciel libre et gratuit. Les exécutables ne sont
+  <strong>pas signés numériquement</strong> (les certificats de signature de code
+  sont coûteux et ne se justifient pas pour une application gratuite). De ce fait,
+  votre système d'exploitation peut afficher un avertissement de sécurité au premier
+  lancement. C'est normal et attendu&nbsp;: voici comment procéder sur chaque
+  plateforme.</p>
+
+  <h3 id="securite-windows">Windows</h3>
+
+  <p>Au premier lancement de GoLogo, Windows SmartScreen peut afficher une fenêtre
+  bleue indiquant «&nbsp;Windows a protégé votre ordinateur&nbsp;».</p>
+
+  <ol>
+    <li>Cliquez sur <strong>Informations complémentaires</strong> (le lien sous le
+        texte d'avertissement).</li>
+    <li>Cliquez sur <strong>Exécuter quand même</strong>.</li>
+  </ol>
+
+  <p>Cet avertissement n'apparaît qu'une fois. Ensuite, Windows retient votre choix et
+  ne redemande plus.</p>
+
+  <h3 id="securite-macos">macOS</h3>
+
+  <p>macOS Gatekeeper bloque par défaut les applications de développeurs non
+  identifiés. À la première tentative d'ouverture de GoLogo, un message indique que
+  l'application «&nbsp;ne peut pas être ouverte car elle provient d'un développeur non
+  identifié&nbsp;» (ou «&nbsp;macOS ne peut pas vérifier l'absence de logiciels
+  malveillants&nbsp;»).</p>
+
+  <ol>
+    <li>Fermez la boîte de dialogue d'avertissement.</li>
+    <li>Ouvrez <strong>Réglages Système</strong> (menu Pomme &gt; Réglages Système).</li>
+    <li>Allez dans <strong>Confidentialité et sécurité</strong>.</li>
+    <li>Faites défiler vers le bas&nbsp;: un message indique que GoLogo a été bloqué.
+        Cliquez sur <strong>Ouvrir quand même</strong>.</li>
+    <li>Saisissez votre mot de passe ou utilisez Touch ID pour confirmer.</li>
+    <li>Une nouvelle fenêtre apparaît&nbsp;: cliquez sur <strong>Ouvrir</strong>.</li>
+  </ol>
+
+  <p>Cette autorisation n'est à faire qu'une seule fois. Ensuite, macOS ouvre GoLogo
+  normalement.</p>
+
+</main>
+</body>
+</html>

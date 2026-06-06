@@ -1,0 +1,185 @@
+; ---- borne une composante couleur dans 0..255 (et arrondit) ----
+POUR BORNE :V
+DONNE "W ARRONDI :V
+SI :W < 0 [ RENDS 0 ]
+SI :W > 255 [ RENDS 255 ]
+RENDS :W
+FIN
+
+; ---- couleur courante du crayon a partir de R V B ----
+POUR POSE :R :V :B
+FCC MP BORNE :R MP BORNE :V MP BORNE :B [ ]
+FIN
+
+; ---- intersection rayon (O,Q) avec la sphere : pose HIT (0/1) et TT ----
+; Q doit etre normalise. On garde la racine la plus proche devant l'origine.
+POUR INTERS :OX :OY :OZ :QX :QY :QZ
+DONNE "WX :OX - :SCX
+DONNE "WY :OY - :SCY
+DONNE "WZ :OZ - :SCZ
+DONNE "BB :QX * :WX + :QY * :WY + :QZ * :WZ
+DONNE "CC :WX * :WX + :WY * :WY + :WZ * :WZ - :SR * :SR
+DONNE "DD :BB * :BB - :CC
+SI :DD < 0 [ DONNE "HIT 0 ] [
+DONNE "TT ( 0 - :BB ) - RC :DD
+SI :TT > :EPS [ DONNE "HIT 1 ] [ DONNE "HIT 0 ]
+]
+FIN
+
+; ---- damier au contact (O,Q) : ecrit CR CG CB ----
+POUR SOLCOL :OX :OY :OZ :QX :QY :QZ
+DONNE "FX :OX + :TF * :QX
+DONNE "FZ :OZ + :TF * :QZ
+; case claire ou foncee selon la parite des coordonnees entieres
+DONNE "PAR RESTE ( ( ENT :FX ) + ( ENT :FZ ) + 1000 ) 2
+SI :PAR = 0 [ DONNE "TR 235 DONNE "TG 235 DONNE "TB 235 ] [ DONNE "TR 30 DONNE "TG 60 DONNE "TB 95 ]
+; sol horizontal : normale = ( 0 1 0 ), donc diffus = LY
+DONNE "IN :AMB + ( 1 - :AMB ) * :LY
+; rayon d'ombre vers la lumiere : si la sphere le bloque, on est a l'ombre
+INTERS :FX 0 :FZ :LX :LY :LZ
+SI :HIT = 1 [ DONNE "IN :AMB ]
+; brume : fondu vers l'horizon quand le contact est loin
+DONNE "FG :TF / :FOG
+SI :FG > 1 [ DONNE "FG 1 ]
+DONNE "CR ( :TR * :IN ) * ( 1 - :FG ) + :SKHR * :FG
+DONNE "CG ( :TG * :IN ) * ( 1 - :FG ) + :SKHG * :FG
+DONNE "CB ( :TB * :IN ) * ( 1 - :FG ) + :SKHB * :FG
+FIN
+
+; ---- couleur du ciel pour une direction de hauteur QY : ecrit CR CG CB ----
+POUR CIELCOL :QY
+DONNE "FG ( :QY + 0.15 ) / 0.85
+SI :FG < 0 [ DONNE "FG 0 ]
+SI :FG > 1 [ DONNE "FG 1 ]
+DONNE "CR :SKHR + ( :SKTR - :SKHR ) * :FG
+DONNE "CG :SKHG + ( :SKTG - :SKHG ) * :FG
+DONNE "CB :SKHB + ( :SKTB - :SKHB ) * :FG
+FIN
+
+; ---- scene SANS la boule (damier OU ciel) le long de (O,Q) -> CR CG CB ----
+; C'est ce que reflete la boule.
+POUR SCENECOL :OX :OY :OZ :QX :QY :QZ
+SI :QY < 0 [
+DONNE "TF ( 0 - :OY ) / :QY
+SOLCOL :OX :OY :OZ :QX :QY :QZ
+] [
+CIELCOL :QY
+]
+FIN
+
+; ---- boule metal : reflet de la scene (teinte) + point speculaire -> CR CG CB ----
+; Le contact est sur la sphere a la distance TH le long de (O,Q).
+POUR SPHERECOL :OX :OY :OZ :QX :QY :QZ :TH
+DONNE "PX :OX + :TH * :QX
+DONNE "PY :OY + :TH * :QY
+DONNE "PZ :OZ + :TH * :QZ
+DONNE "NX ( :PX - :SCX ) / :SR
+DONNE "NY ( :PY - :SCY ) / :SR
+DONNE "NZ ( :PZ - :SCZ ) / :SR
+; rayon reflechi  R = Q - 2 ( Q.N ) N
+DONNE "DN :QX * :NX + :QY * :NY + :QZ * :NZ
+DONNE "RX :QX - 2 * :DN * :NX
+DONNE "RY :QY - 2 * :DN * :NY
+DONNE "RZ :QZ - 2 * :DN * :NZ
+; couleur vue dans le reflet (on decolle un peu du point pour ne pas se toucher)
+SCENECOL ( :PX + :EPS * :NX ) ( :PY + :EPS * :NY ) ( :PZ + :EPS * :NZ ) :RX :RY :RZ
+; point speculaire blanc (vecteur a mi-chemin H = norme( L - Q ))
+DONNE "HX :LX - :QX
+DONNE "HY :LY - :QY
+DONNE "HZ :LZ - :QZ
+DONNE "HL RC ( :HX * :HX + :HY * :HY + :HZ * :HZ )
+DONNE "ND ( :NX * :HX + :NY * :HY + :NZ * :HZ ) / :HL
+SI :ND < 0 [ DONNE "ND 0 ]
+DONNE "SPC PUISSANCE :ND 60
+; reflet teinte par le metal + reflet speculaire
+DONNE "CR :CR * :REFL * :TINTR + 255 * :SPC
+DONNE "CG :CG * :REFL * :TINTG + 255 * :SPC
+DONNE "CB :CB * :REFL * :TINTB + 255 * :SPC
+FIN
+
+; ---- construit le rayon normalise (Dx,Dy,Dz) pour le pixel (U,V) ----
+POUR RAYON
+DONNE "CX :U * :ASP
+DONNE "CY :V
+DONNE "CZ 0 - :FOC
+; bascule la camera vers le bas (rotation autour de X)
+DONNE "Dx :CX
+DONNE "Dy :CY * :CP + :CZ * :SP
+DONNE "Dz ( 0 - :CY ) * :SP + :CZ * :CP
+DONNE "LN RC ( :Dx * :Dx + :Dy * :Dy + :Dz * :Dz )
+DONNE "Dx :Dx / :LN
+DONNE "Dy :Dy / :LN
+DONNE "Dz :Dz / :LN
+FIN
+
+; ---- lance le rayon primaire et peint le pixel courant ----
+POUR TRACE
+INTERS :EX :EY :EZ :Dx :Dy :Dz
+DONNE "HS :HIT
+SI :HS = 1 [ DONNE "TS :TT ] [ DONNE "TS 99999 ]
+SI :Dy < 0 [ DONNE "HF 1 DONNE "TF ( 0 - :EY ) / :Dy ] [ DONNE "HF 0 ]
+SI ET ( :HS = 1 ) ( OU ( :HF = 0 ) ( :TS < :TF ) ) [
+SPHERECOL :EX :EY :EZ :Dx :Dy :Dz :TS
+POSE :CR :CG :CB
+] [
+SI :HF = 1 [ SOLCOL :EX :EY :EZ :Dx :Dy :Dz ] [ CIELCOL :Dy ]
+POSE :CR :CG :CB
+]
+FIN
+
+POUR START
+VE CT FCFG 0
+; --- oeil et objectif ---
+DONNE "EX 0
+DONNE "EY 1.6
+DONNE "EZ 4.5
+DONNE "FOC 2.4
+DONNE "ASP 1.6
+DONNE "PITCH 14
+DONNE "CP COS :PITCH
+DONNE "SP SIN :PITCH
+; --- sphere posee sur le sol (y=0) ---
+DONNE "SCX 0
+DONNE "SCY 1
+DONNE "SCZ 0
+DONNE "SR 1
+DONNE "REFL 0.92
+; --- teinte du metal (multiplie le reflet) ---
+DONNE "TINTR 1
+DONNE "TINTG 0.80
+DONNE "TINTB 0.43
+; --- lumiere directionnelle (normalisee) ---
+DONNE "LX 0 - 0.5
+DONNE "LY 1
+DONNE "LZ 0.45
+DONNE "LL RC ( :LX * :LX + :LY * :LY + :LZ * :LZ )
+DONNE "LX :LX / :LL
+DONNE "LY :LY / :LL
+DONNE "LZ :LZ / :LL
+; --- parametres d'eclairage ---
+DONNE "AMB 0.18
+DONNE "FOG 16
+DONNE "EPS 0.001
+; --- ciel : zenith (T) et horizon (H) ---
+DONNE "SKTR 90
+DONNE "SKTG 140
+DONNE "SKTB 220
+DONNE "SKHR 200
+DONNE "SKHG 215
+DONNE "SKHB 235
+; --- balayage de l'ecran ---
+DONNE "PAS 4
+DONNE "DEMI :PAS / 2
+DONNE "XMAX 800 - :DEMI
+DONNE "YMAX 500
+FIXETAILLECRAYON :PAS
+REPETEPOUR [ SY ( 0 - :YMAX ) :YMAX :PAS ] [
+DONNE "V :SY / :YMAX
+REPETEPOUR [ SX ( 0 - :XMAX ) :XMAX :PAS ] [
+DONNE "U :SX / :XMAX
+RAYON
+TRACE
+LC FXY ( :SX - :DEMI ) :SY BC FXY ( :SX + :DEMI ) :SY LC
+]
+]
+FIN

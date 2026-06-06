@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoLogo · Documentation</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html" class="active">Overview</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html">From the square to the arcade</a></li>
+    <li><a href="language.html">The Logo language</a></li>
+    <li><a href="examples.html">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>GoLogo</h1>
+    <p>A bilingual French-English Logo. You write, the turtle obeys.</p>
+  </div>
+
+  <p>GoLogo is for <strong>programming in Logo</strong>. Logo is a very simple
+  programming language, invented for learning. At its heart is a little
+  <strong>turtle</strong> shown on the screen&nbsp;: you give it orders (forward,
+  turn, pen up...), it obeys and leaves a trail behind it. By steering it, you draw,
+  and step by step you learn to program.</p>
+
+  <p>With GoLogo, you type a sentence and something happens at once.
+  <code>FORWARD 100</code>, and the turtle draws a line. Change the number, the
+  drawing changes. Make a mistake, you see it straight away. This immediate loop
+  (type, look, try again) is at the heart of Logo&nbsp;: the program stops being an
+  abstract idea and becomes a character you steer.</p>
+
+  <p>And the turtle does not stop at squares. With the same building blocks (loops,
+  variables, procedures), you move on to fractals, animations and real little
+  games.</p>
+
+  <p>GoLogo is an interpreter for the Logo language, built to run on today's
+  computers without losing any of its original simplicity.</p>
+
+  <p>The language takes its cue from the French Logo of the 1980s home computers,
+  in particular the Thomson MO5. It has since been extended to keep up with today's
+  Logos and to offer more&nbsp;: music, mouse, files, iterators, error handling,
+  recursion with no depth limit, and a good deal more.</p>
+
+  <p>GoLogo aims to recapture the look and feel of the 1984 SOLI Logo (the screen, the
+  turtle, the spirit of the commands), but it is neither a clone nor an emulation&nbsp;:
+  it does not replay the period code and does not reproduce the MO5 byte for byte. On the
+  contrary, it adds a host of conveniences and extra instructions to widen what it can do
+  and to improve its compatibility with other Logos.</p>
+
+  <h2>A little history</h2>
+
+  <p>Logo was born in the late 1960s, where mathematics met education. We owe it
+  above all to Seymour Papert, a mathematician who had worked alongside the
+  psychologist Jean Piaget, together with Wally Feurzeig and Cynthia Solomon. Their
+  idea was a new one&nbsp;: give children a real programming language, designed for
+  them, where you learn by doing and experimenting. The turtle, steered step by step,
+  became the symbol of that approach&nbsp;: a concrete object to think with, to make
+  mistakes with, to start over with. Papert told the whole story in his book
+  <em>Mindstorms</em> (1980).</p>
+
+  <p>GoLogo grows out of that tradition. It draws directly on the French Logo of the
+  Thomson machines, both in its language and in its general look and feel. But so as
+  not to stay locked in the 1980s, GoLogo adds an extended instruction set that opens
+  up the full range of what the language can do.</p>
+
+  <h2>What you can do with GoLogo</h2>
+
+  <ul>
+    <li><strong>Draw</strong>&nbsp;: the turtle traces geometric figures from your instructions,
+      from the plainest square to the most intricate fractal.</li>
+    <li><strong>Program</strong>&nbsp;: you define your own procedures, create variables,
+      build loops and conditionals, and combine them freely.</li>
+    <li><strong>Play with data</strong>&nbsp;: Logo handles words, lists and numbers
+      with the same ease.</li>
+    <li><strong>Make music</strong>&nbsp;: the <code>PLAY</code> primitive plays notes
+      across several octaves, with a choice of timbre.</li>
+    <li><strong>Interact</strong>&nbsp;: read the keyboard, query the mouse or joysticks,
+      print text anywhere on the screen.</li>
+    <li><strong>Save</strong>&nbsp;: your procedures and drawings can be stored on disk
+      and reloaded in the next session.</li>
+  </ul>
+
+  <h2>Who is it for?</h2>
+
+  <p>GoLogo suits a child discovering programming just as well as an adult who wants
+  to return to an environment they once knew on a school computer. The Logo language
+  was designed from the start to be immediately approachable&nbsp;: every instruction
+  has a visible effect at once, and you move naturally from the single command to the
+  full program.</p>
+
+  <p>If you already know another Logo, you will find your bearings&nbsp;: GoLogo
+  recognises most of the commands of the reference Logos.</p>
+
+  <h2>Quick start</h2>
+
+  <p>When it starts, the screen holds only the <code>?</code> prompt&nbsp;: GoLogo
+  begins in text mode, and that is where you type your instructions.</p>
+
+  <p>GoLogo starts up in French. Type <code>ENGLISH</code> and press Enter to switch its
+  messages and help to English (<code>FRANCAIS</code> switches back). The commands work
+  in either language regardless.</p>
+
+  <p>To bring up the graphics area, type <code>ST</code> (SHOWTURTLE) and press
+  <kbd>Enter</kbd>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">ST</span></code></pre>
+
+  <p>The graphics area appears, and at its centre a small arrow-shaped character, the
+  <strong>turtle</strong>&nbsp;:</p>
+
+  <p style="text-align:center">
+    <img src="../images/tortue.png" alt="the turtle"
+         style="width:48px;image-rendering:pixelated;vertical-align:middle">
+  </p>
+
+  <p>The turtle holds a <strong>pen</strong>. As it moves, the pen leaves a trail
+  behind it. Now type&nbsp;:</p>
+
+  <pre><code>? <span class="kw">FORWARD</span> <span class="num">100</span></code></pre>
+
+  <p>The turtle moves forward 100 steps, drawing a line from its starting point.
+  Here is the result&nbsp;: the turtle has moved up, and the line marks the path it
+  travelled.</p>
+
+  <img class="shot" src="../images/ex-avance.png" alt="line drawn by FORWARD 100">
+  <p class="shot-cap">FORWARD 100 : the turtle goes up 100 steps and leaves a trail.</p>
+
+  <p>To draw a square in one go&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">50</span> <span class="kw">RT</span> <span class="num">90</span> ]</code></pre>
+
+  <p>That is all. You have just written your first Logo program. The rest of this
+  documentation shows you how to go further, at your own pace.</p>
+
+  <h2>How this manual is organised</h2>
+
+  <table>
+    <tr>
+      <th>Section</th>
+      <th>Contents</th>
+    </tr>
+    <tr>
+      <td><a href="getting-started.html">Getting started</a></td>
+      <td>How to launch GoLogo, use the REPL, type your first instructions, open the
+          editor. A step-by-step guide for beginners.</td>
+    </tr>
+    <tr>
+      <td><a href="language.html">The Logo language</a></td>
+      <td>A full introduction to the language&nbsp;: data, variables, procedures,
+          loops, conditionals, graphics. The essentials for understanding and writing
+          programs.</td>
+    </tr>
+    <tr>
+      <td><a href="examples.html">Example programs</a></td>
+      <td>A collection of annotated programs, from the simplest to the most elaborate,
+          which you can copy and modify freely.</td>
+    </tr>
+    <tr>
+      <td><a href="interface.html">Interface &amp; shortcuts</a></td>
+      <td>A description of the screen, the procedure editor, the help browser, and a
+          full table of keyboard shortcuts.</td>
+    </tr>
+    <tr>
+      <td><a href="commands.html">All commands</a></td>
+      <td>A complete reference of GoLogo's ~150 instructions, organised by category,
+          with parameters and examples.</td>
+    </tr>
+    <tr>
+      <td><a href="index-commands.html">Command index</a></td>
+      <td>An alphabetical list of every command and its aliases, with a link to the
+          matching description.</td>
+    </tr>
+  </table>
+
+  <h2>Conventions used in this manual</h2>
+
+  <p>Logo instructions are written in <strong>upper case</strong> throughout this
+  manual. There is no need to hold Shift&nbsp;: GoLogo automatically turns every
+  character you type into upper case. This cuts down on mistakes and makes typing
+  easier for younger users. Code examples appear on a dark background&nbsp;:</p>
+
+  <pre><code><span class="kw">REPEAT</span> <span class="num">36</span> [ <span class="kw">FD</span> <span class="num">10</span> <span class="kw">RT</span> <span class="num">10</span> ]</code></pre>
+
+  <p>Variable parameters are shown in italics&nbsp;: <code>FD <em>n</em></code> means
+  you replace <em>n</em> with a number.</p>
+
+  <p>In the command tables, the type of each instruction is given&nbsp;:</p>
+  <ul>
+    <li><strong>C</strong> (command)&nbsp;: produces an effect, returns no value.</li>
+    <li><strong>O</strong> (operation)&nbsp;: computes and returns a value.</li>
+    <li><strong>P</strong> (predicate)&nbsp;: returns <code>TRUE</code> or <code>FALSE</code>.</li>
+  </ul>
+
+  <h2 id="about">About GoLogo</h2>
+
+  <p>GoLogo - (C)2024-2026 Cyril LAMY. It is free
+  software, distributed under the
+  <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html" target="_blank" rel="noopener">GPL&nbsp;v2</a> licence.</p>
+
+  <p>It is written in <a href="https://go.dev/" target="_blank" rel="noopener">Go</a> and
+  builds on a few free libraries&nbsp;:
+  <a href="https://gioui.org/" target="_blank" rel="noopener">Gio</a> (cross-platform GUI)
+  and <a href="https://github.com/ebitengine/oto" target="_blank" rel="noopener">oto</a>
+  (sound).</p>
+
+  <p>The documentation of the original SOLI Logo, consulted for this project, can be found
+  on Daniel Coulom's Thomson emulator site,
+  <a href="http://dcmoto.free.fr/" target="_blank" rel="noopener">DCMOTO</a>. To learn more
+  about the Logo language and its history, see the
+  <a href="https://en.wikipedia.org/wiki/Logo_(programming_language)" target="_blank" rel="noopener">Wikipedia article</a>
+  and the <a href="https://el.media.mit.edu/logo-foundation/index.html" target="_blank" rel="noopener">Logo Foundation</a> website.</p>
+
+</main>
+</body>
+</html>
