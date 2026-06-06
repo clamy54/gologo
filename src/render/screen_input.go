@@ -315,7 +315,12 @@ func (s *Screen) handleInput(gtx layout.Context) {
 			if s.edActive.Load() && s.pgResolve != nil {
 				if word := s.edWordAtCursor(); word != "" {
 					if name, ok := s.pgResolve(word); ok {
-						s.openHelpAt(name, extended)
+						// aide directe sur un mot : on ouvre la vue complete. toutes
+						// les fiches y figurent sous leur nom canonique (celui que
+						// rend pgResolve) ; en vue debutant la fiche serait indexee
+						// sous un autre nom (alias long) ou absente (commande
+						// d'extension), d'ou une page vide.
+						s.openHelpAt(name, true)
 						continue
 					}
 				}

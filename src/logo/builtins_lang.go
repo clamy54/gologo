@@ -367,7 +367,12 @@ func (i *Interp) registerOperations() {
 	i.register(&primitive{name: "FIN", arity: 0, fn: func(in *Interp, a []Value) (Value, error) {
 		return Value{}, fmt.Errorf("FIN N'A DE SENS QU'EN DEFINITION DE PROCEDURE")
 	}}, "FIN")
-	i.register(&primitive{name: "SI", special: formeSi}, "SI", "SISINON")
+	// SI (une branche) et SISINON (deux branches) partagent formeSi mais sont deux
+	// primitives distinctes : chacune a sa propre fiche d'aide (cf. helpData), donc
+	// les deux apparaissent dans l'aide debutant. formeSi accepte de toute facon une
+	// 2e liste optionnelle, les deux noms se comportent donc pareil a l'execution.
+	i.register(&primitive{name: "SI", special: formeSi}, "SI")
+	i.register(&primitive{name: "SISINON", special: formeSi}, "SISINON")
 	i.register(&primitive{name: "TANTQUE", special: formeTantque}, "TANTQUE")          // while
 	i.register(&primitive{name: "REPETEPOUR", special: formeRepetepour}, "REPETEPOUR") // for
 	i.register(&primitive{name: "SCENE", special: formeScene}, "SCENE")                // double tampon (anti-clignotement)
