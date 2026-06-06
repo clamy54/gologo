@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Programmes exemples · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="tortue GoLogo">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Démarrer</li>
+    <li><a href="index.html">Présentation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Apprendre</li>
+    <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
+    <li><a href="langage.html">Le langage Logo</a></li>
+    <li><a href="exemples.html" class="active">Programmes exemples</a></li>
+    <li class="section-title">Référence</li>
+    <li><a href="interface.html">Interface &amp; raccourcis</a></li>
+    <li><a href="commandes.html">Toutes les commandes</a></li>
+    <li><a href="index-commandes.html">Index des commandes</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Programmes exemples</h1>
+    <p>Des programmes à recopier, exécuter et modifier, du plus simple au plus élaboré</p>
+  </div>
+
+  <p>Tous les programmes de cette page ont été testés et fonctionnent. Recopiez-les
+  dans l'éditeur (<code>ED</code>), validez avec <kbd>Ctrl</kbd>+<kbd>S</kbd>, puis
+  appelez la procédure depuis le REPL. N'hésitez pas à changer les nombres pour voir
+  ce qui se passe, c'est la meilleure façon d'apprendre.</p>
+
+  <div class="conseil">Au sommaire :
+    <a href="#figures">figures de base</a> ·
+    <a href="#rosaces">rosaces &amp; spirales</a> ·
+    <a href="#maison">le projet maison</a> ·
+    <a href="#couleurs">couleurs</a> ·
+    <a href="#fractales">fractales (récursion)</a> ·
+    <a href="#texte">texte &amp; calcul</a> ·
+    <a href="#musique">musique</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="figures">Figures de base</h2>
+
+  <h3>Le polygone universel</h3>
+  <p>Une seule procédure pour tous les polygones réguliers&nbsp;: on donne le nombre
+  de côtés et leur longueur. L'angle de virage est toujours 360 divisé par le nombre
+  de côtés.</p>
+
+  <pre><code><span class="kw">POUR</span> POLYGONE <span class="var">:N</span> <span class="var">:COTE</span>
+  <span class="kw">REPETE</span> <span class="var">:N</span> [ <span class="kw">AV</span> <span class="var">:COTE</span> <span class="kw">TD</span> <span class="num">360</span> / <span class="var">:N</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Essayez&nbsp;: <code>POLYGONE 3 100</code> (triangle), <code>POLYGONE 5 80</code>
+  (pentagone), <code>POLYGONE 8 60</code> (octogone), <code>POLYGONE 36 12</code>
+  (presque un cercle).</p>
+
+  <img class="shot" src="../images/ex-polygone.png" alt="octogone">
+  <p class="shot-cap">POLYGONE 8 70 : un octogone régulier.</p>
+
+  <h3>L'étoile</h3>
+  <p>En tournant d'un angle plus grand que pour un polygone, le tracé se croise et
+  forme une étoile&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> ETOILE <span class="var">:COTE</span>
+  <span class="kw">REPETE</span> <span class="num">5</span> [ <span class="kw">AV</span> <span class="var">:COTE</span> <span class="kw">TD</span> <span class="num">144</span> ]
+<span class="kw">FIN</span></code></pre>
+
+<img class="shot" src="../images/ex-etoile.png" alt="étoile à 5 branches">
+  <p class="shot-cap">REPETE 5 [ AV 150 TD 144 ] : l'étoile à cinq branches.</p>
+
+  <h3>L'escalier</h3>
+  <pre><code><span class="kw">POUR</span> MARCHE <span class="var">:H</span>
+  <span class="kw">AV</span> <span class="var">:H</span> <span class="kw">TD</span> <span class="num">90</span> <span class="kw">AV</span> <span class="var">:H</span> <span class="kw">TG</span> <span class="num">90</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> ESCALIER <span class="var">:N</span> <span class="var">:H</span>
+  <span class="kw">REPETE</span> <span class="var">:N</span> [ <span class="kw">MARCHE</span> <span class="var">:H</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Appelez <code>ESCALIER 6 30</code>. Remarquez comment <code>ESCALIER</code>
+  s'appuie sur <code>MARCHE</code>&nbsp;: on construit un gros programme à partir de
+  petites briques. C'est tout l'art de la programmation Logo.</p>
+
+  <!-- ============================================================ -->
+<img class="shot" src="../images/ex-escalier.png" alt="escalier">
+  <p class="shot-cap">ESCALIER 6 30 : six marches.</p>
+
+  <h2 id="rosaces">Rosaces &amp; spirales</h2>
+
+  <h3>La rosace de carrés</h3>
+  <p>On répète une figure en la faisant tourner un peu à chaque fois. Ici, 12 carrés
+  espacés de 30 degrés (12 × 30 = 360, le tour complet)&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> CARRE <span class="var">:C</span>
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="var">:C</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> ROSACE
+  <span class="kw">VE</span>
+  <span class="kw">REPETE</span> <span class="num">12</span> [ <span class="kw">CARRE</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">30</span> ]
+<span class="kw">FIN</span></code></pre>
+
+<img class="shot" src="../images/ex-rosace.png" alt="rosace de carrés">
+  <p class="shot-cap">ROSACE : douze carrés tournés de 30°.</p>
+
+  <h3>La spirale carrée</h3>
+  <p>À chaque tour, le côté grandit. On utilise <code>COMPTEUR</code>, qui donne le
+  numéro de l'itération en cours&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> SPIRALE
+  <span class="kw">VE</span>
+  <span class="kw">REPETE</span> <span class="num">40</span> [ <span class="kw">AV</span> <span class="kw">COMPTEUR</span> * <span class="num">5</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span></code></pre>
+
+<img class="shot" src="../images/ex-spirale.png" alt="spirale carrée colorée">
+  <p class="shot-cap">SPIRALE : le côté grandit à chaque tour.</p>
+
+  <h3>La spirale douce</h3>
+  <p>En tournant d'un angle qui n'est pas un diviseur de 360, on obtient une
+  spirale arrondie&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> SPIRO
+  <span class="kw">VE</span>
+  <span class="kw">REPETE</span> <span class="num">100</span> [ <span class="kw">AV</span> <span class="kw">COMPTEUR</span> <span class="kw">TD</span> <span class="num">59</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <!-- ============================================================ -->
+<img class="shot" src="../images/ex-spiro.png" alt="spirale douce">
+  <p class="shot-cap">SPIRO : rosace obtenue avec un angle de 59°.</p>
+
+  <h2 id="maison">Le projet : dessiner une maison</h2>
+
+  <p>Voici un projet complet, dans l'esprit du livre d'initiation au Logo&nbsp;:
+  on dessine une maison en l'assemblant à partir de briques simples, un carré pour
+  le mur, un triangle pour le toit.</p>
+
+  <pre><code><span class="kw">POUR</span> MUR
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> TOIT
+  <span class="kw">REPETE</span> <span class="num">3</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">120</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> MAISON
+  <span class="kw">VE</span>
+  <span class="kw">MUR</span>
+  <span class="kw">AV</span> <span class="num">80</span>        <span class="cmt">; monte en haut du mur</span>
+  <span class="kw">TD</span> <span class="num">30</span>        <span class="cmt">; oriente pour le toit</span>
+  <span class="kw">TOIT</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Appelez <code>MAISON</code>. Le secret est dans le placement&nbsp;: après avoir
+  tracé le mur, la tortue est revenue à son point de départ&nbsp;; on la fait monter
+  le long du mur, on l'incline de 30 degrés, et le toit se pose pile dessus.</p>
+
+  <div class="conseil">
+    <strong>À vous de jouer&nbsp;:</strong> ajoutez une procédure <code>PORTE</code>
+    et une procédure <code>FENETRE</code>, puis appelez-les depuis <code>MAISON</code>.
+    Pensez à lever le crayon (<code>LC</code>) pour déplacer la tortue sans tracer,
+    et à le rebaisser (<code>BC</code>) avant de dessiner.
+  </div>
+
+<img class="shot" src="../images/ex-maison.png" alt="maison">
+  <p class="shot-cap">MAISON : un mur carré surmonté d'un toit triangulaire.</p>
+
+  <h3>Un village</h3>
+  <p>Une fois le mur <em>et</em> le toit définis, on peut aligner plusieurs maisons pour
+  former une rangée. Pour chaque maison, on trace le mur puis le toit, on revient au
+  pied du mur, puis on lève le crayon pour se décaler vers la droite. On commence assez
+  à gauche pour que toute la rangée tienne à l'écran&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> VILLAGE <span class="var">:N</span>
+  <span class="kw">VE</span>
+  <span class="kw">LC</span> <span class="kw">TG</span> <span class="num">90</span> <span class="kw">AV</span> <span class="num">220</span> <span class="kw">TD</span> <span class="num">90</span> <span class="kw">BC</span>                 <span class="cmt">; place la tortue à gauche</span>
+  <span class="kw">REPETE</span> <span class="var">:N</span> [
+    <span class="kw">MUR</span>  <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">30</span> <span class="kw">TOIT</span>  <span class="kw">TG</span> <span class="num">30</span> <span class="kw">RE</span> <span class="num">80</span>     <span class="cmt">; une maison (mur + toit)</span>
+    <span class="kw">LC</span> <span class="kw">TD</span> <span class="num">90</span> <span class="kw">AV</span> <span class="num">90</span> <span class="kw">TG</span> <span class="num">90</span> <span class="kw">BC</span>                <span class="cmt">; décale vers la droite</span>
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Appelez <code>VILLAGE 5</code> pour cinq maisons côte à côte (jusqu'à cinq
+  tiennent à l'écran).</p>
+
+  <img class="shot" src="../images/ex-village.png" alt="rangée de maisons">
+  <p class="shot-cap">VILLAGE 5 : une rangée de maisons à toit.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="couleurs">Jouer avec les couleurs</h2>
+
+  <h3>Le ventilateur arc-en-ciel</h3>
+  <p>On change la couleur du crayon à chaque branche en utilisant
+  <code>COMPTEUR</code> comme code de couleur&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> EVENTAIL
+  <span class="kw">VE</span>
+  <span class="kw">REPETE</span> <span class="num">15</span> [ <span class="kw">FCC</span> <span class="kw">COMPTEUR</span> <span class="kw">AV</span> <span class="num">120</span> <span class="kw">RE</span> <span class="num">120</span> <span class="kw">TD</span> <span class="num">24</span> ]
+<span class="kw">FIN</span></code></pre>
+
+<img class="shot" src="../images/ex-eventail.png" alt="éventail de couleurs">
+  <p class="shot-cap">EVENTAIL : une branche par couleur de la palette.</p>
+
+  <h3>Le carré plein</h3>
+  <p>On trace un carré, puis on le remplit. <code>FCR</code> choisit la couleur de
+  remplissage, distincte de celle du contour. <code>REMPLIS</code> remplit la zone
+  <strong>qui contient la tortue</strong>&nbsp;: après avoir tracé le carré, la tortue
+  est revenue sur un coin, c'est-à-dire <em>sur</em> le trait. Il faut donc d'abord
+  l'amener <strong>à l'intérieur</strong> du carré, sinon le remplissage déborde au lieu
+  de colorier l'intérieur&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> CARRE_PLEIN
+  <span class="kw">VE</span>
+  <span class="kw">FCC</span> <span class="num">7</span>     <span class="cmt">; contour blanc</span>
+  <span class="kw">FCR</span> <span class="num">1</span>     <span class="cmt">; remplissage rouge</span>
+  <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">80</span> <span class="kw">TD</span> <span class="num">90</span> ]
+  <span class="kw">LC</span> <span class="kw">AV</span> <span class="num">40</span> <span class="kw">TD</span> <span class="num">90</span> <span class="kw">AV</span> <span class="num">40</span> <span class="kw">BC</span>   <span class="cmt">; se placer à l'intérieur du carré</span>
+  <span class="kw">REMPLIS</span>
+<span class="kw">FIN</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="fractales">Fractales : la puissance de la récursion</h2>
+
+  <p>Une procédure récursive s'appelle elle-même. C'est l'outil rêvé pour les
+  dessins qui se répètent à toutes les échelles.</p>
+
+  <h3>L'arbre</h3>
+  <p>Un tronc, puis deux branches plus petites, qui se divisent à leur tour… jusqu'à
+  ce que les branches deviennent trop courtes pour continuer.</p>
+
+  <pre><code><span class="kw">POUR</span> ARBRE <span class="var">:T</span>
+  <span class="kw">SI</span> <span class="var">:T</span> &lt; <span class="num">5</span> [ <span class="kw">STOP</span> ]      <span class="cmt">; arrêt quand la branche est trop petite</span>
+  <span class="kw">AV</span> <span class="var">:T</span>
+  <span class="kw">TG</span> <span class="num">30</span> <span class="kw">ARBRE</span> <span class="var">:T</span> * <span class="num">0.7</span>   <span class="cmt">; branche de gauche</span>
+  <span class="kw">TD</span> <span class="num">60</span> <span class="kw">ARBRE</span> <span class="var">:T</span> * <span class="num">0.7</span>   <span class="cmt">; branche de droite</span>
+  <span class="kw">TG</span> <span class="num">30</span>
+  <span class="kw">RE</span> <span class="var">:T</span>                  <span class="cmt">; revient au pied de la branche</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> DESSINE_ARBRE
+  <span class="kw">VE</span>
+  <span class="kw">FCAP</span> <span class="num">0</span>
+  <span class="kw">RE</span> <span class="num">100</span>
+  <span class="kw">ARBRE</span> <span class="num">60</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Changez le <code>0.7</code> (taux de réduction) ou les angles pour obtenir des
+  arbres très différents.</p>
+
+<img class="shot" src="../images/ex-arbre.png" alt="arbre fractal">
+  <p class="shot-cap">DESSINE_ARBRE : chaque branche se divise en deux plus petites.</p>
+
+  <h3>Le flocon de Koch</h3>
+  <p>Chaque côté du flocon est remplacé par une ligne brisée, elle-même composée de
+  lignes brisées plus petites&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> KOCH <span class="var">:L</span> <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> = <span class="num">0</span> [ <span class="kw">AV</span> <span class="var">:L</span> <span class="kw">STOP</span> ]
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+  <span class="kw">TG</span> <span class="num">60</span>
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+  <span class="kw">TD</span> <span class="num">120</span>
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+  <span class="kw">TG</span> <span class="num">60</span>
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> FLOCON <span class="var">:N</span>
+  <span class="kw">VE</span>
+  <span class="kw">REPETE</span> <span class="num">3</span> [ <span class="kw">KOCH</span> <span class="num">150</span> <span class="var">:N</span> <span class="kw">TD</span> <span class="num">120</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Appelez <code>FLOCON 3</code>. Essayez <code>FLOCON 1</code>, <code>FLOCON 2</code>,
+  <code>FLOCON 4</code> pour voir le détail augmenter à chaque niveau.</p>
+
+  <!-- ============================================================ -->
+<img class="shot" src="../images/ex-flocon.png" alt="flocon de Koch">
+  <p class="shot-cap">FLOCON 3 : chaque côté est redécoupé trois fois.</p>
+
+  <h2 id="texte">Texte &amp; calcul</h2>
+
+  <h3>La table de multiplication</h3>
+  <pre><code><span class="kw">POUR</span> TABLE <span class="var">:N</span>
+  <span class="kw">REPETEPOUR</span> [ I <span class="num">1</span> <span class="num">10</span> ] [
+    ( <span class="kw">ECRIS</span> <span class="var">:N</span> <span class="str">"x</span> <span class="var">:I</span> <span class="str">"=</span> <span class="var">:N</span> * <span class="var">:I</span> )
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Appelez <code>TABLE 7</code>. La forme entre parenthèses
+  <code>( ECRIS … )</code> permet d'écrire plusieurs éléments sur la même ligne,
+  séparés par une espace.</p>
+
+  <h3>Compte à rebours récursif</h3>
+  <pre><code><span class="kw">POUR</span> REBOURS <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> = <span class="num">0</span> [ <span class="kw">ECRIS</span> <span class="str">"PARTEZ</span> <span class="kw">STOP</span> ]
+  <span class="kw">ECRIS</span> <span class="var">:N</span>
+  <span class="kw">REBOURS</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Calculer une factorielle</h3>
+  <p>Une opération récursive qui retourne un résultat avec <code>RENDS</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> FACT <span class="var">:N</span>
+  <span class="kw">SI</span> <span class="var">:N</span> &lt; <span class="num">2</span> [ <span class="kw">RENDS</span> <span class="num">1</span> ]
+  <span class="kw">RENDS</span> <span class="var">:N</span> * <span class="kw">FACT</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Testez avec <code>ECRIS FACT 5</code> (qui affiche 120).</p>
+
+  <h3>Un petit dialogue</h3>
+  <p>On demande son prénom à l'utilisateur, puis on le salue&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> BONJOUR
+  <span class="kw">LIS</span> [ COMMENT T APPELLES-TU ] <span class="str">"NOM</span>
+  ( <span class="kw">ECRIS</span> <span class="str">"BONJOUR</span> <span class="var">:NOM</span> )
+<span class="kw">FIN</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="musique">Musique</h2>
+
+  <h3>La gamme</h3>
+  <pre><code><span class="kw">POUR</span> GAMME
+  <span class="kw">JOUE</span> [ <span class="str">DO</span> <span class="str">RE</span> <span class="str">MI</span> <span class="str">FA</span> <span class="str">SOL</span> <span class="str">LA</span> <span class="str">SI</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Une petite mélodie</h3>
+  <pre><code><span class="kw">POUR</span> AU_CLAIR
+  <span class="kw">TEMPO</span> <span class="num">8</span>
+  <span class="kw">JOUE</span> [ <span class="str">DO</span> <span class="str">DO</span> <span class="str">DO</span> <span class="str">RE</span> <span class="str">MI</span> ]
+  <span class="kw">JOUE</span> [ <span class="str">RE</span> <span class="str">DO</span> <span class="str">MI</span> <span class="str">RE</span> <span class="str">RE</span> <span class="str">DO</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Dessiner en musique</h3>
+  <p>On peut mêler graphisme et son&nbsp;: à chaque côté du polygone, on joue une note.</p>
+
+  <pre><code><span class="kw">POUR</span> CARRE_SONORE
+  <span class="kw">VE</span>
+  <span class="kw">POURCHAQUE</span> [ <span class="str">DO</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">DO</span> ] [
+    <span class="kw">JOUE</span> <span class="var">:?</span>
+    <span class="kw">AV</span> <span class="num">80</span>
+    <span class="kw">TD</span> <span class="num">90</span>
+  ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>Au-delà de ces petits exemples, GoLogo est livré avec des programmes un peu plus
+  complets (figures, images de synthèse, vrais petits jeux). Pour savoir comment les
+  lister, les charger et les essayer, rendez-vous dans la
+  <a href="prise-en-main.html#exemples-fournis">prise en main, section
+  «&nbsp;Explorer les exemples fournis&nbsp;»</a>.</p>
+
+  <p>Et maintenant, à vous d'inventer vos propres programmes. Bon Logo&nbsp;!</p>
+
+</main>
+</body>
+</html>

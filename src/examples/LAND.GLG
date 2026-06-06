@@ -1,0 +1,111 @@
+
+; ---- borne une composante couleur dans 0..255 ----
+POUR BORNE :V
+DONNE "W ARRONDI :V
+SI :W < 0 [ RENDS 0 ]
+SI :W > 255 [ RENDS 255 ]
+RENDS :W
+FIN
+
+; ---- altitude du terrain au point ( X , Z ) : somme de sinus ----
+POUR RELIEF :X :Z
+DONNE "H 0
+DONNE "H :H + 1.10 * SIN ( :X * :KA + :Z * :KB + :P1 )
+DONNE "H :H + 0.55 * SIN ( :X * 70 - :Z * 48 + :P2 )
+DONNE "H :H + 0.45 * COS ( :Z * 58 + :P3 )
+DONNE "H :H + 0.50 * SIN ( :X * :KC - :Z * 27 + :P4 )
+DONNE "H :H + 0.28 * SIN ( :X * 131 + :Z * 97 + :P5 )
+RENDS :H
+FIN
+
+; ---- projette le point monde ( X , Y , Z ) a l'ecran ----
+POUR PROJET :X :Y :Z
+DONNE "RX :X
+DONNE "RY :Y - :CAMY
+DONNE "RZ :Z
+DONNE "RY2 :RY * :CP - :RZ * :SP
+DONNE "RZ2 :RY * :SP + :RZ * :CP
+SI :RZ2 < 0.4 [ DONNE "POK 0 STOP ]
+DONNE "POK 1
+DONNE "PSX ( :RX / :RZ2 ) * :KX
+DONNE "PSY ( :RY2 / :RZ2 ) * :KY
+FIN
+
+; ---- couleur du crayon selon la profondeur Z (fondu vers le fond) ----
+POUR TEINTE :Z
+DONNE "FG ( :Z - :ZN ) / ( :ZF - :ZN )
+SI :FG < 0 [ DONNE "FG 0 ]
+SI :FG > 1 [ DONNE "FG 1 ]
+DONNE "CR :LR * ( 1 - :FG ) + :BR * :FG
+DONNE "CG :LG * ( 1 - :FG ) + :BG * :FG
+DONNE "CB :LB * ( 1 - :FG ) + :BB * :FG
+FCC MP BORNE :CR MP BORNE :CG MP BORNE :CB [ ]
+FIN
+
+; ---- trace le segment du point precedent ( PPSX,PPSY ) au courant ----
+POUR LIEN :ZC
+SI ET ( :POK = 1 ) ( :PPOK = 1 ) [
+TEINTE :ZC
+LC FXY :PPSX :PPSY BC FXY :PSX :PSY LC
+]
+DONNE "PPSX :PSX
+DONNE "PPSY :PSY
+DONNE "PPOK :POK
+FIN
+
+POUR START
+VE CT FEN
+FCFG MP 8 MP 12 MP 26 [ ]
+FIXETAILLECRAYON 1
+; --- relief tire au hasard (frequences + phases) ---
+DONNE "KA ( HASARD 26 40 )
+DONNE "KB ( HASARD 12 22 )
+DONNE "KC ( HASARD 15 26 )
+DONNE "P1 HASARD 360
+DONNE "P2 HASARD 360
+DONNE "P3 HASARD 360
+DONNE "P4 HASARD 360
+DONNE "P5 HASARD 360
+; --- camera ---
+DONNE "CAMY 2.2
+DONNE "PITCH 4
+DONNE "CP COS :PITCH
+DONNE "SP SIN :PITCH
+DONNE "KX 820
+DONNE "KY 820
+; --- couleur des mailles : pres (L) -> loin / fond (B) ---
+DONNE "LR 60
+DONNE "LG 235
+DONNE "LB 220
+DONNE "BR 10
+DONNE "BG 16
+DONNE "BB 34
+; --- grille du terrain ---
+DONNE "GX 7
+DONNE "ZN 1.6
+DONNE "ZF 22
+DONNE "NX 56
+DONNE "NZ 44
+DONNE "DX ( 2 * :GX ) / :NX
+DONNE "DZ ( :ZF - :ZN ) / :NZ
+; --- lignes suivant X (a Z constant) ---
+REPETEPOUR [ J 0 :NZ 1 ] [
+DONNE "Z :ZN + :J * :DZ
+DONNE "PPOK 0
+REPETEPOUR [ I 0 :NX 1 ] [
+DONNE "X ( 0 - :GX ) + :I * :DX
+PROJET :X RELIEF :X :Z :Z
+LIEN :Z
+]
+]
+; --- lignes suivant Z (a X constant) ---
+REPETEPOUR [ I 0 :NX 1 ] [
+DONNE "X ( 0 - :GX ) + :I * :DX
+DONNE "PPOK 0
+REPETEPOUR [ J 0 :NZ 1 ] [
+DONNE "Z :ZN + :J * :DZ
+PROJET :X RELIEF :X :Z :Z
+LIEN :Z
+]
+]
+FIN

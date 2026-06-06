@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Example programs · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html">From the square to the arcade</a></li>
+    <li><a href="language.html">The Logo language</a></li>
+    <li><a href="examples.html" class="active">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Example programs</h1>
+    <p>Programs to copy, run and modify, from the simplest to the most elaborate</p>
+  </div>
+
+  <p>Every program on this page has been tested and works. Copy them into the editor
+  (<code>EDIT</code>), validate with <kbd>Ctrl</kbd>+<kbd>S</kbd>, then call the
+  procedure from the REPL. Do not hesitate to change the numbers to see what happens,
+  it is the best way to learn.</p>
+
+  <div class="conseil">Contents:
+    <a href="#shapes">basic shapes</a> ·
+    <a href="#rosettes">rosettes &amp; spirals</a> ·
+    <a href="#house">the house project</a> ·
+    <a href="#colours">colours</a> ·
+    <a href="#fractals">fractals (recursion)</a> ·
+    <a href="#text">text &amp; computation</a> ·
+    <a href="#music">music</a>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="shapes">Basic shapes</h2>
+
+  <h3>The universal polygon</h3>
+  <p>A single procedure for every regular polygon&nbsp;: you give the number of sides
+  and their length. The turn is always 360 divided by the number of sides.</p>
+
+  <pre><code><span class="kw">TO</span> POLYGON <span class="var">:N</span> <span class="var">:SIDE</span>
+  <span class="kw">REPEAT</span> <span class="var">:N</span> [ <span class="kw">FD</span> <span class="var">:SIDE</span> <span class="kw">RT</span> <span class="num">360</span> / <span class="var">:N</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>Try&nbsp;: <code>POLYGON 3 100</code> (triangle), <code>POLYGON 5 80</code>
+  (pentagon), <code>POLYGON 8 60</code> (octagon), <code>POLYGON 36 12</code>
+  (almost a circle).</p>
+
+  <img class="shot" src="../images/ex-polygone.png" alt="octagon">
+  <p class="shot-cap">POLYGON 8 70 : a regular octagon.</p>
+
+  <h3>The star</h3>
+  <p>By turning through a larger angle than for a polygon, the path crosses itself and
+  forms a star&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> STAR <span class="var">:SIDE</span>
+  <span class="kw">REPEAT</span> <span class="num">5</span> [ <span class="kw">FD</span> <span class="var">:SIDE</span> <span class="kw">RT</span> <span class="num">144</span> ]
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-etoile.png" alt="five-pointed star">
+  <p class="shot-cap">REPEAT 5 [ FD 150 RT 144 ] : the five-pointed star.</p>
+
+  <h3>The staircase</h3>
+  <pre><code><span class="kw">TO</span> STEP <span class="var">:H</span>
+  <span class="kw">FD</span> <span class="var">:H</span> <span class="kw">RT</span> <span class="num">90</span> <span class="kw">FD</span> <span class="var">:H</span> <span class="kw">LT</span> <span class="num">90</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> STAIRS <span class="var">:N</span> <span class="var">:H</span>
+  <span class="kw">REPEAT</span> <span class="var">:N</span> [ <span class="kw">STEP</span> <span class="var">:H</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>Call <code>STAIRS 6 30</code>. Notice how <code>STAIRS</code> relies on
+  <code>STEP</code>&nbsp;: you build a big program out of small bricks. That is the
+  whole art of Logo programming.</p>
+
+  <img class="shot" src="../images/ex-escalier.png" alt="staircase">
+  <p class="shot-cap">STAIRS 6 30 : six steps.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="rosettes">Rosettes &amp; spirals</h2>
+
+  <h3>The rosette of squares</h3>
+  <p>You repeat a figure while turning it a little each time. Here, 12 squares spaced
+  by 30 degrees (12 × 30 = 360, a full turn)&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SQUARE <span class="var">:C</span>
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="var">:C</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> ROSETTE
+  <span class="kw">CS</span>
+  <span class="kw">REPEAT</span> <span class="num">12</span> [ <span class="kw">SQUARE</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">30</span> ]
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-rosace.png" alt="rosette of squares">
+  <p class="shot-cap">ROSETTE : twelve squares turned by 30°.</p>
+
+  <h3>The square spiral</h3>
+  <p>On each turn, the side grows. We use <code>REPCOUNT</code>, which gives the number
+  of the current iteration&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SPIRAL
+  <span class="kw">CS</span>
+  <span class="kw">REPEAT</span> <span class="num">40</span> [ <span class="kw">FD</span> <span class="kw">REPCOUNT</span> * <span class="num">5</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-spirale.png" alt="square spiral">
+  <p class="shot-cap">SPIRAL : the side grows on every turn.</p>
+
+  <h3>The smooth spiral</h3>
+  <p>By turning through an angle that is not a divisor of 360, you get a rounded
+  spiral&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> SPIRO
+  <span class="kw">CS</span>
+  <span class="kw">REPEAT</span> <span class="num">100</span> [ <span class="kw">FD</span> <span class="kw">REPCOUNT</span> <span class="kw">RT</span> <span class="num">59</span> ]
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-spiro.png" alt="smooth spiral">
+  <p class="shot-cap">SPIRO : a rosette made with a 59° angle.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="house">The project: drawing a house</h2>
+
+  <p>Here is a complete project, in the spirit of the Logo primer&nbsp;: you draw a
+  house by assembling it from simple bricks, a square for the wall, a triangle for the
+  roof.</p>
+
+  <pre><code><span class="kw">TO</span> WALL
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> ROOF
+  <span class="kw">REPEAT</span> <span class="num">3</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">120</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> HOUSE
+  <span class="kw">CS</span>
+  <span class="kw">WALL</span>
+  <span class="kw">FD</span> <span class="num">80</span>        <span class="cmt">; go up to the top of the wall</span>
+  <span class="kw">RT</span> <span class="num">30</span>        <span class="cmt">; orient for the roof</span>
+  <span class="kw">ROOF</span>
+<span class="kw">END</span></code></pre>
+
+  <p>Call <code>HOUSE</code>. The secret is in the placement&nbsp;: after drawing the
+  wall, the turtle is back at its start&nbsp;; we send it up along the wall, tilt it by
+  30 degrees, and the roof lands right on top.</p>
+
+  <img class="shot" src="../images/ex-maison.png" alt="house">
+  <p class="shot-cap">HOUSE : a square wall topped by a triangular roof.</p>
+
+  <div class="conseil">
+    <strong>Your turn&nbsp;:</strong> add a <code>DOOR</code> procedure and a
+    <code>WINDOW</code> procedure, then call them from <code>HOUSE</code>. Remember to
+    lift the pen (<code>PU</code>) to move the turtle without drawing, and to lower it
+    (<code>PD</code>) before drawing.
+  </div>
+
+  <h3>A village</h3>
+  <p>Once the wall <em>and</em> the roof are defined, you can line up several houses to
+  make a row. For each house we draw the wall then the roof, come back to the foot of the
+  wall, then lift the pen to shift to the right. We start far enough to the left so the
+  whole row fits on screen&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> VILLAGE <span class="var">:N</span>
+  <span class="kw">CS</span>
+  <span class="kw">PU</span> <span class="kw">LT</span> <span class="num">90</span> <span class="kw">FD</span> <span class="num">220</span> <span class="kw">RT</span> <span class="num">90</span> <span class="kw">PD</span>                 <span class="cmt">; place the turtle on the left</span>
+  <span class="kw">REPEAT</span> <span class="var">:N</span> [
+    <span class="kw">WALL</span>  <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">30</span> <span class="kw">ROOF</span>  <span class="kw">LT</span> <span class="num">30</span> <span class="kw">BK</span> <span class="num">80</span>     <span class="cmt">; one house (wall + roof)</span>
+    <span class="kw">PU</span> <span class="kw">RT</span> <span class="num">90</span> <span class="kw">FD</span> <span class="num">90</span> <span class="kw">LT</span> <span class="num">90</span> <span class="kw">PD</span>                <span class="cmt">; shift to the right</span>
+  ]
+<span class="kw">END</span></code></pre>
+
+  <p>Call <code>VILLAGE 5</code> for five houses side by side (up to five fit on screen).</p>
+
+  <img class="shot" src="../images/ex-village.png" alt="row of houses">
+  <p class="shot-cap">VILLAGE 5 : a row of houses with roofs.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="colours">Playing with colours</h2>
+
+  <h3>The rainbow fan</h3>
+  <p>We change the pen colour on each spoke by using <code>REPCOUNT</code> as the
+  colour code&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> FAN
+  <span class="kw">CS</span>
+  <span class="kw">REPEAT</span> <span class="num">15</span> [ <span class="kw">SETPC</span> <span class="kw">REPCOUNT</span> <span class="kw">FD</span> <span class="num">120</span> <span class="kw">BK</span> <span class="num">120</span> <span class="kw">RT</span> <span class="num">24</span> ]
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-eventail.png" alt="fan of colours">
+  <p class="shot-cap">FAN : one spoke per palette colour.</p>
+
+  <h3>The filled square</h3>
+  <p>We draw a square, then fill it. <code>SETFC</code> chooses a fill colour distinct
+  from the outline. <code>FILL</code> fills the area <strong>that contains the
+  turtle</strong>&nbsp;: after drawing the square the turtle is back on a corner, that is
+  <em>on</em> the line. So we must first bring it <strong>inside</strong> the square,
+  otherwise the fill spills out instead of colouring the inside&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> FILLEDSQUARE
+  <span class="kw">CS</span>
+  <span class="kw">SETPC</span> <span class="num">7</span>     <span class="cmt">; white outline</span>
+  <span class="kw">SETFC</span> <span class="num">1</span>     <span class="cmt">; red fill</span>
+  <span class="kw">REPEAT</span> <span class="num">4</span> [ <span class="kw">FD</span> <span class="num">80</span> <span class="kw">RT</span> <span class="num">90</span> ]
+  <span class="kw">PU</span> <span class="kw">FD</span> <span class="num">40</span> <span class="kw">RT</span> <span class="num">90</span> <span class="kw">FD</span> <span class="num">40</span> <span class="kw">PD</span>   <span class="cmt">; move inside the square</span>
+  <span class="kw">FILL</span>
+<span class="kw">END</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="fractals">Fractals: the power of recursion</h2>
+
+  <p>A recursive procedure calls itself. It is the perfect tool for drawings that
+  repeat at every scale.</p>
+
+  <h3>The tree</h3>
+  <p>A trunk, then two smaller branches, which split in turn, until the branches grow
+  too short to continue.</p>
+
+  <pre><code><span class="kw">TO</span> TREE <span class="var">:T</span>
+  <span class="kw">IF</span> <span class="var">:T</span> &lt; <span class="num">5</span> [ <span class="kw">STOP</span> ]      <span class="cmt">; stop when the branch is too small</span>
+  <span class="kw">FD</span> <span class="var">:T</span>
+  <span class="kw">LT</span> <span class="num">30</span> <span class="kw">TREE</span> <span class="var">:T</span> * <span class="num">0.7</span>   <span class="cmt">; left branch</span>
+  <span class="kw">RT</span> <span class="num">60</span> <span class="kw">TREE</span> <span class="var">:T</span> * <span class="num">0.7</span>   <span class="cmt">; right branch</span>
+  <span class="kw">LT</span> <span class="num">30</span>
+  <span class="kw">BK</span> <span class="var">:T</span>                  <span class="cmt">; back to the foot of the branch</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> DRAWTREE
+  <span class="kw">CS</span>
+  <span class="kw">SETH</span> <span class="num">0</span>
+  <span class="kw">BK</span> <span class="num">100</span>
+  <span class="kw">TREE</span> <span class="num">60</span>
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-arbre.png" alt="fractal tree">
+  <p class="shot-cap">DRAWTREE : each branch splits into two smaller ones.</p>
+
+  <p>Change the <code>0.7</code> (the shrink rate) or the angles to get very different
+  trees.</p>
+
+  <h3>The Koch snowflake</h3>
+  <p>Each side of the snowflake is replaced by a broken line, itself made of smaller
+  broken lines&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> KOCH <span class="var">:L</span> <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> = <span class="num">0</span> [ <span class="kw">FD</span> <span class="var">:L</span> <span class="kw">STOP</span> ]
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+  <span class="kw">LT</span> <span class="num">60</span>
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+  <span class="kw">RT</span> <span class="num">120</span>
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+  <span class="kw">LT</span> <span class="num">60</span>
+  <span class="kw">KOCH</span> <span class="var">:L</span> / <span class="num">3</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> SNOWFLAKE <span class="var">:N</span>
+  <span class="kw">CS</span>
+  <span class="kw">REPEAT</span> <span class="num">3</span> [ <span class="kw">KOCH</span> <span class="num">150</span> <span class="var">:N</span> <span class="kw">RT</span> <span class="num">120</span> ]
+<span class="kw">END</span></code></pre>
+
+  <img class="shot" src="../images/ex-flocon.png" alt="Koch snowflake">
+  <p class="shot-cap">SNOWFLAKE 3 : each side is split three times over.</p>
+
+  <p>Call <code>SNOWFLAKE 3</code>. Try <code>SNOWFLAKE 1</code>,
+  <code>SNOWFLAKE 2</code>, <code>SNOWFLAKE 4</code> to watch the detail grow at each
+  level.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="text">Text &amp; computation</h2>
+
+  <h3>The times table</h3>
+  <pre><code><span class="kw">TO</span> TIMESTABLE <span class="var">:N</span>
+  <span class="kw">FOR</span> [ I <span class="num">1</span> <span class="num">10</span> ] [
+    ( <span class="kw">PRINT</span> <span class="var">:N</span> <span class="str">"x</span> <span class="var">:I</span> <span class="str">"=</span> <span class="var">:N</span> * <span class="var">:I</span> )
+  ]
+<span class="kw">END</span></code></pre>
+
+  <p>Call <code>TIMESTABLE 7</code>. The parenthesised form
+  <code>( PRINT … )</code> lets you print several items on the same line, separated by
+  a space.</p>
+
+  <h3>Recursive countdown</h3>
+  <pre><code><span class="kw">TO</span> COUNTDOWN <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> = <span class="num">0</span> [ <span class="kw">PRINT</span> <span class="str">"GO</span> <span class="kw">STOP</span> ]
+  <span class="kw">PRINT</span> <span class="var">:N</span>
+  <span class="kw">COUNTDOWN</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">END</span></code></pre>
+
+  <h3>Computing a factorial</h3>
+  <p>A recursive operation that returns a result with <code>OUTPUT</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> FACT <span class="var">:N</span>
+  <span class="kw">IF</span> <span class="var">:N</span> &lt; <span class="num">2</span> [ <span class="kw">OUTPUT</span> <span class="num">1</span> ]
+  <span class="kw">OUTPUT</span> <span class="var">:N</span> * <span class="kw">FACT</span> <span class="var">:N</span> - <span class="num">1</span>
+<span class="kw">END</span></code></pre>
+
+  <p>Test it with <code>PRINT FACT 5</code> (which prints 120).</p>
+
+  <h3>A little dialogue</h3>
+  <p>We ask the user for their name, then greet them&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> HELLO
+  <span class="kw">READ</span> [ WHAT IS YOUR NAME ] <span class="str">"NAME</span>
+  ( <span class="kw">PRINT</span> <span class="str">"HELLO</span> <span class="var">:NAME</span> )
+<span class="kw">END</span></code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="music">Music</h2>
+
+  <h3>The scale</h3>
+  <pre><code><span class="kw">TO</span> DOREMI
+  <span class="kw">PLAY</span> [ <span class="str">DO</span> <span class="str">RE</span> <span class="str">MI</span> <span class="str">FA</span> <span class="str">SOL</span> <span class="str">LA</span> <span class="str">SI</span> ]
+<span class="kw">END</span></code></pre>
+
+  <h3>A short tune</h3>
+  <pre><code><span class="kw">TO</span> TUNE
+  <span class="kw">TEMPO</span> <span class="num">8</span>
+  <span class="kw">PLAY</span> [ <span class="str">DO</span> <span class="str">DO</span> <span class="str">DO</span> <span class="str">RE</span> <span class="str">MI</span> ]
+  <span class="kw">PLAY</span> [ <span class="str">RE</span> <span class="str">DO</span> <span class="str">MI</span> <span class="str">RE</span> <span class="str">RE</span> <span class="str">DO</span> ]
+<span class="kw">END</span></code></pre>
+
+  <h3>Drawing in time to music</h3>
+  <p>You can mix graphics and sound&nbsp;: on each side of the polygon, play a note.</p>
+
+  <pre><code><span class="kw">TO</span> MUSICSQUARE
+  <span class="kw">CS</span>
+  <span class="kw">FOREACH</span> [ <span class="str">DO</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">DO</span> ] [
+    <span class="kw">PLAY</span> <span class="var">:?</span>
+    <span class="kw">FD</span> <span class="num">80</span>
+    <span class="kw">RT</span> <span class="num">90</span>
+  ]
+<span class="kw">END</span></code></pre>
+
+  <p>Beyond these small examples, GoLogo ships with more complete programs (figures,
+  rendered images, real little games). To learn how to list, load and try them, head
+  over to <a href="getting-started.html#bundled-examples">getting started, section
+  &ldquo;Exploring the bundled examples&rdquo;</a>.</p>
+
+  <p>And now, it is your turn to invent your own programs. Happy Logo&nbsp;!</p>
+
+</main>
+</body>
+</html>

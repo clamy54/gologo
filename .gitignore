@@ -1,0 +1,6 @@
+# Artefacts de compilation et de packaging
+tools/build/bin/
+src/cmd/gologo/*.syso
+dist/windows/output/
+dist/linux/build/
+dist/macos/build/

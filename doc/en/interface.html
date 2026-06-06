@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interface &amp; shortcuts · GoLogo</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="GoLogo turtle">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Get started</li>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Learn</li>
+    <li><a href="journey.html">From the square to the arcade</a></li>
+    <li><a href="language.html">The Logo language</a></li>
+    <li><a href="examples.html">Example programs</a></li>
+    <li class="section-title">Reference</li>
+    <li><a href="interface.html" class="active">Interface &amp; shortcuts</a></li>
+    <li><a href="commands.html">All commands</a></li>
+    <li><a href="index-commands.html">Command index</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>Interface &amp; shortcuts</h1>
+    <p>GoLogo's screen, the procedure editor and the built-in help</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="philosophy">An interface designed for learning</h2>
+
+  <p>GoLogo's interface is no accident&nbsp;: every choice is meant to support
+  learning, especially for younger users.</p>
+
+  <h3>Full screen, a deliberate choice</h3>
+
+  <p>GoLogo starts in full screen. This is not a technical constraint but a considered
+  decision&nbsp;: when a child works in a window sitting on a full desktop, the icons,
+  the notifications and the other programs are so many distractions and temptations.
+  By filling the whole screen, GoLogo puts the learner in a state of focus, alone with
+  the turtle and its instructions.</p>
+
+  <p>The experienced user keeps control&nbsp;: the <code>-w</code> argument on the
+  command line runs GoLogo in a window, handy for development or for keeping an eye on
+  other tools.</p>
+
+  <h3>Typing real instructions</h3>
+
+  <p>With GoLogo, you write your programs line by line, at the keyboard. The child thus
+  learns two things at once&nbsp;: the algorithmics (how to break down a problem,
+  repeat, decide) and the act of programming for real, typing instructions and reading
+  back what they wrote. It is a skill that carries over to any programming language.</p>
+
+  <h3>Getting used to reading documentation</h3>
+
+  <p>GoLogo's detailed help is consulted right in the text terminal, at the keyboard.
+  By practising it, the learner gets used to reading and searching written
+  documentation, rather than following a video tutorial.</p>
+
+  <h3>Getting comfortable with keyboard shortcuts</h3>
+
+  <p>GoLogo also familiarises the child with keyboard shortcuts. The essential ones are
+  <strong>always shown in the status bar</strong>, at the bottom of the screen&nbsp;:
+  no need to learn them by heart to get started. Other shortcuts, meant for more
+  confident users, exist and are gathered in the <a href="#shortcuts">summary</a>
+  further down this page.</p>
+
+  <p class="note"><strong>On macOS&nbsp;:</strong> every shortcut uses the <kbd>Cmd</kbd>
+  (⌘) key instead of <kbd>Ctrl</kbd>&nbsp;: read <kbd>Cmd</kbd>+<kbd>S</kbd>,
+  <kbd>Cmd</kbd>+<kbd>Q</kbd>, <kbd>Cmd</kbd>+<kbd>C</kbd>, and so on (the status bar
+  shows &ldquo;Cmd&rdquo;). <kbd>Ctrl</kbd>+<kbd>C</kbd> stays the &ldquo;interrupt a
+  running program&rdquo; key on every platform.</p>
+
+  <h3>The spirit of the 80s, the comfort of today</h3>
+
+  <p>The interface takes its cue from that of SOLI Logo and the Logos of the 1980s home
+  computers&nbsp;: the <code>?</code> prompt, the split graphics-and-text screen, the
+  blue and cyan colours. But it adds modern comfort&nbsp;: copy and paste, full-text
+  search in the help and navigation between results, autocompletion, command history.
+  You get the original feel without giving up today's habits.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="screen">GoLogo's screen</h2>
+
+  <p>GoLogo lays out the display in two areas&nbsp;:</p>
+
+  <ul>
+    <li><strong>The graphics field</strong> (top)&nbsp;: the turtle's workspace. Blue
+      background at startup. Logical size&nbsp;: 1600 × 1000 steps, origin at the
+      centre (x from −800 to +800, y from −500 to +500).</li>
+    <li><strong>The text area</strong> (bottom)&nbsp;: GoLogo's messages and the input
+      line with the <code>?</code> prompt. By default it takes up 4 lines. The
+      <code>SETTEXTLINES n</code> command adjusts this number (1 to 25).</li>
+  </ul>
+
+  <p>With <code>SETTEXTLINES 25</code>, the graphics field disappears and the text area
+  fills the whole screen, handy for printing tables or text. With
+  <code>SETTEXTLINES 4</code> (the default) you return to mixed mode.</p>
+
+  <div class="note">
+    GoLogo starts in text mode, showing only the <code>?</code> prompt. The graphics
+    field appears as soon as you run <code>ST</code> (SHOWTURTLE) or any drawing
+    command.
+  </div>
+
+  <h3>The turtle</h3>
+
+  <p>The little figure in the centre is the turtle. Its shape can be changed with
+  <code>SPRITE n</code>&nbsp;: <code>SPRITE 0</code> = triangle (default),
+  <code>SPRITE 1</code> = detailed turtle, <code>SPRITE 2</code> = car.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="repl">The REPL (command line)</h2>
+
+  <p>The REPL is the input line at the bottom of the screen. That is where you converse
+  with GoLogo interactively.</p>
+
+  <table>
+    <tr><th>Key</th><th>Action</th></tr>
+    <tr><td><kbd>Enter</kbd></td><td>Runs the typed line</td></tr>
+    <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Moves through the history of the last 100 commands</td></tr>
+    <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Moves the cursor within the line</td></tr>
+    <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Goes to the start / end of the line</td></tr>
+    <tr><td><kbd>Del</kbd> / <kbd>Backspace</kbd></td><td>Deletes the character under or before the cursor</td></tr>
+    <tr><td><kbd>Tab</kbd></td><td>Autocompletion: completes the current word (primitives + defined procedures)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Interrupts the running program</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Opens the editor (when the line is empty)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td>Quits GoLogo</td></tr>
+    <tr><td><kbd>F1</kbd></td><td>Opens the beginner help (original SOLI Logo commands, full names)</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Opens the full help (every command)</td></tr>
+  </table>
+
+  <h3>Autocompletion</h3>
+
+  <p>Press <kbd>Tab</kbd> to complete a word as you type&nbsp;:</p>
+  <ul>
+    <li>If there is only one possibility, the word is completed and a space is added
+      automatically.</li>
+    <li>If there are several, GoLogo completes the common prefix and lists the
+      candidates. Press <kbd>Tab</kbd> again to pick one.</li>
+  </ul>
+
+  <pre><code>? <span class="kw">REP</span>[Tab]   -> <span class="kw">REPEAT </span>  (unique)</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="editor">The procedure editor</h2>
+
+  <p>The full-screen editor is where you write programs made of several procedures. You
+  open it with <code>EDIT</code> or <kbd>Ctrl</kbd>+<kbd>E</kbd> (when the input line is
+  empty).</p>
+
+  <p>Ways to open it&nbsp;:</p>
+  <ul>
+    <li><code>EDIT</code>&nbsp;: reopens the content of the last editing session.</li>
+    <li><code>EDIT "SQUARE</code>&nbsp;: loads the definition of the SQUARE procedure.</li>
+    <li><code>EDIT [ SQUARE POLY ]</code>&nbsp;: loads several procedures.</li>
+    <li><code>EDIT [ ]</code>&nbsp;: opens an empty editor.</li>
+  </ul>
+
+  <p>In the editor, the screen is split in two&nbsp;: the editing area (blue
+  background) and a status bar at the bottom (cyan) that recalls the main shortcuts.</p>
+
+  <h3>Editor shortcuts</h3>
+
+  <table>
+    <tr><th>Key</th><th>Action</th></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Saves the content and interprets it (back to the REPL, procedures defined)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>X</kbd></td><td>Quits without saving (the content is lost)</td></tr>
+    <tr><td><kbd>F1</kbd></td><td>Context help: opens the page for the word under the cursor if it exists, otherwise the beginner help</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Opens the full help (every command)</td></tr>
+    <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Moves the cursor</td></tr>
+    <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Start / end of the current line</td></tr>
+    <tr><td><kbd>Page Up</kbd> / <kbd>Page Down</kbd></td><td>Moves the cursor up / down by one page</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>Selects all the text</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>T</kbd> (⌘+T on Mac)</td><td>Translates every instruction in the program to English; pressing again translates them back to French, and so on (toggles each press). Data, procedure names and comments are left untouched.</td></tr>
+    <tr><td><kbd>Shift</kbd>+arrows</td><td>Extends the selection</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Copies the selection to the clipboard</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>Pastes from the clipboard</td></tr>
+    <tr><td><kbd>Del</kbd></td><td>Deletes the selection (or the character under the cursor)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Undoes the last action</td></tr>
+  </table>
+
+  <div class="note">
+    Typing in the editor is automatically turned into <strong>upper case</strong>: this is
+    a GoLogo choice (no need for the Shift key, fewer mistakes), not a rule of the Logo
+    language.
+  </div>
+
+  <h3>A typical editor workflow</h3>
+
+  <ol>
+    <li>At the REPL, type <code>EDIT</code> to open the editor.</li>
+    <li>Write or change your procedures.</li>
+    <li>Press <kbd>Ctrl</kbd>+<kbd>S</kbd> to validate. GoLogo interprets the code and
+      returns to the REPL.</li>
+    <li>Test your procedures at the REPL.</li>
+    <li>If needed, reopen the editor with <code>EDIT</code> to fix or extend.</li>
+    <li>Save to disk&nbsp;: <code>SAVE "MYPROG CONTENTS</code>.</li>
+  </ol>
+
+  <!-- ============================================================ -->
+  <h2 id="help">The help browser</h2>
+
+  <p>GoLogo has a built-in help browser, available&nbsp;:</p>
+  <ul>
+    <li>through the <code>HELP</code> or <code>HELP NAME</code> command at the REPL.</li>
+    <li>through <kbd>F1</kbd> (beginner help) or <kbd>Shift</kbd>+<kbd>F1</kbd>
+    (full help) from the REPL or the editor.</li>
+  </ul>
+
+  <p>The browser fills the screen, with the grid of commands and the detail of the
+  selected command.</p>
+
+  <h3>Beginner help and full help</h3>
+
+  <p><kbd>F1</kbd> opens the <strong>beginner help</strong>&nbsp;: it lists only the
+  original commands of SOLI Logo, under their full name (for example
+  <code>HIDETURTLE</code> rather than <code>HT</code>, or <code>SQRT</code> rather
+  than <code>RC</code>), so as not to overwhelm the beginner.</p>
+
+  <p><kbd>Shift</kbd>+<kbd>F1</kbd> opens the <strong>full help</strong>&nbsp;: every
+  primitive, including the modern extensions (the <code>HELP</code> command also opens
+  the full help). You can switch from one to the other at any time, without leaving the
+  help, with <kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd>&nbsp;; the footer recalls the
+  key for the other view.</p>
+
+  <h3>Help browser shortcuts</h3>
+
+  <table>
+    <tr><th>Key</th><th>Action</th></tr>
+    <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Selects the previous / next command</td></tr>
+    <tr><td><kbd>Page Up</kbd> / <kbd>Page Down</kbd></td><td>Previous / next page in the grid</td></tr>
+    <tr><td><kbd>Enter</kbd></td><td>Shows the detail of the selected command</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>I</kbd></td><td>Inserts the selected command into the REPL (or the editor)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd> or <kbd>/</kbd></td><td>Opens the search field</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Next / previous search result</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Switches between English and French</td></tr>
+    <tr><td><kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Switches between the beginner help and the full help</td></tr>
+    <tr><td>A letter (<kbd>A</kbd>…<kbd>Z</kbd>)</td><td>Jumps to the first command starting with that letter</td></tr>
+    <tr><td><kbd>Q</kbd> or <kbd>Esc</kbd></td><td>Closes the help</td></tr>
+  </table>
+
+  <h3>Searching the help</h3>
+
+  <p>Press <kbd>Ctrl</kbd>+<kbd>F</kbd> (or <kbd>/</kbd>) to open the search field. Type
+  a word, confirm with <kbd>Enter</kbd>&nbsp;: the commands whose page contains that
+  word are shown in yellow in the grid. <kbd>Ctrl</kbd>+<kbd>N</kbd> and
+  <kbd>Ctrl</kbd>+<kbd>P</kbd> move between the results.</p>
+
+  <h3>Context F1 in the editor</h3>
+
+  <p>From the editor, <kbd>F1</kbd> detects the word under the cursor and opens its help
+  page directly. For instance, if the cursor is on the word <code>REPEAT</code>, the
+  page for <code>REPEAT</code> appears. If the word is not a known command, the general
+  help opens instead.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="shortcuts">Summary of global shortcuts</h2>
+
+  <div class="note">
+    <strong>On macOS</strong>, GoLogo follows the system convention&nbsp;: wherever this
+    manual says <kbd>Ctrl</kbd>, use the <kbd>⌘</kbd> (Command) key. For example
+    <kbd>⌘</kbd>+<kbd>S</kbd> to save in the editor. The status bars automatically show
+    the right symbol for your system. On Linux and Windows it is <kbd>Ctrl</kbd>.
+    <br><strong>One exception&nbsp;: <kbd>Ctrl</kbd>+<kbd>C</kbd></strong>, which
+    interrupts a running program, stays <kbd>Ctrl</kbd>+<kbd>C</kbd> on every platform
+    (the universal "stop" convention). So on a Mac, <kbd>⌘</kbd>+<kbd>C</kbd> copies and
+    <kbd>Ctrl</kbd>+<kbd>C</kbd> stops.
+  </div>
+
+  <table>
+    <tr><th>Context</th><th>Key</th><th>Action</th></tr>
+    <tr>
+      <td rowspan="7">Everywhere</td>
+      <td><kbd>Ctrl</kbd>+<kbd>C</kbd></td>
+      <td>Interrupts the running program</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td>
+      <td>Quits GoLogo (except in the editor, where it has no effect)</td>
+    </tr>
+    <tr>
+      <td><kbd>F1</kbd></td>
+      <td>Opens the beginner help (context-aware in the editor)</td>
+    </tr>
+    <tr>
+      <td><kbd>Shift</kbd>+<kbd>F1</kbd></td>
+      <td>Opens the full help (every command)</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>L</kbd></td>
+      <td>Switches FR/EN (in the help browser)</td>
+    </tr>
+    <tr>
+      <td>Numeric keypad</td>
+      <td>Works normally (0–9, . , /, *, -, +)</td>
+    </tr>
+    <tr>
+      <td>Arrow keys</td>
+      <td>Emulate joystick 0 (up/down/left/right) + space bar = button</td>
+    </tr>
+    <tr>
+      <td rowspan="3">REPL</td>
+      <td><kbd>Tab</kbd></td>
+      <td>Autocompletes the current command</td>
+    </tr>
+    <tr>
+      <td><kbd>↑</kbd> / <kbd>↓</kbd></td>
+      <td>Command history (last 100)</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>E</kbd></td>
+      <td>Opens the editor (when the line is empty)</td>
+    </tr>
+    <tr>
+      <td rowspan="5">Editor</td>
+      <td><kbd>Ctrl</kbd>+<kbd>S</kbd></td>
+      <td>Saves and interprets</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>X</kbd></td>
+      <td>Quits without saving</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>A</kbd></td>
+      <td>Selects all</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td>
+      <td>Undo</td>
+    </tr>
+    <tr>
+      <td><kbd>F1</kbd></td>
+      <td>Context help on the word under the cursor</td>
+    </tr>
+    <tr>
+      <td rowspan="5">Help</td>
+      <td><kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd></td>
+      <td>Toggle beginner help / full help</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>F</kbd> / <kbd>/</kbd></td>
+      <td>Full-text search</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>P</kbd></td>
+      <td>Next / previous result</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl</kbd>+<kbd>I</kbd></td>
+      <td>Inserts the command into the REPL or the editor</td>
+    </tr>
+    <tr>
+      <td><kbd>Q</kbd> / <kbd>Esc</kbd></td>
+      <td>Closes the help</td>
+    </tr>
+  </table>
+
+  <!-- ============================================================ -->
+  <h2 id="joysticks">Game joysticks</h2>
+
+  <p>The <code>JOYSTICK</code> and <code>BUTTON?</code> primitives existed on the
+  original Logo for reading a game joystick. GoLogo keeps them for compatibility, but
+  always makes them respond to the <strong>keyboard</strong>&nbsp;: there is no reading
+  of a physical joystick, even if one is connected&nbsp;:</p>
+
+  <ul>
+    <li>The arrow keys → direction of joystick 0 (1 = up, 3 = right, 5 = down,
+      7 = left, plus the diagonals).</li>
+    <li><kbd>Space</kbd> → fire button of joystick 0.</li>
+  </ul>
+
+  <pre><code><span class="kw">WHILE</span> [ <span class="kw">NOT</span> <span class="kw">BUTTON?</span> <span class="num">0</span> ] [
+  <span class="kw">MAKE</span> <span class="str">"DIR</span> <span class="kw">JOYSTICK</span> <span class="num">0</span>
+  <span class="kw">IF</span> <span class="var">:DIR</span> = <span class="num">1</span> [ <span class="kw">FD</span> <span class="num">5</span> ]     <span class="cmt">; up</span>
+  <span class="kw">IF</span> <span class="var">:DIR</span> = <span class="num">3</span> [ <span class="kw">RT</span> <span class="num">5</span> ]     <span class="cmt">; right</span>
+  <span class="kw">IF</span> <span class="var">:DIR</span> = <span class="num">5</span> [ <span class="kw">BK</span> <span class="num">5</span> ]     <span class="cmt">; down</span>
+  <span class="kw">IF</span> <span class="var">:DIR</span> = <span class="num">7</span> [ <span class="kw">LT</span> <span class="num">5</span> ]     <span class="cmt">; left</span>
+  <span class="kw">WAIT</span> <span class="num">1</span>
+]</code></pre>
+
+  <!-- ============================================================ -->
+  <h2 id="language">English and French</h2>
+
+  <p>GoLogo understands <strong>both English and French</strong> command names. You can
+  write <code>FORWARD 100</code> or <code>AVANCE 100</code>, <code>REPEAT 4 […]</code>
+  or <code>REPETE 4 […]</code>&nbsp;: GoLogo accepts both.</p>
+
+  <p>The help and the error messages can be shown in either language&nbsp;:</p>
+
+  <pre><code><span class="kw">FRENCH</span>    <span class="cmt">; switches help and messages to French</span>
+<span class="kw">ENGLISH</span>   <span class="cmt">; switches back to English</span></code></pre>
+
+  <p>In the help browser, <kbd>Ctrl</kbd>+<kbd>L</kbd> switches the language on the fly
+  without leaving the help.</p>
+
+</main>
+</body>
+</html>

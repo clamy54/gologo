@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=GoLogo
+GenericName=Logo interpreter
+GenericName[fr]=Interpréteur Logo
+Comment=Bilingual Logo with a retro look
+Comment[fr]=Un Logo bilingue au look rétro
+Exec=gologo
+Icon=gologo
+Terminal=false
+Categories=Education;Development;
+Keywords=logo;turtle;programming;tortue;

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoLogo · Documentation</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="../images/gologo-logo.png" alt="tortue GoLogo">
+    <span>GoLogo</span>
+  </a>
+  <ul>
+    <li class="section-title">Démarrer</li>
+    <li><a href="index.html" class="active">Présentation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
+    <li><a href="installation.html">Installation</a></li>
+    <li class="section-title">Apprendre</li>
+    <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
+    <li><a href="langage.html">Le langage Logo</a></li>
+    <li><a href="exemples.html">Programmes exemples</a></li>
+    <li class="section-title">Référence</li>
+    <li><a href="interface.html">Interface &amp; raccourcis</a></li>
+    <li><a href="commandes.html">Toutes les commandes</a></li>
+    <li><a href="index-commandes.html">Index des commandes</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>GoLogo</h1>
+    <p>Un Logo bilingue français-anglais. Vous écrivez, la tortue obéit.</p>
+  </div>
+
+  <h2>GoLogo</h2>
+
+  <p>GoLogo sert à <strong>programmer en Logo</strong>. Logo est un langage de
+  programmation très simple, inventé pour apprendre. Au centre, il y a une petite
+  <strong>tortue</strong> affichée à l'écran&nbsp;: on lui donne des ordres (avance,
+  tourne, lève ton crayon...), elle obéit et laisse une trace derrière elle. En la
+  dirigeant, on dessine, et petit à petit on apprend à programmer.</p>
+
+  <p>Avec GoLogo, vous tapez une phrase et il se passe quelque chose aussitôt.
+  <code>AVANCE 100</code>, et la tortue trace un trait. Vous changez le nombre, le
+  dessin change. Vous vous trompez, vous le voyez tout de suite. Cette boucle
+  immédiate (taper, regarder, recommencer) est au cœur de Logo&nbsp;: le programme
+  cesse d'être une idée abstraite, il devient un personnage que l'on pilote.</p>
+
+  <p>Et la tortue ne s'arrête pas aux carrés. Avec les mêmes briques (boucles,
+  variables, procédures), on passe aux fractales, aux dessins animés, et à de vrais
+  petits jeux.</p>
+
+  <p>GoLogo est un interpréteur du langage Logo, conçu pour fonctionner sur les
+  ordinateurs d'aujourd'hui sans rien sacrifier à la simplicité d'origine.</p>
+
+  <p>Le langage s'inspire du Logo français tel qu'on le pratiquait sur les
+  micro-ordinateurs des années 1980, notamment le MO5 de Thomson. Depuis,
+  il a été étendu pour rester en phase avec les Logo actuels et pour offrir
+  des possibilités supplémentaires&nbsp;: musique, souris, fichiers, itérateurs,
+  gestion des erreurs, récursion sans limite de profondeur, et bien d'autres choses.</p>
+
+  <p>GoLogo cherche à retrouver le <em>look&nbsp;and&nbsp;feel</em> du Logo SOLI de 1984
+  (l'écran, la tortue, l'esprit des commandes), mais ce n'est ni un clone ni une
+  émulation&nbsp;: il ne rejoue pas le code d'époque et ne reproduit pas le MO5 octet
+  par octet. Au contraire, il ajoute quantité de facilités et d'instructions
+  supplémentaires pour élargir ses possibilités et améliorer sa compatibilité avec
+  d'autres Logo.</p>
+
+  <h2>Un peu d'histoire</h2>
+
+  <p>Logo est né à la fin des années 1960, à la rencontre des mathématiques et de la
+  pédagogie. On le doit surtout à Seymour Papert, un mathématicien qui avait travaillé
+  aux côtés du psychologue Jean Piaget, entouré de Wally Feurzeig et Cynthia Solomon.
+  Leur idée était neuve&nbsp;: donner aux enfants un véritable langage de programmation,
+  pensé pour eux, où l'on apprend en faisant et en expérimentant. La tortue, qu'on
+  pilote pas à pas, est devenue le symbole de cette démarche&nbsp;: un objet concret
+  pour réfléchir, se tromper, recommencer. Papert a raconté tout cela dans son livre
+  <em>Mindstorms</em> (1980).</p>
+
+  <p>En France, beaucoup d'écoliers ont découvert la programmation grâce au
+  <a href="https://fr.wikipedia.org/wiki/Plan_informatique_pour_tous">Plan Informatique
+  pour Tous</a>, lancé en 1985, qui a équipé les écoles d'ordinateurs, souvent des
+  Thomson. C'est là que toute une génération s'est initiée au code, fréquemment avec
+  Logo, et en particulier avec le Logo de la société S.O.L.I. sur le MO5.</p>
+
+  <p>GoLogo est un environnement de programmation amusant qui s'inspire directement de
+  ce Logo-là, autant par le langage que par l'allure générale. Mais pour ne pas rester
+  enfermé dans les années 80, GoLogo ajoute un jeu d'instructions étendu qui ouvre
+  grand le champ des possibilités offertes par le langage.</p>
+
+  <h2>Ce que vous pouvez faire avec GoLogo</h2>
+
+  <ul>
+    <li><strong>Dessiner</strong>&nbsp;: la tortue trace des figures géométriques selon vos instructions,
+      du simple carré à la fractale la plus complexe.</li>
+    <li><strong>Programmer</strong>&nbsp;: vous définissez vos propres procédures, créez des variables,
+      construisez des boucles et des conditions, et composez tout ça librement.</li>
+    <li><strong>Jouer avec les données</strong>&nbsp;: Logo manipule des mots, des listes et des
+      nombres avec la même facilité.</li>
+    <li><strong>Faire de la musique</strong>&nbsp;: la primitive <code>JOUE</code> joue des notes
+      sur plusieurs octaves, avec choix du timbre.</li>
+    <li><strong>Interagir</strong>&nbsp;: lire le clavier, interroger la souris ou les manettes,
+      afficher du texte à n'importe quelle position de l'écran.</li>
+    <li><strong>Sauvegarder</strong>&nbsp;: vos procédures et vos dessins peuvent être enregistrés
+      sur disque et rechargés à la session suivante.</li>
+  </ul>
+
+  <h2>Pour qui&nbsp;?</h2>
+
+  <p>GoLogo convient aussi bien à un enfant qui découvre la programmation qu'à un
+  adulte qui souhaite retrouver un environnement qu'il a connu sur un ordinateur
+  scolaire des années 80. Le langage Logo a été conçu dès l'origine pour être
+  immédiatement accessible&nbsp;: chaque instruction a un effet visible tout de suite,
+  et on progresse naturellement de la commande isolée au programme complet.</p>
+
+  <p>Si vous connaissez déjà un autre Logo, vous retrouverez vos repères&nbsp;:
+  GoLogo reconnaît la plupart des commandes des Logos de référence.</p>
+
+  <h2>Démarrage rapide</h2>
+
+  <p>Au lancement, l'écran ne contient que l'invite <code>?</code>&nbsp;: GoLogo
+  démarre en mode texte, c'est là que vous tapez vos instructions. Pour faire
+  apparaître la zone graphique, tapez <code>MT</code> (Montre Tortue) et appuyez sur
+  <kbd>Entrée</kbd>&nbsp;:</p>
+
+  <pre><code>? <span class="kw">MT</span></code></pre>
+
+  <p>La zone graphique apparaît, et en son centre un petit personnage en forme de
+  flèche, la <strong>tortue</strong>&nbsp;:</p>
+
+  <p style="text-align:center">
+    <img src="../images/tortue.png" alt="la tortue"
+         style="width:48px;image-rendering:pixelated;vertical-align:middle">
+  </p>
+
+  <p>La tortue tient un <strong>crayon</strong>. Quand elle se déplace, ce crayon
+  laisse une trace derrière elle. Tapez maintenant&nbsp;:</p>
+
+  <pre><code>? <span class="kw">AVANCE</span> <span class="num">100</span></code></pre>
+
+  <p>La tortue avance de 100 pas tout en traçant un trait depuis sa position de
+  départ. Voici le résultat&nbsp;: la tortue s'est déplacée vers le haut, et la ligne
+  marque le chemin parcouru.</p>
+
+  <img class="shot" src="../images/ex-avance.png" alt="trait tracé par AVANCE 100">
+  <p class="shot-cap">AVANCE 100 : la tortue monte de 100 pas et laisse un trait.</p>
+
+  <p>Pour tracer un carré d'un seul coup&nbsp;:</p>
+
+  <pre><code>? <span class="kw">REPETE</span> <span class="num">4</span> [ <span class="kw">AV</span> <span class="num">50</span> <span class="kw">TD</span> <span class="num">90</span> ]</code></pre>
+
+  <p>C'est tout, vous venez d'écrire votre premier programme Logo. La suite de
+  cette documentation vous explique comment aller plus loin, à votre rythme.</p>
+
+  <h2>Organisation du manuel</h2>
+
+  <table>
+    <tr>
+      <th>Section</th>
+      <th>Contenu</th>
+    </tr>
+    <tr>
+      <td><a href="prise-en-main.html">Prise en main</a></td>
+      <td>Comment lancer GoLogo, utiliser le REPL, saisir ses premières
+          instructions, ouvrir l'éditeur. Un guide pas à pas pour débuter.</td>
+    </tr>
+    <tr>
+      <td><a href="parcours.html">Du carré au jeu vidéo</a></td>
+      <td>Un parcours guidé en douze étapes, du premier trait jusqu'à ton propre
+          jeu (un casse-brique). La meilleure porte d'entrée pour débuter.</td>
+    </tr>
+    <tr>
+      <td><a href="langage.html">Le langage Logo</a></td>
+      <td>Introduction complète au langage&nbsp;: données, variables, procédures,
+          boucles, conditions, graphisme. L'essentiel pour comprendre et écrire
+          des programmes.</td>
+    </tr>
+    <tr>
+      <td><a href="exemples.html">Programmes exemples</a></td>
+      <td>Une collection de programmes annotés, du plus simple au plus élaboré,
+          que vous pouvez recopier et modifier librement.</td>
+    </tr>
+    <tr>
+      <td><a href="interface.html">Interface &amp; raccourcis</a></td>
+      <td>Description de l'écran, de l'éditeur de procédures, du navigateur
+          d'aide, et tableau complet des raccourcis clavier.</td>
+    </tr>
+    <tr>
+      <td><a href="commandes.html">Toutes les commandes</a></td>
+      <td>Référence complète des ~150 instructions de GoLogo, classées par
+          catégorie, avec paramètres et exemples.</td>
+    </tr>
+    <tr>
+      <td><a href="index-commandes.html">Index des commandes</a></td>
+      <td>Liste alphabétique de toutes les commandes et de leurs alias, avec
+          renvoi vers la description correspondante.</td>
+    </tr>
+  </table>
+
+  <h2>Conventions de ce manuel</h2>
+
+  <p>Les instructions Logo s'écrivent en <strong>majuscules</strong> dans ce manuel.
+  Pas besoin de maintenir la touche Majuscule&nbsp;: GoLogo convertit automatiquement
+  en majuscule chaque caractère que vous tapez. Cela limite les erreurs et facilite la
+  frappe au clavier pour les plus jeunes. Les exemples de code apparaissent sur fond
+  sombre&nbsp;:</p>
+
+  <pre><code><span class="kw">REPETE</span> <span class="num">36</span> [ <span class="kw">AV</span> <span class="num">10</span> <span class="kw">TD</span> <span class="num">10</span> ]</code></pre>
+
+  <p>Les paramètres variables sont indiqués en italique ou entre chevrons&nbsp;:
+  <code>AV <em>n</em></code> signifie que vous remplacez <em>n</em> par un nombre.</p>
+
+  <p>Dans les tableaux de commandes, le type de chaque instruction est précisé&nbsp;:</p>
+  <ul>
+    <li><strong>C</strong> (commande)&nbsp;: produit un effet, ne retourne pas de valeur.</li>
+    <li><strong>O</strong> (opération)&nbsp;: calcule et retourne une valeur.</li>
+    <li><strong>P</strong> (prédicat)&nbsp;: retourne <code>VRAI</code> ou <code>FAUX</code>.</li>
+  </ul>
+
+  <h2 id="a-propos">À propos de GoLogo</h2>
+
+  <p><strong>GoLogo</strong></p><p> (C)2024-2026 Cyril LAMY</p><p> C'est un
+  logiciel libre, distribué sous licence
+  <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html" target="_blank" rel="noopener">GPL&nbsp;v2</a>.</p>
+
+  <p>Il est écrit en <a href="https://go.dev/" target="_blank" rel="noopener">Go</a> et
+  s'appuie sur quelques bibliothèques libres&nbsp;:
+  <a href="https://gioui.org/" target="_blank" rel="noopener">Gio</a> (interface graphique
+  multiplateforme) et <a href="https://github.com/ebitengine/oto" target="_blank" rel="noopener">oto</a>
+  (son).</p>
+
+  <p>La documentation du Logo SOLI d'origine, consultée pour ce projet, se trouve sur le
+  site de l'émulateur Thomson <a href="http://dcmoto.free.fr/" target="_blank" rel="noopener">DCMOTO</a>
+  de Daniel Coulom. Pour en savoir plus sur le langage Logo et son histoire, voir
+  <a href="https://fr.wikipedia.org/wiki/Logo_(langage)" target="_blank" rel="noopener">l'article Wikipédia</a>
+  et le site de la <a href="https://el.media.mit.edu/logo-foundation/index.html" target="_blank" rel="noopener">Logo Foundation</a>.</p>
+
+</main>
+</body>
+</html>

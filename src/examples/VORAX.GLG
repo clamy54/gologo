@@ -1,0 +1,173 @@
+; VORAX - le serpent vorace facon NIBBLES (QBasic / MS-DOS).
+; Fleches pour diriger, mange les pommes, evite les murs et ta queue.
+; Terrain en grille COLS x ROWS ; chaque case porte un numero unique
+; N = ligne * COLS + colonne. Le corps est une liste de numeros (tete
+; en premier) : avancer = ajouter la tete (MP) et retirer la queue (SD),
+; sauf quand on mange (le serpent grandit).
+
+; ---- dessine une pastille (case N) dans la couleur et la taille courantes ----
+POUR CASE :N
+DONNE "C RESTE :N :COLS
+DONNE "R ENT ( :N / :COLS )
+DONNE "X :IXL + ( :C + 0.5 ) * :CELL
+DONNE "Y :IYT - ( :R + 0.5 ) * :CELL
+LC FXY ( :X - 1 ) :Y BC FXY ( :X + 1 ) :Y LC
+FIN
+
+; ---- texte centre horizontalement (N = nb de caracteres), centre vertical en Y ----
+POUR CENTRE :TXT :N :Y :COUL
+FCC :COUL LC FXY ( 0 - :N * 11.67 ) ( :Y + 22 ) ETIQUETTE :TXT
+FIN
+
+; ---- place une nouvelle pomme sur une case libre ----
+POUR NOUVELLEPOMME
+DONNE "LIBRE 0
+TANTQUE [ :LIBRE = 0 ] [
+DONNE "FOOD ( HASARD :ROWS ) * :COLS + ( HASARD :COLS )
+SI MEMBRE? :FOOD :BODY [ ] [ DONNE "LIBRE 1 ]
+]
+FIN
+
+; ---- lit les fleches et tourne (sans demi-tour instantane) ----
+POUR DIRECTION
+DONNE "J MANETTE 0
+SI :J = 1 [ SI NON ( :DR = 1 ) [ DONNE "DC 0 DONNE "DR -1 ] ]
+SI :J = 5 [ SI NON ( :DR = -1 ) [ DONNE "DC 0 DONNE "DR 1 ] ]
+SI :J = 7 [ SI NON ( :DC = 1 ) [ DONNE "DC -1 DONNE "DR 0 ] ]
+SI :J = 3 [ SI NON ( :DC = -1 ) [ DONNE "DC 1 DONNE "DR 0 ] ]
+FIN
+
+; ---- fait avancer le serpent d'une case (ecrit MORT 0/1) ----
+POUR PAS
+DONNE "HEAD PREMIER :BODY
+DONNE "NC ( RESTE :HEAD :COLS ) + :DC
+DONNE "NR ( ENT ( :HEAD / :COLS ) ) + :DR
+; collision avec un mur
+SI :NC < 0 [ DONNE "MORT 1 STOP ]
+SI :NC > :CMAX [ DONNE "MORT 1 STOP ]
+SI :NR < 0 [ DONNE "MORT 1 STOP ]
+SI :NR > :RMAX [ DONNE "MORT 1 STOP ]
+DONNE "NH :NR * :COLS + :NC
+SI :NH = :FOOD [ DONNE "MANGE 1 ] [ DONNE "MANGE 0 ]
+; collision avec soi-meme (la queue libere sa case si on ne mange pas)
+SI :MANGE = 1 [
+SI MEMBRE? :NH :BODY [ DONNE "MORT 1 STOP ]
+] [
+SI MEMBRE? :NH ( SAUFDERNIER :BODY ) [ DONNE "MORT 1 STOP ]
+]
+DONNE "BODY MP :NH :BODY
+SI :MANGE = 1 [
+DONNE "SCORE :SCORE + 1
+NOUVELLEPOMME
+; on accelere d'un cran a chaque palier (tous les PALIER pommes)
+SI ( RESTE :SCORE :PALIER ) = 0 [ SI :PAUSE > :PMIN [ DONNE "PAUSE :PAUSE - 1 ] ]
+] [
+DONNE "BODY SAUFDERNIER :BODY
+]
+FIN
+
+; ---- la muraille autour du terrain ----
+POUR MURS
+FCC :WALL FIXETAILLECRAYON :WALLW
+LC FXY :BXL :BYT BC FXY :BXR :BYT FXY :BXR :BYB FXY :BXL :BYB FXY :BXL :BYT LC
+FIN
+
+; ---- la pomme ----
+POUR POMME
+FIXETAILLECRAYON :FOODD FCC :ROUGE CASE :FOOD
+FIN
+
+; ---- tout le serpent (corps puis tete plus claire) ----
+POUR CORPS
+FIXETAILLECRAYON :BODYD FCC :VERT
+DONNE "L :BODY
+TANTQUE [ ( COMPTE :L ) > 0 ] [ CASE PREMIER :L  DONNE "L SAUFPREMIER :L ]
+FCC :TETE CASE PREMIER :BODY
+FIN
+
+; ---- le score, au-dessus de la muraille ----
+POUR TABLEAU
+FCC :TXT LC FXY -740 485 ETIQUETTE ( PHRASE [ SCORE ] :SCORE )
+FIN
+
+; ---- une image complete (double tampon : pas de clignotement) ----
+POUR IMAGE
+SCENE [ NETTOIE MURS POMME CORPS TABLEAU ]
+FIN
+
+; ---- ecran titre : attend une touche ----
+POUR ECRANTITRE
+SCENE [
+NETTOIE MURS
+CENTRE [ V O R A X ] 9 90 :JAUNE
+CENTRE [ ARROWS TO MOVE ] 14 0 :TXT
+CENTRE [ ANY KEY TO START ] 16 -70 :TXT
+]
+DONNE "K LISCAR
+FIN
+
+; ---- ecran de fin (pas d'attente : la partie est finie) ----
+POUR ECRANFIN
+SCENE [
+NETTOIE MURS POMME CORPS
+CENTRE [ GAME OVER ] 9 60 :JAUNE
+CENTRE ( PHRASE [ SCORE ] :SCORE ) ( 6 + COMPTE :SCORE ) -40 :TXT
+]
+FIN
+
+; ---- prepare une nouvelle partie ----
+POUR DEPART
+DONNE "BODY MP ( 11 * :COLS + 12 ) MP ( 11 * :COLS + 11 ) MP ( 11 * :COLS + 10 ) [ ]
+DONNE "DC 1
+DONNE "DR 0
+DONNE "SCORE 0
+DONNE "PAUSE 7
+NOUVELLEPOMME
+FIN
+
+; ---- deroule une manche jusqu'a la mort ----
+POUR MANCHE
+DONNE "MORT 0
+TANTQUE [ :MORT = 0 ] [
+DIRECTION
+PAS
+SI :MORT = 0 [ IMAGE ATTENDS :PAUSE ]
+]
+FIN
+
+POUR START
+VE CT FEN
+FCFG [ 12 16 28 ]
+; --- geometrie de la grille ---
+DONNE "CELL 40
+DONNE "COLS 38
+DONNE "ROWS 22
+DONNE "CMAX 37
+DONNE "RMAX 21
+DONNE "IXL -760
+DONNE "IYT 420
+; --- taille des pastilles (compactes : le contact visuel = la case) ---
+DONNE "BODYD 36
+DONNE "FOODD 28
+; --- muraille (un peu hors de la grille) ---
+DONNE "BXL -766
+DONNE "BXR 766
+DONNE "BYT 426
+DONNE "BYB -466
+DONNE "WALLW 10
+; --- couleurs ---
+DONNE "VERT [ 70 200 90 ]
+DONNE "TETE [ 150 240 120 ]
+DONNE "ROUGE [ 235 80 70 ]
+DONNE "WALL [ 70 110 180 ]
+DONNE "TXT [ 120 220 230 ]
+DONNE "JAUNE [ 250 230 90 ]
+; --- vitesse (soixantiemes de seconde par case) : un cran plus vite
+;     tous les PALIER pommes, jusqu'a PMIN ---
+DONNE "PMIN 2
+DONNE "PALIER 5
+ECRANTITRE
+DEPART
+MANCHE
+ECRANFIN
+FIN

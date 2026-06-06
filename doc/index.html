@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GoLogo</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Page d'accueil : choix de la langue (FR/EN). Mise en page centree, sans nav laterale. */
+    body.landing {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bleu-fond);
+      color: var(--texte);
+      text-align: center;
+    }
+    .landing main {
+      flex: initial;
+      max-width: none;
+      padding: 24px;
+    }
+    .landing img {           /* logo de l'accueil : original 1024px reduit a 30 % (307px), net */
+      width: 307px;
+      max-width: 70vw;
+      height: auto;
+    }
+    .landing h1 {
+      color: var(--cyan);
+      border: none;
+      font-size: 2.6rem;
+      margin: 12px 0 4px;
+    }
+    .landing .sub {
+      color: var(--cyan-pale);
+      margin-bottom: 36px;
+    }
+    .landing .choose-links {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .landing .choose-links a {
+      display: block;
+      min-width: 170px;
+      padding: 18px 28px;
+      background: var(--bleu-clair);
+      color: var(--texte);
+      border: 1px solid var(--cyan);
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 1.3rem;
+      font-weight: 600;
+      transition: background .15s, transform .15s;
+    }
+    .landing .choose-links a:hover {
+      background: var(--cyan);
+      color: var(--bleu-fond);
+      transform: translateY(-2px);
+    }
+    .landing .choose-links small {
+      display: block;
+      font-weight: 400;
+      font-size: .8rem;
+      opacity: .85;
+      margin-top: 4px;
+    }
+    .landing .repo-link {
+      margin-top: 34px;
+      font-size: .95rem;
+    }
+    .landing .repo-link a {
+      color: var(--cyan-pale);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--cyan);
+    }
+    .landing .repo-link a:hover {
+      color: var(--cyan);
+    }
+  </style>
+</head>
+<body class="landing">
+  <main>
+    <img src="images/gologo-accueil.png" alt="GoLogo" width="307" height="307">
+    <h1>GoLogo</h1>
+    <p class="sub">Choisissez votre langue&nbsp;·&nbsp;Choose your language</p>
+    <div class="choose-links">
+      <a href="fr/index.html">Français<small>Documentation en français</small></a>
+      <a href="en/index.html">English<small>Documentation in English</small></a>
+    </div>
+    <p class="repo-link"><a href="https://github.com/clamy54/gologo" target="_blank" rel="noopener">Code source sur GitHub&nbsp;·&nbsp;Source code on GitHub</a></p>
+  </main>
+</body>
+</html>
