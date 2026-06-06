@@ -16,8 +16,8 @@
   <ul>
     <li class="section-title">Démarrer</li>
     <li><a href="index.html">Présentation</a></li>
-    <li><a href="prise-en-main.html">Prise en main</a></li>
     <li><a href="installation.html">Installation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
     <li class="section-title">Apprendre</li>
     <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
     <li><a href="langage.html">Le langage Logo</a></li>
@@ -325,6 +325,74 @@
   <span class="kw">LIS</span> [ COMMENT T APPELLES-TU ] <span class="str">"NOM</span>
   ( <span class="kw">ECRIS</span> <span class="str">"BONJOUR</span> <span class="var">:NOM</span> )
 <span class="kw">FIN</span></code></pre>
+
+  <h3>Découper et recoller un mot</h3>
+  <p>Un mot (une chaîne de caractères) se manipule avec quelques primitives de
+  base. Le mot littéral s'écrit avec un guillemet ouvrant&nbsp;:
+  <code>"CHAT</code>. Attention&nbsp;: les crochets <code>[ ]</code> font une
+  <em>liste</em>, pas un mot.</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">PREM</span> <span class="str">"CHAT</span>
+<span class="kw">ECRIS</span> <span class="kw">DER</span> <span class="str">"CHAT</span>
+<span class="kw">ECRIS</span> <span class="kw">SP</span> <span class="str">"CHAT</span>
+<span class="kw">ECRIS</span> <span class="kw">COMPTE</span> <span class="str">"CHAT</span>
+<span class="kw">ECRIS</span> <span class="kw">MOT</span> <span class="str">"BON</span> <span class="str">"JOUR</span>
+<span class="kw">ECRIS</span> <span class="kw">MAJUSCULE</span> <span class="str">"chat</span></code></pre>
+
+  <p>Affiche tour à tour <code>C</code> (premier caractère), <code>T</code>
+  (dernier), <code>HAT</code> (sauf‑premier), <code>4</code> (le nombre de
+  caractères), <code>BONJOUR</code> (les deux mots collés) et <code>CHAT</code>.</p>
+
+  <h3>Inverser un mot</h3>
+  <p>En décomposant le mot caractère par caractère, on l'inverse par
+  récursivité&nbsp;: on colle le dernier caractère devant l'inversion du reste.
+  Le cas d'arrêt est le mot vide (<code>"</code>).</p>
+
+  <pre><code><span class="kw">POUR</span> ENVERS <span class="var">:MOT</span>
+  <span class="kw">SI</span> <span class="kw">VIDE?</span> <span class="var">:MOT</span> [ <span class="kw">RENDS</span> <span class="str">"</span> ]
+  <span class="kw">RENDS</span> <span class="kw">MOT</span> <span class="kw">DER</span> <span class="var">:MOT</span> <span class="kw">ENVERS</span> <span class="kw">SD</span> <span class="var">:MOT</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p><code>ECRIS ENVERS "BONJOUR</code> affiche <code>RUOJNOB</code>. (La primitive
+  <code>INVERSE</code> fait d'ailleurs ce travail directement.)</p>
+
+  <h3>Compter les voyelles</h3>
+  <p>On compte les voyelles du reste du mot, puis on ajoute 1 si le premier
+  caractère en fait partie. <code>MEMBRE?</code> teste l'appartenance à la liste
+  des voyelles&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> COMPTEVOYELLES <span class="var">:MOT</span>
+  <span class="kw">SI</span> <span class="kw">VIDE?</span> <span class="var">:MOT</span> [ <span class="kw">RENDS</span> <span class="num">0</span> ]
+  <span class="kw">LOCAL</span> <span class="str">"RESTE</span>
+  <span class="kw">DONNE</span> <span class="str">"RESTE</span> <span class="kw">COMPTEVOYELLES</span> <span class="kw">SP</span> <span class="var">:MOT</span>
+  <span class="kw">SI</span> <span class="kw">MEMBRE?</span> <span class="kw">MAJUSCULE</span> <span class="kw">PREM</span> <span class="var">:MOT</span> [ A E I O U Y ] [ <span class="kw">RENDS</span> <span class="var">:RESTE</span> + <span class="num">1</span> ]
+  <span class="kw">RENDS</span> <span class="var">:RESTE</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p><code>ECRIS COMPTEVOYELLES "ANTICONSTITUTIONNEL</code> affiche <code>8</code>.</p>
+
+  <div class="attention">
+    <strong>Le piège de la récursivité&nbsp;: pensez à <code>LOCAL</code>.</strong>
+    La commande <code>DONNE</code> écrit une variable <em>globale</em>. Sans la
+    ligne <code>LOCAL "RESTE</code>, chaque appel récursif écraserait le
+    <code>:RESTE</code> des appels encore en attente&nbsp;: au retour, on relirait
+    une valeur corrompue et le compte serait faux. Règle d'or&nbsp;: toute
+    variable de travail d'une procédure récursive doit être déclarée
+    <code>LOCAL</code>. Le paramètre <code>:MOT</code>, lui, est déjà propre à
+    chaque appel automatiquement.
+  </div>
+
+  <h3>Reconnaître un palindrome</h3>
+  <p>Un <em>prédicat</em> (il rend VRAI ou FAUX)&nbsp;: le mot est‑il égal à son
+  inverse, en ignorant la casse grâce à <code>MAJUSCULE</code>&nbsp;? Il réutilise
+  la procédure <code>ENVERS</code> ci‑dessus.</p>
+
+  <pre><code><span class="kw">POUR</span> PALINDROME? <span class="var">:MOT</span>
+  <span class="kw">RENDS</span> <span class="kw">EGAL?</span> <span class="kw">MAJUSCULE</span> <span class="var">:MOT</span> <span class="kw">ENVERS</span> <span class="kw">MAJUSCULE</span> <span class="var">:MOT</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p><code>SI PALINDROME? "Radar [ ECRIS [RADAR est un palindrome] ]</code>
+  affiche bien le message.</p>
 
   <!-- ============================================================ -->
   <h2 id="musique">Musique</h2>

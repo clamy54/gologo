@@ -16,8 +16,8 @@
   <ul>
     <li class="section-title">Get started</li>
     <li><a href="index.html">Overview</a></li>
-    <li><a href="getting-started.html">Getting started</a></li>
     <li><a href="installation.html">Installation</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
     <li class="section-title">Learn</li>
     <li><a href="journey.html">From the square to the arcade</a></li>
     <li><a href="language.html">The Logo language</a></li>
@@ -323,6 +323,73 @@
   <span class="kw">READ</span> [ WHAT IS YOUR NAME ] <span class="str">"NAME</span>
   ( <span class="kw">PRINT</span> <span class="str">"HELLO</span> <span class="var">:NAME</span> )
 <span class="kw">END</span></code></pre>
+
+  <h3>Taking a word apart and back together</h3>
+  <p>A word (a character string) is handled with a few basic primitives. A
+  literal word is written with a leading quote&nbsp;: <code>"CAT</code>. Careful&nbsp;:
+  square brackets <code>[ ]</code> make a <em>list</em>, not a word.</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">FIRST</span> <span class="str">"CAT</span>
+<span class="kw">PRINT</span> <span class="kw">LAST</span> <span class="str">"CAT</span>
+<span class="kw">PRINT</span> <span class="kw">BUTFIRST</span> <span class="str">"CAT</span>
+<span class="kw">PRINT</span> <span class="kw">COUNT</span> <span class="str">"CAT</span>
+<span class="kw">PRINT</span> <span class="kw">WORD</span> <span class="str">"GOOD</span> <span class="str">"BYE</span>
+<span class="kw">PRINT</span> <span class="kw">UPPERCASE</span> <span class="str">"cat</span></code></pre>
+
+  <p>Prints in turn <code>C</code> (first character), <code>T</code> (last),
+  <code>AT</code> (but-first), <code>3</code> (the number of characters),
+  <code>GOODBYE</code> (the two words joined) and <code>CAT</code>.</p>
+
+  <h3>Reversing a word</h3>
+  <p>By taking the word apart character by character, we reverse it with
+  recursion&nbsp;: we put the last character in front of the reversed rest. The base
+  case is the empty word (<code>"</code>).</p>
+
+  <pre><code><span class="kw">TO</span> BACKWARDS <span class="var">:WORD</span>
+  <span class="kw">IF</span> <span class="kw">EMPTY?</span> <span class="var">:WORD</span> [ <span class="kw">OUTPUT</span> <span class="str">"</span> ]
+  <span class="kw">OUTPUT</span> <span class="kw">WORD</span> <span class="kw">LAST</span> <span class="var">:WORD</span> <span class="kw">BACKWARDS</span> <span class="kw">BUTLAST</span> <span class="var">:WORD</span>
+<span class="kw">END</span></code></pre>
+
+  <p><code>PRINT BACKWARDS "HELLO</code> prints <code>OLLEH</code>. (The
+  <code>REVERSE</code> primitive does this directly.)</p>
+
+  <h3>Counting the vowels</h3>
+  <p>We count the vowels in the rest of the word, then add 1 if the first
+  character is one. <code>MEMBER?</code> tests membership of the list of
+  vowels&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> COUNTVOWELS <span class="var">:WORD</span>
+  <span class="kw">IF</span> <span class="kw">EMPTY?</span> <span class="var">:WORD</span> [ <span class="kw">OUTPUT</span> <span class="num">0</span> ]
+  <span class="kw">LOCAL</span> <span class="str">"REST</span>
+  <span class="kw">MAKE</span> <span class="str">"REST</span> <span class="kw">COUNTVOWELS</span> <span class="kw">BUTFIRST</span> <span class="var">:WORD</span>
+  <span class="kw">IF</span> <span class="kw">MEMBER?</span> <span class="kw">UPPERCASE</span> <span class="kw">FIRST</span> <span class="var">:WORD</span> [ A E I O U Y ] [ <span class="kw">OUTPUT</span> <span class="var">:REST</span> + <span class="num">1</span> ]
+  <span class="kw">OUTPUT</span> <span class="var">:REST</span>
+<span class="kw">END</span></code></pre>
+
+  <p><code>PRINT COUNTVOWELS "EXTRAORDINARY</code> prints <code>6</code>.</p>
+
+  <div class="attention">
+    <strong>The recursion trap&nbsp;: remember <code>LOCAL</code>.</strong>
+    The <code>MAKE</code> command writes a <em>global</em> variable. Without the
+    <code>LOCAL "REST</code> line, each recursive call would overwrite the
+    <code>:REST</code> of the calls still waiting&nbsp;: on the way back we would read
+    a corrupted value and the count would be wrong. Golden rule&nbsp;: every working
+    variable of a recursive procedure must be declared <code>LOCAL</code>. The
+    parameter <code>:WORD</code>, on the other hand, is already private to each
+    call automatically.
+  </div>
+
+  <h3>Recognising a palindrome</h3>
+  <p>A <em>predicate</em> (it returns TRUE or FALSE)&nbsp;: is the word equal to its
+  reverse, ignoring case thanks to <code>UPPERCASE</code>&nbsp;? It reuses the
+  <code>BACKWARDS</code> procedure above.</p>
+
+  <pre><code><span class="kw">TO</span> PALINDROME? <span class="var">:WORD</span>
+  <span class="kw">OUTPUT</span> <span class="kw">EQUAL?</span> <span class="kw">UPPERCASE</span> <span class="var">:WORD</span> <span class="kw">BACKWARDS</span> <span class="kw">UPPERCASE</span> <span class="var">:WORD</span>
+<span class="kw">END</span></code></pre>
+
+  <p><code>IF PALINDROME? "Level [ PRINT [LEVEL is a palindrome] ]</code> prints
+  the message.</p>
 
   <!-- ============================================================ -->
   <h2 id="music">Music</h2>

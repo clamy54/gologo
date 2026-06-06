@@ -16,8 +16,8 @@
   <ul>
     <li class="section-title">Démarrer</li>
     <li><a href="index.html">Présentation</a></li>
-    <li><a href="prise-en-main.html">Prise en main</a></li>
     <li><a href="installation.html">Installation</a></li>
+    <li><a href="prise-en-main.html">Prise en main</a></li>
     <li class="section-title">Apprendre</li>
     <li><a href="parcours.html">Du carré au jeu vidéo</a></li>
     <li><a href="langage.html">Le langage Logo</a></li>
@@ -1123,13 +1123,22 @@ DEFINIS &#34;POLY [ NB LG ] [ REPETE :NB [ AV :LG TD 360 / :NB ] ]</code></pre><
 
   <h2 id="controle">Contrôle d&#39;exécution</h2>
   <div class="cmd-entry" id="cmd-si">
-    <div class="cmd-header"><span class="cmd-name">SI</span> <span class="cmd-params">pred liste [liste2]</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-header"><span class="cmd-name">SI</span> <span class="cmd-params">pred liste</span><span class="cmd-kind">commande</span></div>
     <div class="cmd-body">
-      <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : IF IFELSE SISINON</div>
-      <p>Conditionnelle : exécute liste si pred est VRAI. Avec une 2e liste : sinon exécute liste2. Alias SISINON (IFELSE).</p>
+      <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : IF</div>
+      <p>Conditionnelle : exécute liste si pred est VRAI, sinon ne fait rien. Pour un cas « sinon », voir SISINON.</p>
       <div class="cmd-example"><pre><code>SI 2 &gt; 1 [ ECRIS &#34;OUI ]
-SI :N = 0 [ ECRIS &#34;ZERO ] [ ECRIS &#34;AUTRE ]</code></pre></div>
-      <div class="cmd-aliases">Voir aussi : <a href="#cmd-tantque">TANTQUE</a> <a href="#cmd-stop">STOP</a></div>
+SI :N = 0 [ ECRIS &#34;ZERO ]</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-sisinon">SISINON</a> <a href="#cmd-tantque">TANTQUE</a> <a href="#cmd-stop">STOP</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-sisinon">
+    <div class="cmd-header"><span class="cmd-name">SISINON</span> <span class="cmd-params">pred liste1 liste2</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : IFELSE</div>
+      <p>Conditionnelle à deux branches : exécute liste1 si pred est VRAI, sinon exécute liste2.</p>
+      <div class="cmd-example"><pre><code>SISINON :N = 0 [ ECRIS &#34;ZERO ] [ ECRIS &#34;AUTRE ]</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-si">SI</a> <a href="#cmd-teste">TESTE</a> <a href="#cmd-stop">STOP</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-repete">

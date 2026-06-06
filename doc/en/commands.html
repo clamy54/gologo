@@ -16,8 +16,8 @@
   <ul>
     <li class="section-title">Get started</li>
     <li><a href="index.html">Overview</a></li>
-    <li><a href="getting-started.html">Getting started</a></li>
     <li><a href="installation.html">Installation</a></li>
+    <li><a href="getting-started.html">Getting started</a></li>
     <li class="section-title">Learn</li>
     <li><a href="journey.html">From the square to the arcade</a></li>
     <li><a href="language.html">The Logo language</a></li>
@@ -1122,13 +1122,22 @@ DEFINE &#34;POLY [ NB LG ] [ REPEAT :NB [ FD :LG RT 360 / :NB ] ]</code></pre></
 
   <h2 id="controle">Flow control</h2>
   <div class="cmd-entry" id="cmd-if">
-    <div class="cmd-header"><span class="cmd-name">IF</span> <span class="cmd-params">pred list [list2]</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-header"><span class="cmd-name">IF</span> <span class="cmd-params">pred list</span><span class="cmd-kind">command</span></div>
     <div class="cmd-body">
-      <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: IFELSE SI SISINON</div>
-      <p>Conditional: runs list if pred is TRUE. With a 2nd list: otherwise runs list2. Alias IFELSE.</p>
+      <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: SI</div>
+      <p>Conditional: runs list if pred is TRUE, otherwise does nothing. For an else branch, see IFELSE.</p>
       <div class="cmd-example"><pre><code>IF 2 &gt; 1 [ PRINT &#34;OUI ]
-IF :N = 0 [ PRINT &#34;ZERO ] [ PRINT &#34;AUTRE ]</code></pre></div>
-      <div class="cmd-aliases">See also: <a href="#cmd-while">WHILE</a> <a href="#cmd-stop">STOP</a></div>
+IF :N = 0 [ PRINT &#34;ZERO ]</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-ifelse">IFELSE</a> <a href="#cmd-while">WHILE</a> <a href="#cmd-stop">STOP</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ifelse">
+    <div class="cmd-header"><span class="cmd-name">IFELSE</span> <span class="cmd-params">pred list1 list2</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: SISINON</div>
+      <p>Two-branch conditional: runs list1 if pred is TRUE, otherwise runs list2.</p>
+      <div class="cmd-example"><pre><code>IFELSE :N = 0 [ PRINT &#34;ZERO ] [ PRINT &#34;AUTRE ]</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-if">IF</a> <a href="#cmd-test">TEST</a> <a href="#cmd-stop">STOP</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-repeat">
