@@ -36,7 +36,7 @@
   </div>
 
   <p>Each entry shows its type (<strong>C</strong> command that produces an effect, <strong>O</strong> operation that returns a value, <strong>P</strong> predicate that returns TRUE/FALSE) and its origin: <em>SOLI Logo</em> (the original Logo), <em>Extension</em> (modern addition) or <em>Compatibility</em> (period hardware, no effect).</p>
-  <div class="conseil">Sections: <a href="#deplacements">The turtle: movement</a> · <a href="#champ">The turtle: the graphics field</a> · <a href="#tortues">Multiple turtles</a> · <a href="#animation">Animating turtles</a> · <a href="#crayon">The turtle: the pen</a> · <a href="#examiner">Words and lists: examine</a> · <a href="#demonter">Words and lists: take apart</a> · <a href="#construire">Words and lists: build and transform</a> · <a href="#logique">Logical values</a> · <a href="#arithmetique">Arithmetic</a> · <a href="#variables">Names (variables)</a> · <a href="#procedures">Procedures</a> · <a href="#controle">Flow control</a> · <a href="#proprietes">Property lists</a> · <a href="#texte">Text output</a> · <a href="#clavier">Keyboard</a> · <a href="#souris">Mouse</a> · <a href="#manettes">Joysticks</a> · <a href="#musique">Music</a> · <a href="#travail">Workspace</a> · <a href="#fichiers">Files</a> · <a href="#compat">Original hardware (compatibility)</a> · <a href="#divers">Miscellaneous</a></div>
+  <div class="conseil">Sections: <a href="#deplacements">The turtle: movement</a> · <a href="#champ">The turtle: the graphics field</a> · <a href="#tortues">Multiple turtles</a> · <a href="#animation">Animating turtles</a> · <a href="#crayon">The turtle: the pen</a> · <a href="#examiner">Words and lists: examine</a> · <a href="#demonter">Words and lists: take apart</a> · <a href="#construire">Words and lists: build and transform</a> · <a href="#chaines">Strings: search, split, clean</a> · <a href="#tableaux">Arrays, stacks and queues</a> · <a href="#logique">Logical values</a> · <a href="#arithmetique">Arithmetic</a> · <a href="#variables">Names (variables)</a> · <a href="#procedures">Procedures</a> · <a href="#controle">Flow control</a> · <a href="#proprietes">Property lists</a> · <a href="#texte">Text output</a> · <a href="#clavier">Keyboard</a> · <a href="#souris">Mouse</a> · <a href="#manettes">Joysticks</a> · <a href="#musique">Music</a> · <a href="#travail">Workspace</a> · <a href="#fichiers">Files</a> · <a href="#fichiers-donnees">Data files (streams)</a> · <a href="#compat">Original hardware (compatibility)</a> · <a href="#divers">Miscellaneous</a></div>
 
   <h2 id="deplacements">The turtle: movement</h2>
   <div class="cmd-entry" id="cmd-forward">
@@ -89,7 +89,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo</div>
       <p>Outputs the current position [x y].</p>
-      <div class="cmd-example"><pre><code>PRINT POS</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT POS
+  -&gt; 0 0</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setpos">SETPOS</a> <a href="#cmd-xcor">XCOR</a> <a href="#cmd-ycor">YCOR</a></div>
     </div>
   </div>
@@ -116,7 +117,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Outputs the turtle&#39;s x coordinate.</p>
-      <div class="cmd-example"><pre><code>PRINT XCOR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT XCOR
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-ycor">YCOR</a> <a href="#cmd-pos">POS</a></div>
     </div>
   </div>
@@ -125,7 +127,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Outputs the turtle&#39;s y coordinate.</p>
-      <div class="cmd-example"><pre><code>PRINT YCOR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT YCOR
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-xcor">XCOR</a> <a href="#cmd-pos">POS</a></div>
     </div>
   </div>
@@ -134,7 +137,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: CAP</div>
       <p>Outputs the current heading, 0 to 359.9 (compass, North = 0 = up).</p>
-      <div class="cmd-example"><pre><code>PRINT HEADING</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT HEADING
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setheading">SETHEADING</a></div>
     </div>
   </div>
@@ -161,7 +165,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Outputs the distance from the turtle to the point [x y].</p>
-      <div class="cmd-example"><pre><code>PRINT DISTANCE [ 30 40 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT DISTANCE [ 30 40 ]
+  -&gt; 50</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-towards">TOWARDS</a> <a href="#cmd-pos">POS</a></div>
     </div>
   </div>
@@ -208,7 +213,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: SHOWNP VISIBLE?</div>
       <p>Outputs TRUE if the turtle is shown.</p>
-      <div class="cmd-example"><pre><code>PRINT SHOWN?</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT SHOWN?
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-showturtle">SHOWTURTLE</a> <a href="#cmd-hideturtle">HIDETURTLE</a></div>
     </div>
   </div>
@@ -253,7 +259,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: BG CF SCREENCOLOR</div>
       <p>Outputs the graphics background color code.</p>
-      <div class="cmd-example"><pre><code>PRINT BACKGROUND</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT BACKGROUND
+  -&gt; 4</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setbackground">SETBACKGROUND</a></div>
     </div>
   </div>
@@ -281,7 +288,8 @@ SETBORDER [ 80 80 80 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: ECH</div>
       <p>Outputs the [horizontal vertical] scales, in percent.</p>
-      <div class="cmd-example"><pre><code>PRINT SCALE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT SCALE
+  -&gt; 100 100</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-setscale">
@@ -352,7 +360,8 @@ SETBORDER [ 80 80 80 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TORTUE</div>
       <p>Outputs the active turtle number.</p>
-      <div class="cmd-example"><pre><code>PRINT TURTLE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT TURTLE
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setturtle">SETTURTLE</a> <a href="#cmd-turtles">TURTLES</a></div>
     </div>
   </div>
@@ -361,7 +370,8 @@ SETBORDER [ 80 80 80 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: NBTORTUES</div>
       <p>Outputs the number of existing turtles.</p>
-      <div class="cmd-example"><pre><code>PRINT TURTLES</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT TURTLES
+  -&gt; 1</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setturtle">SETTURTLE</a> <a href="#cmd-clearturtles">CLEARTURTLES</a></div>
     </div>
   </div>
@@ -389,7 +399,8 @@ ASK [ 0 1 ] [ RT 90 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: COLLIDEP COLLISION?</div>
       <p>Outputs TRUE if the two turtles in the list [ a b ] exist, are visible and overlap (bounding boxes matching each sprite&#39;s size). Otherwise FALSE.</p>
-      <div class="cmd-example"><pre><code>PRINT COLLIDE? [ 0 1 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT COLLIDE? [ 0 1 ]
+  -&gt; FAUX</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setturtle">SETTURTLE</a> <a href="#cmd-shown?">SHOWN?</a></div>
     </div>
   </div>
@@ -448,7 +459,8 @@ ASK [ 0 1 ] [ RT 90 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: BC? PENDOWNP</div>
       <p>Outputs TRUE if the pen is down.</p>
-      <div class="cmd-example"><pre><code>PRINT PENDOWN?</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PENDOWN?
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-pendown">PENDOWN</a> <a href="#cmd-penup">PENUP</a></div>
     </div>
   </div>
@@ -457,7 +469,8 @@ ASK [ 0 1 ] [ RT 90 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: CC PC</div>
       <p>Outputs the pen color code.</p>
-      <div class="cmd-example"><pre><code>PRINT PENCOLOR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PENCOLOR
+  -&gt; 6</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setpencolor">SETPENCOLOR</a></div>
     </div>
   </div>
@@ -504,7 +517,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: CR</div>
       <p>Outputs the flood color code (SETFLOODCOLOR). If it has not been set, outputs the pen color (the effective FILL color).</p>
-      <div class="cmd-example"><pre><code>PRINT FLOODCOLOR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT FLOODCOLOR
+  -&gt; 6</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-setfloodcolor">SETFLOODCOLOR</a> <a href="#cmd-fill">FILL</a></div>
     </div>
   </div>
@@ -523,8 +537,9 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">EQUAL?</span> <span class="cmd-params">obj1 obj2</span><span class="cmd-kind">predicate</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: EGAL? EQUALP</div>
-      <p>Outputs TRUE if obj1 and obj2 are equal. Infix operator: =.</p>
-      <div class="cmd-example"><pre><code>PRINT EQUAL? 2 2</code></pre></div>
+      <p>Outputs TRUE if obj1 and obj2 are equal. Infix operator: =. Word comparison ignores letter case (EQUAL? &#34;a &#34;A is TRUE); when case matters, compare codes: EQUAL? ASCII :c1 ASCII :c2.</p>
+      <div class="cmd-example"><pre><code>PRINT EQUAL? 2 2
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-empty?">
@@ -532,7 +547,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: EMPTYP VIDE?</div>
       <p>Outputs TRUE if obj is the empty word or empty list.</p>
-      <div class="cmd-example"><pre><code>PRINT EMPTY? [ ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT EMPTY? [ ]
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-list?">
@@ -540,7 +556,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: LISTE? LISTP</div>
       <p>Outputs TRUE if obj is a list.</p>
-      <div class="cmd-example"><pre><code>PRINT LIST? [ A B ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LIST? [ A B ]
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-word?">
@@ -548,7 +565,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: MOT? WORDP</div>
       <p>Outputs TRUE if obj is a word.</p>
-      <div class="cmd-example"><pre><code>PRINT WORD? &#34;BONJOUR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT WORD? &#34;BONJOUR
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-number?">
@@ -556,7 +574,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: NOMBRE? NUMBERP</div>
       <p>Outputs TRUE if obj is a number.</p>
-      <div class="cmd-example"><pre><code>PRINT NUMBER? 42</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT NUMBER? 42
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-member?">
@@ -564,15 +583,17 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: MEMBERP MEMBRE?</div>
       <p>Outputs TRUE if obj is a member of list.</p>
-      <div class="cmd-example"><pre><code>PRINT MEMBER? &#34;A [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT MEMBER? &#34;A [ A B C ]
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-count">
-    <div class="cmd-header"><span class="cmd-name">COUNT</span> <span class="cmd-params">list</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-header"><span class="cmd-name">COUNT</span> <span class="cmd-params">chose</span><span class="cmd-kind">operation</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: COMPTE</div>
-      <p>Outputs the number of members of a list (or characters of a word).</p>
-      <div class="cmd-example"><pre><code>PRINT COUNT [ A B C ]</code></pre></div>
+      <p>Outputs the number of members of a list, characters of a word, or cells of an array.</p>
+      <div class="cmd-example"><pre><code>PRINT COUNT [ A B C ]
+  -&gt; 3</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-ascii">
@@ -580,7 +601,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo</div>
       <p>Outputs the ASCII code of the first character of word (empty word -&gt; 0).</p>
-      <div class="cmd-example"><pre><code>PRINT ASCII &#34;A</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT ASCII &#34;A
+  -&gt; 65</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-char">
@@ -588,7 +610,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: CAR</div>
       <p>Outputs the character of code n (modulo 256; 0 -&gt; empty word).</p>
-      <div class="cmd-example"><pre><code>PRINT CHAR 65</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT CHAR 65
+  -&gt; A</code></pre></div>
     </div>
   </div>
 
@@ -598,7 +621,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: PREM PREMIER</div>
       <p>Outputs the first member of a list (or first character of a word).</p>
-      <div class="cmd-example"><pre><code>PRINT FIRST [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT FIRST [ A B C ]
+  -&gt; A</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-last">LAST</a> <a href="#cmd-butfirst">BUTFIRST</a> <a href="#cmd-butlast">BUTLAST</a></div>
     </div>
   </div>
@@ -607,7 +631,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: DER DERNIER</div>
       <p>Outputs the last member of a list (or last character of a word).</p>
-      <div class="cmd-example"><pre><code>PRINT LAST [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LAST [ A B C ]
+  -&gt; C</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-first">FIRST</a> <a href="#cmd-butfirst">BUTFIRST</a> <a href="#cmd-butlast">BUTLAST</a></div>
     </div>
   </div>
@@ -616,7 +641,8 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: BF SAUFPREMIER SP</div>
       <p>Outputs obj without its first element.</p>
-      <div class="cmd-example"><pre><code>PRINT BUTFIRST [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT BUTFIRST [ A B C ]
+  -&gt; B C</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-butlast">BUTLAST</a> <a href="#cmd-first">FIRST</a> <a href="#cmd-last">LAST</a></div>
     </div>
   </div>
@@ -625,17 +651,20 @@ SETFLOODCOLOR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: BL SAUFDERNIER SD</div>
       <p>Outputs obj without its last element.</p>
-      <div class="cmd-example"><pre><code>PRINT BUTLAST [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT BUTLAST [ A B C ]
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-butfirst">BUTFIRST</a> <a href="#cmd-first">FIRST</a> <a href="#cmd-last">LAST</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-item">
-    <div class="cmd-header"><span class="cmd-name">ITEM</span> <span class="cmd-params">n list or word</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-header"><span class="cmd-name">ITEM</span> <span class="cmd-params">n chose</span><span class="cmd-kind">operation</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo</div>
-      <p>Outputs the nth member of a list, or the nth character of a word (n integer &gt;= 1).</p>
+      <p>Outputs the nth member of a list, the nth character of a word, or cell n of an array (n integer; for an array the origin is taken into account).</p>
       <div class="cmd-example"><pre><code>PRINT ITEM 2 [ A B C ]
-PRINT ITEM 2 &#34;CHAT</code></pre></div>
+  -&gt; B
+PRINT ITEM 2 &#34;CHAT
+  -&gt; H</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-pick">
@@ -643,7 +672,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: PIOCHE</div>
       <p>Outputs a randomly chosen member of a list (or character of a word). (FMSLogo compatibility.)</p>
-      <div class="cmd-example"><pre><code>PRINT PICK [ PILE FACE ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PICK [ PILE FACE ]
+  -&gt; FACE</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-item">ITEM</a> <a href="#cmd-random">RANDOM</a> <a href="#cmd-count">COUNT</a></div>
     </div>
   </div>
@@ -654,7 +684,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: MOT</div>
       <p>Concatenates word1 and word2 into a single word.</p>
-      <div class="cmd-example"><pre><code>PRINT WORD &#34;BON &#34;JOUR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT WORD &#34;BON &#34;JOUR
+  -&gt; BONJOUR</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-sentence">SENTENCE</a> <a href="#cmd-list">LIST</a></div>
     </div>
   </div>
@@ -663,7 +694,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: PH PHRASE SE</div>
       <p>Builds a list from obj1 and obj2 (flattens lists).</p>
-      <div class="cmd-example"><pre><code>PRINT SENTENCE &#34;A &#34;B</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT SENTENCE &#34;A &#34;B
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-word">WORD</a> <a href="#cmd-list">LIST</a></div>
     </div>
   </div>
@@ -672,7 +704,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: LISTE</div>
       <p>Builds the list [obj1 obj2].</p>
-      <div class="cmd-example"><pre><code>PRINT LIST &#34;A &#34;B</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LIST &#34;A &#34;B
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-word">WORD</a> <a href="#cmd-sentence">SENTENCE</a></div>
     </div>
   </div>
@@ -681,7 +714,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: METSPREMIER MP</div>
       <p>Adds obj at the front of list.</p>
-      <div class="cmd-example"><pre><code>PRINT FPUT &#34;A [ B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT FPUT &#34;A [ B C ]
+  -&gt; A B C</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-lput">
@@ -689,7 +723,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: MD METSDERNIER</div>
       <p>Adds obj at the end of list.</p>
-      <div class="cmd-example"><pre><code>PRINT LPUT &#34;C [ A B ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LPUT &#34;C [ A B ]
+  -&gt; A B C</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-reverse">
@@ -697,7 +732,8 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: INVERSE</div>
       <p>Outputs the list (or word) with its elements in reverse order.</p>
-      <div class="cmd-example"><pre><code>PRINT REVERSE [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT REVERSE [ A B C ]
+  -&gt; C B A</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-sort">
@@ -706,8 +742,10 @@ PRINT ITEM 2 &#34;CHAT</code></pre></div>
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TRIE</div>
       <p>Outputs the list sorted: numbers by increasing value, otherwise alphabetically. Stable sort.</p>
       <div class="cmd-example"><pre><code>PRINT SORT [ 3 1 2 ]
-PRINT SORT [ POMME CERISE BANANE ]</code></pre></div>
-      <div class="cmd-aliases">See also: <a href="#cmd-reverse">REVERSE</a> <a href="#cmd-item">ITEM</a></div>
+  -&gt; 1 2 3
+PRINT SORT [ POMME CERISE BANANE ]
+  -&gt; BANANE CERISE POMME</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-reverse">REVERSE</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-sortarray">SORTARRAY</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-uppercase">
@@ -715,7 +753,8 @@ PRINT SORT [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: MAJUSCULE</div>
       <p>Outputs the word in upper case.</p>
-      <div class="cmd-example"><pre><code>PRINT UPPERCASE &#34;bonjour</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT UPPERCASE &#34;bonjour
+  -&gt; BONJOUR</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-lowercase">LOWERCASE</a> <a href="#cmd-word">WORD</a></div>
     </div>
   </div>
@@ -724,8 +763,322 @@ PRINT SORT [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: MINUSCULE</div>
       <p>Outputs the word in lower case.</p>
-      <div class="cmd-example"><pre><code>PRINT LOWERCASE &#34;BONJOUR</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LOWERCASE &#34;BONJOUR
+  -&gt; bonjour</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-uppercase">UPPERCASE</a> <a href="#cmd-word">WORD</a></div>
+    </div>
+  </div>
+
+  <h2 id="chaines">Strings: search, split, clean</h2>
+  <div class="cmd-entry" id="cmd-member">
+    <div class="cmd-header"><span class="cmd-name">MEMBER</span> <span class="cmd-params">chose1 chose2</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: MEMBRE</div>
+      <p>Outputs the portion of thing2 (word or list) from the first occurrence of thing1 to the end, or empty if thing1 is absent. On a word, thing1 is a single character.</p>
+      <div class="cmd-example"><pre><code>PRINT MEMBER &#34;C &#34;ABCDE
+  -&gt; CDE
+PRINT MEMBER &#34;B [ A B C ]
+  -&gt; B C</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-substring?">SUBSTRING?</a> <a href="#cmd-member?">MEMBER?</a> <a href="#cmd-item">ITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-substring?">
+    <div class="cmd-header"><span class="cmd-name">SUBSTRING?</span> <span class="cmd-params">chose1 chose2</span><span class="cmd-kind">predicate</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: SOUSCHAINE? SUBSTRINGP</div>
+      <p>Outputs TRUE if thing1 is a substring of the word thing2 (case-insensitive). FALSE if either one is a list.</p>
+      <div class="cmd-example"><pre><code>PRINT SUBSTRING? &#34;bc &#34;abc
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-member">MEMBER</a> <a href="#cmd-member?">MEMBER?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-before?">
+    <div class="cmd-header"><span class="cmd-name">BEFORE?</span> <span class="cmd-params">word1 word2</span><span class="cmd-kind">predicate</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: AVANT? BEFOREP</div>
+      <p>Outputs TRUE if word1 comes before word2 in alphabetical order (case-insensitive).</p>
+      <div class="cmd-example"><pre><code>PRINT BEFORE? &#34;abc &#34;abd
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-equal?">EQUAL?</a> <a href="#cmd-sort">SORT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-position">
+    <div class="cmd-header"><span class="cmd-name">POSITION</span> <span class="cmd-params">chose chaine</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)</div>
+      <p>Outputs the rank (1-based) of the first occurrence of thing in chaine, or 0 if absent. In a word, thing can be a substring; in a list, an element. Case-insensitive. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT POSITION &#34;n &#34;bonjour
+  -&gt; 3
+PRINT POSITION &#34;B [ A B C ]
+  -&gt; 2</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-member">MEMBER</a> <a href="#cmd-substring?">SUBSTRING?</a> <a href="#cmd-item">ITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-split">
+    <div class="cmd-header"><span class="cmd-name">SPLIT</span> <span class="cmd-params">word separateur</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: DECOUPE</div>
+      <p>Splits word on the separator and outputs the list of pieces (empty pieces are kept). The separator may be a single character or a whole string. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT SPLIT &#34;1-2-3 &#34;-
+  -&gt; 1 2 3
+PRINT SPLIT &#34;a::b::c &#34;::
+  -&gt; a b c</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-word">WORD</a> <a href="#cmd-sentence">SENTENCE</a> <a href="#cmd-slice">SLICE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-substitute">
+    <div class="cmd-header"><span class="cmd-name">SUBSTITUTE</span> <span class="cmd-params">ancien nouveau chaine</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: SUBSTITUE</div>
+      <p>Outputs string with every occurrence of the substring old replaced by new. In parentheses, (SUBSTITUTE old new string n) replaces at most n. An empty old is an error. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT SUBSTITUTE &#34;an &#34;AN &#34;banane
+  -&gt; bANANe
+PRINT ( SUBSTITUTE &#34;a &#34;o &#34;ananas 1 )
+  -&gt; onanas</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-member">MEMBER</a> <a href="#cmd-word">WORD</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-trim">
+    <div class="cmd-header"><span class="cmd-name">TRIM</span> <span class="cmd-params">word</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ROGNE</div>
+      <p>Outputs word without leading and trailing blanks (spaces, tabs). Useful on a line read from input. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT TRIM &#34;bonjour
+  -&gt; bonjour</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-ltrim">LTRIM</a> <a href="#cmd-rtrim">RTRIM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ltrim">
+    <div class="cmd-header"><span class="cmd-name">LTRIM</span> <span class="cmd-params">word</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ROGNEDEBUT</div>
+      <p>Outputs word without leading blanks. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT LTRIM &#34;bonjour
+  -&gt; bonjour</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-trim">TRIM</a> <a href="#cmd-rtrim">RTRIM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-rtrim">
+    <div class="cmd-header"><span class="cmd-name">RTRIM</span> <span class="cmd-params">word</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ROGNEFIN</div>
+      <p>Outputs word without trailing blanks. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT RTRIM &#34;bonjour
+  -&gt; bonjour</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-trim">TRIM</a> <a href="#cmd-ltrim">LTRIM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-remove">
+    <div class="cmd-header"><span class="cmd-name">REMOVE</span> <span class="cmd-params">chose elements</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OTETOUT</div>
+      <p>Outputs elements (list or word) without all members equal to thing. On a word, thing is a single character.</p>
+      <div class="cmd-example"><pre><code>PRINT REMOVE &#34;A [ A B A C ]
+  -&gt; B C</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-remdup">REMDUP</a> <a href="#cmd-member?">MEMBER?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-delete">
+    <div class="cmd-header"><span class="cmd-name">DELETE</span> <span class="cmd-params">sequence debut longueur</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OTE</div>
+      <p>Outputs sequence (word or list) without length elements starting at start (1-based). Removes by position (unlike REMOVE, which removes by value). gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT DELETE &#34;bonjour 2 3
+  -&gt; bour
+PRINT DELETE [ A B C D ] 2 2
+  -&gt; A D</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-slice">SLICE</a> <a href="#cmd-remove">REMOVE</a> <a href="#cmd-substitute">SUBSTITUTE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-remdup">
+    <div class="cmd-header"><span class="cmd-name">REMDUP</span> <span class="cmd-params">elements</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: SANSDOUBLONS</div>
+      <p>Outputs a copy of elements with duplicates removed: if a member appears several times, the rightmost one is kept.</p>
+      <div class="cmd-example"><pre><code>PRINT REMDUP [ A B C C B ]
+  -&gt; A C B</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-remove">REMOVE</a> <a href="#cmd-sort">SORT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-replace">
+    <div class="cmd-header"><span class="cmd-name">REPLACE</span> <span class="cmd-params">sequence n arg</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: REMPLACE</div>
+      <p>Outputs sequence (word or list) with item number n replaced by arg (1-based). Non-destructive (outputs a new value). From XLogo.</p>
+      <div class="cmd-example"><pre><code>PRINT REPLACE [ A B C ] 2 8
+  -&gt; A 8 C
+PRINT REPLACE &#34;chat 1 &#34;r
+  -&gt; rhat</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-insertitem">INSERTITEM</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-slice">SLICE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-insertitem">
+    <div class="cmd-header"><span class="cmd-name">INSERTITEM</span> <span class="cmd-params">sequence n arg</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: AJOUTE</div>
+      <p>Outputs sequence (word or list) with arg inserted at position n (n from 1 to length+1). From XLogo.</p>
+      <div class="cmd-example"><pre><code>PRINT INSERTITEM [ A B C ] 2 8
+  -&gt; A 8 B C
+PRINT INSERTITEM &#34;cat 2 &#34;h
+  -&gt; chat</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-replace">REPLACE</a> <a href="#cmd-fput">FPUT</a> <a href="#cmd-lput">LPUT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-slice">
+    <div class="cmd-header"><span class="cmd-name">SLICE</span> <span class="cmd-params">sequence debut fin</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TRANCHE</div>
+      <p>Outputs the subsequence from start to end inclusive (1-based, like ITEM); the type follows the input (word or list). (SLICE sequence start) goes to the end. Out-of-range bounds are clamped. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT SLICE &#34;bonjour 2 4
+  -&gt; onj
+PRINT ( SLICE &#34;bonjour 4 )
+  -&gt; jour
+PRINT SLICE [ A B C D ] 2 3
+  -&gt; B C</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-item">ITEM</a> <a href="#cmd-first">FIRST</a> <a href="#cmd-last">LAST</a> <a href="#cmd-split">SPLIT</a></div>
+    </div>
+  </div>
+
+  <h2 id="tableaux">Arrays, stacks and queues</h2>
+  <div class="cmd-entry" id="cmd-array">
+    <div class="cmd-header"><span class="cmd-name">ARRAY</span> <span class="cmd-params">taille</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TABLEAU</div>
+      <p>Outputs an array of size cells, each initially the empty list (not 0: initialise the cells before using them as counters or flags). (ARRAY size origin) sets the first cell&#39;s index (1 by default). An array is mutable and shared by reference. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW ARRAY 3
+  -&gt; { }
+MAKE &#34;T ( ARRAY 3 0 )</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setitem">SETITEM</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-listtoarray">LISTTOARRAY</a> <a href="#cmd-array?">ARRAY?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-mdarray">
+    <div class="cmd-header"><span class="cmd-name">MDARRAY</span> <span class="cmd-params">listtailles</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TABLEAUMD</div>
+      <p>Outputs a multi-dimensional array: one dimension per size in the list (positive sizes). (MDARRAY sizelist origin) sets the origin. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW MDARRAY [ 2 2 ]
+  -&gt; {{ } { }}</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-array">ARRAY</a> <a href="#cmd-mdsetitem">MDSETITEM</a> <a href="#cmd-mditem">MDITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-listtoarray">
+    <div class="cmd-header"><span class="cmd-name">LISTTOARRAY</span> <span class="cmd-params">list</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: LISTEVERSTABLEAU</div>
+      <p>Outputs an array with the same elements as the list. (LISTTOARRAY list origin) sets the origin. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW LISTTOARRAY [ 1 2 3 ]
+  -&gt; {1 2 3}</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-arraytolist">ARRAYTOLIST</a> <a href="#cmd-array">ARRAY</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-arraytolist">
+    <div class="cmd-header"><span class="cmd-name">ARRAYTOLIST</span> <span class="cmd-params">tableau</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TABLEAUVERSLISTE</div>
+      <p>Outputs the list of the array&#39;s cells (first cell first, whatever the origin). Handy to process an array with MAP/FILTER. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW ARRAYTOLIST LISTTOARRAY [ 1 2 3 ]
+  -&gt; [1 2 3]</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-listtoarray">LISTTOARRAY</a> <a href="#cmd-array">ARRAY</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-mditem">
+    <div class="cmd-header"><span class="cmd-name">MDITEM</span> <span class="cmd-params">listindices tableaumd</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ITEMMD</div>
+      <p>Outputs the cell of a multi-dimensional array, selected by a list of indices. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>PRINT MDITEM [ 1 ] LISTTOARRAY [ 7 8 9 ]
+  -&gt; 7</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-mdsetitem">MDSETITEM</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-mdarray">MDARRAY</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-setitem">
+    <div class="cmd-header"><span class="cmd-name">SETITEM</span> <span class="cmd-params">indice tableau valeur</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXEITEM</div>
+      <p>Replaces cell index of the array with value (mutates the array in place). Refuses to create a cycle (value must not contain the array). From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;T ARRAY 3 SETITEM 2 :T 9 PRINT ITEM 2 :T
+  -&gt; 9</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-item">ITEM</a> <a href="#cmd-array">ARRAY</a> <a href="#cmd-copyarray">COPYARRAY</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-mdsetitem">
+    <div class="cmd-header"><span class="cmd-name">MDSETITEM</span> <span class="cmd-params">listindices tableaumd valeur</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXEITEMMD</div>
+      <p>Replaces a cell of a multi-dimensional array (selected by a list of indices) with value. Refuses cycles. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;T MDARRAY [ 2 2 ] MDSETITEM [ 1 2 ] :T 5 PRINT MDITEM [ 1 2 ] :T
+  -&gt; 5</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-mditem">MDITEM</a> <a href="#cmd-mdarray">MDARRAY</a> <a href="#cmd-setitem">SETITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-array?">
+    <div class="cmd-header"><span class="cmd-name">ARRAY?</span> <span class="cmd-params">chose</span><span class="cmd-kind">predicate</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ARRAYP TABLEAU?</div>
+      <p>Outputs TRUE if thing is an array.</p>
+      <div class="cmd-example"><pre><code>PRINT ARRAY? ARRAY 3
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-array">ARRAY</a> <a href="#cmd-list?">LIST?</a> <a href="#cmd-word?">WORD?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-copyarray">
+    <div class="cmd-header"><span class="cmd-name">COPYARRAY</span> <span class="cmd-params">tableau</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: COPIETABLEAU</div>
+      <p>Outputs a DEEP copy of the array (recursive on sub-arrays, sharing preserved), so the copy can be modified without touching the original. gologo extension.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;T ARRAY 3 MAKE &#34;C COPYARRAY :T PRINT ARRAY? :C
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-array">ARRAY</a> <a href="#cmd-setitem">SETITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-sortarray">
+    <div class="cmd-header"><span class="cmd-name">SORTARRAY</span> <span class="cmd-params">tableau</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ORDONNE</div>
+      <p>Sorts the array&#39;s slots in place (numbers by increasing value, otherwise alphabetically). Modifies the array, like SETITEM; stable sort. Faster than SORT on large data.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;T LISTTOARRAY [ 3 1 2 ] SORTARRAY :T SHOW :T
+  -&gt; {1 2 3}</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-sort">SORT</a> <a href="#cmd-array">ARRAY</a> <a href="#cmd-setitem">SETITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-push">
+    <div class="cmd-header"><span class="cmd-name">PUSH</span> <span class="cmd-params">nomvar valeur</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: EMPILE</div>
+      <p>Adds value to the front of the list named nomvar (stack). Pop it with POP. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;P [ ] PUSH &#34;P 1 PUSH &#34;P 2 SHOW :P
+  -&gt; [2 1]</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-pop">POP</a> <a href="#cmd-queue">QUEUE</a> <a href="#cmd-fput">FPUT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-pop">
+    <div class="cmd-header"><span class="cmd-name">POP</span> <span class="cmd-params">nomvar</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: DEPILE</div>
+      <p>Removes and outputs the front element of the list named nomvar (stack, last in first out). From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;P [ ] PUSH &#34;P 1 PUSH &#34;P 2 PRINT POP &#34;P
+  -&gt; 2</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-push">PUSH</a> <a href="#cmd-dequeue">DEQUEUE</a> <a href="#cmd-first">FIRST</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-queue">
+    <div class="cmd-header"><span class="cmd-name">QUEUE</span> <span class="cmd-params">nomvar valeur</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ENFILE</div>
+      <p>Adds value to the back of the list named nomvar (queue). Dequeue it with DEQUEUE. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;F [ ] QUEUE &#34;F 1 QUEUE &#34;F 2 SHOW :F
+  -&gt; [1 2]</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-dequeue">DEQUEUE</a> <a href="#cmd-push">PUSH</a> <a href="#cmd-lput">LPUT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-dequeue">
+    <div class="cmd-header"><span class="cmd-name">DEQUEUE</span> <span class="cmd-params">nomvar</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: DEFILE</div>
+      <p>Removes and outputs the oldest element (at the front) of the list named nomvar (queue, first in first out). From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MAKE &#34;F [ ] QUEUE &#34;F 1 QUEUE &#34;F 2 PRINT DEQUEUE &#34;F
+  -&gt; 1</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-queue">QUEUE</a> <a href="#cmd-pop">POP</a> <a href="#cmd-first">FIRST</a></div>
     </div>
   </div>
 
@@ -735,7 +1088,8 @@ PRINT SORT [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: VRAI</div>
       <p>Outputs the word TRUE.</p>
-      <div class="cmd-example"><pre><code>PRINT TRUE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT TRUE
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-false">FALSE</a></div>
     </div>
   </div>
@@ -744,7 +1098,8 @@ PRINT SORT [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: FAUX</div>
       <p>Outputs the word FALSE.</p>
-      <div class="cmd-example"><pre><code>PRINT FALSE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT FALSE
+  -&gt; FAUX</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-true">TRUE</a></div>
     </div>
   </div>
@@ -754,7 +1109,9 @@ PRINT SORT [ POMME CERISE BANANE ]</code></pre></div>
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: ET</div>
       <p>Logical AND: TRUE if both predicates are TRUE. In parentheses, accepts several: (AND a b c).</p>
       <div class="cmd-example"><pre><code>PRINT AND TRUE FALSE
-PRINT ( AND TRUE TRUE TRUE )</code></pre></div>
+  -&gt; FAUX
+PRINT ( AND TRUE TRUE TRUE )
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-or">OR</a> <a href="#cmd-not">NOT</a></div>
     </div>
   </div>
@@ -764,7 +1121,9 @@ PRINT ( AND TRUE TRUE TRUE )</code></pre></div>
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: OU</div>
       <p>Logical OR: TRUE if at least one predicate is TRUE. In parentheses: (OR a b c).</p>
       <div class="cmd-example"><pre><code>PRINT OR TRUE FALSE
-PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
+  -&gt; VRAI
+PRINT ( OR FALSE FALSE TRUE )
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-and">AND</a> <a href="#cmd-not">NOT</a></div>
     </div>
   </div>
@@ -773,7 +1132,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: NON</div>
       <p>Logical negation.</p>
-      <div class="cmd-example"><pre><code>PRINT NOT TRUE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT NOT TRUE
+  -&gt; FAUX</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-and">AND</a> <a href="#cmd-or">OR</a></div>
     </div>
   </div>
@@ -782,7 +1142,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: LESSP PLP?</div>
       <p>Outputs TRUE if n1 &lt; n2. Infix operator: &lt;.</p>
-      <div class="cmd-example"><pre><code>PRINT LESS? 3 5</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LESS? 3 5
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-greater?">
@@ -790,7 +1151,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: GREATERP PLG?</div>
       <p>Outputs TRUE if n1 &gt; n2. Infix operator: &gt;.</p>
-      <div class="cmd-example"><pre><code>PRINT GREATER? 5 3</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT GREATER? 5 3
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
 
@@ -800,7 +1162,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: SOMME</div>
       <p>Sum n1 + n2. Infix operator: +.</p>
-      <div class="cmd-example"><pre><code>PRINT SUM 3 4</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT SUM 3 4
+  -&gt; 7</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-difference">DIFFERENCE</a> <a href="#cmd-product">PRODUCT</a> <a href="#cmd-quotient">QUOTIENT</a></div>
     </div>
   </div>
@@ -809,7 +1172,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: DIF DIFF</div>
       <p>Difference n1 - n2. Infix operator: -.</p>
-      <div class="cmd-example"><pre><code>PRINT DIFFERENCE 10 4</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT DIFFERENCE 10 4
+  -&gt; 6</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-sum">SUM</a></div>
     </div>
   </div>
@@ -818,7 +1182,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: PROD PRODUIT</div>
       <p>Product n1 * n2. Infix operator: *.</p>
-      <div class="cmd-example"><pre><code>PRINT PRODUCT 6 7</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PRODUCT 6 7
+  -&gt; 42</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-quotient">QUOTIENT</a> <a href="#cmd-sum">SUM</a></div>
     </div>
   </div>
@@ -827,7 +1192,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: DIV DIVISE</div>
       <p>Quotient n1 / n2 (n2 not 0). Infix operator: /.</p>
-      <div class="cmd-example"><pre><code>PRINT QUOTIENT 20 4</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT QUOTIENT 20 4
+  -&gt; 5</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-product">PRODUCT</a> <a href="#cmd-intquotient">INTQUOTIENT</a> <a href="#cmd-remainder">REMAINDER</a></div>
     </div>
   </div>
@@ -836,7 +1202,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: QUOT</div>
       <p>Integer quotient of n1 by n2 (n2 not 0).</p>
-      <div class="cmd-example"><pre><code>PRINT INTQUOTIENT 17 5</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT INTQUOTIENT 17 5
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-quotient">QUOTIENT</a> <a href="#cmd-remainder">REMAINDER</a></div>
     </div>
   </div>
@@ -845,7 +1212,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: RESTE</div>
       <p>Remainder of the integer division of n1 by n2 (n2 not 0).</p>
-      <div class="cmd-example"><pre><code>PRINT REMAINDER 17 5</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT REMAINDER 17 5
+  -&gt; 2</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-quotient">QUOTIENT</a> <a href="#cmd-intquotient">INTQUOTIENT</a></div>
     </div>
   </div>
@@ -854,7 +1222,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: MOD</div>
       <p>Remainder of n1 divided by n2, with the sign of n2 (differs from REMAINDER for negatives).</p>
-      <div class="cmd-example"><pre><code>PRINT MODULO -17 5</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT MODULO -17 5
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-remainder">REMAINDER</a> <a href="#cmd-quotient">QUOTIENT</a></div>
     </div>
   </div>
@@ -863,7 +1232,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: PUISSANCE</div>
       <p>Outputs n1 raised to the power n2.</p>
-      <div class="cmd-example"><pre><code>PRINT POWER 2 10</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT POWER 2 10
+  -&gt; 1024</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-sqrt">
@@ -871,7 +1241,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: RAC RACINE RC</div>
       <p>Square root of n (n &gt;= 0).</p>
-      <div class="cmd-example"><pre><code>PRINT SQRT 16</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT SQRT 16
+  -&gt; 4</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-abs">
@@ -879,7 +1250,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: VALABS</div>
       <p>Absolute value of n.</p>
-      <div class="cmd-example"><pre><code>PRINT ABS -7</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT ABS -7
+  -&gt; 7</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-round">ROUND</a> <a href="#cmd-truncate">TRUNCATE</a></div>
     </div>
   </div>
@@ -888,7 +1260,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: MOINS</div>
       <p>Outputs the negation of n (-n).</p>
-      <div class="cmd-example"><pre><code>PRINT MINUS 5</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT MINUS 5
+  -&gt; -5</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-int">
@@ -896,7 +1269,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: ENT</div>
       <p>Integer part of n (rounded down: INT -1.5 = -2).</p>
-      <div class="cmd-example"><pre><code>PRINT INT 3.7</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT INT 3.7
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-round">ROUND</a> <a href="#cmd-truncate">TRUNCATE</a></div>
     </div>
   </div>
@@ -905,7 +1279,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ARRONDI</div>
       <p>Outputs the nearest integer to n.</p>
-      <div class="cmd-example"><pre><code>PRINT ROUND 3.6</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT ROUND 3.6
+  -&gt; 4</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-truncate">TRUNCATE</a> <a href="#cmd-int">INT</a></div>
     </div>
   </div>
@@ -914,7 +1289,8 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TRONQUE</div>
       <p>Outputs the integer part of n (truncated toward zero).</p>
-      <div class="cmd-example"><pre><code>PRINT TRUNCATE 3.9</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT TRUNCATE 3.9
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-round">ROUND</a> <a href="#cmd-int">INT</a></div>
     </div>
   </div>
@@ -924,7 +1300,9 @@ PRINT ( OR FALSE FALSE TRUE )</code></pre></div>
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: HASARD</div>
       <p>Outputs a random integer between 0 and n-1 (n &gt;= 1). In parentheses, (RANDOM start end) picks between start and end inclusive.</p>
       <div class="cmd-example"><pre><code>PRINT RANDOM 6
-PRINT ( RANDOM 1 6 )</code></pre></div>
+  -&gt; 5
+PRINT ( RANDOM 1 6 )
+  -&gt; 6</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-sin">
@@ -932,7 +1310,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: SINUS</div>
       <p>Sine of n (n in degrees).</p>
-      <div class="cmd-example"><pre><code>PRINT SIN 30</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT SIN 30
+  -&gt; 0.5</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-cos">COS</a> <a href="#cmd-tan">TAN</a> <a href="#cmd-arctan">ARCTAN</a></div>
     </div>
   </div>
@@ -941,7 +1320,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: COSINUS</div>
       <p>Cosine of n (n in degrees).</p>
-      <div class="cmd-example"><pre><code>PRINT COS 60</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT COS 60
+  -&gt; 0.5</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-sin">SIN</a> <a href="#cmd-tan">TAN</a> <a href="#cmd-arctan">ARCTAN</a></div>
     </div>
   </div>
@@ -950,7 +1330,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TANGENTE</div>
       <p>Tangent of n (n in degrees).</p>
-      <div class="cmd-example"><pre><code>PRINT TAN 45</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT TAN 45
+  -&gt; 1</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-sin">SIN</a> <a href="#cmd-cos">COS</a> <a href="#cmd-arctan">ARCTAN</a></div>
     </div>
   </div>
@@ -959,7 +1340,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: ARCTANGENTE ATAN</div>
       <p>Arctangent of n, in degrees.</p>
-      <div class="cmd-example"><pre><code>PRINT ARCTAN 1</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT ARCTAN 1
+  -&gt; 45</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-tan">TAN</a> <a href="#cmd-sin">SIN</a> <a href="#cmd-cos">COS</a></div>
     </div>
   </div>
@@ -968,7 +1350,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Exponential: e to the power n.</p>
-      <div class="cmd-example"><pre><code>PRINT EXP 1</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT EXP 1
+  -&gt; 2.7182818285</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-ln">LN</a> <a href="#cmd-log10">LOG10</a> <a href="#cmd-power">POWER</a></div>
     </div>
   </div>
@@ -977,7 +1360,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Natural logarithm of n (n &gt; 0).</p>
-      <div class="cmd-example"><pre><code>PRINT LN 1</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LN 1
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-exp">EXP</a> <a href="#cmd-log10">LOG10</a></div>
     </div>
   </div>
@@ -986,7 +1370,8 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Base-10 logarithm of n (n &gt; 0).</p>
-      <div class="cmd-example"><pre><code>PRINT LOG10 100</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT LOG10 100
+  -&gt; 2</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-ln">LN</a> <a href="#cmd-exp">EXP</a></div>
     </div>
   </div>
@@ -995,7 +1380,58 @@ PRINT ( RANDOM 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)</div>
       <p>Outputs the constant pi (3.14159...).</p>
-      <div class="cmd-example"><pre><code>PRINT PI</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PI
+  -&gt; 3.141592653589793</code></pre></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-xor">
+    <div class="cmd-header"><span class="cmd-name">XOR</span> <span class="cmd-params">n1 n2</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OUEX</div>
+      <p>Bitwise exclusive-or of two non-negative integers (XOR 6 3 = 5).</p>
+      <div class="cmd-example"><pre><code>PRINT XOR 6 3
+  -&gt; 5</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-and">AND</a> <a href="#cmd-or">OR</a> <a href="#cmd-remainder">REMAINDER</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-tobase">
+    <div class="cmd-header"><span class="cmd-name">TOBASE</span> <span class="cmd-params">n base</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: VERSBASE</div>
+      <p>Writes the integer n in the given base (2 to 36), in upper case: TOBASE 255 16 gives FF. See HEX and BIN for the common cases.</p>
+      <div class="cmd-example"><pre><code>PRINT TOBASE 255 16
+  -&gt; FF</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-frombase">FROMBASE</a> <a href="#cmd-hex">HEX</a> <a href="#cmd-bin">BIN</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-frombase">
+    <div class="cmd-header"><span class="cmd-name">FROMBASE</span> <span class="cmd-params">word base</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: DEPUISBASE</div>
+      <p>Reads the word as a number written in the given base (2 to 36) and outputs its value: FROMBASE &#34;FF 16 gives 255.</p>
+      <div class="cmd-example"><pre><code>PRINT FROMBASE &#34;FF 16
+  -&gt; 255</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-tobase">TOBASE</a> <a href="#cmd-hex">HEX</a> <a href="#cmd-bin">BIN</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-hex">
+    <div class="cmd-header"><span class="cmd-name">HEX</span> <span class="cmd-params">n</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: HEXA</div>
+      <p>Shows the integer n in hexadecimal (base 16). Shorthand for TOBASE n 16.</p>
+      <div class="cmd-example"><pre><code>PRINT HEX 255
+  -&gt; FF</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-bin">BIN</a> <a href="#cmd-tobase">TOBASE</a> <a href="#cmd-frombase">FROMBASE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-bin">
+    <div class="cmd-header"><span class="cmd-name">BIN</span> <span class="cmd-params">n</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: BINAIRE</div>
+      <p>Shows the integer n in binary (base 2). Shorthand for TOBASE n 2.</p>
+      <div class="cmd-example"><pre><code>PRINT BIN 10
+  -&gt; 1010</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-hex">HEX</a> <a href="#cmd-tobase">TOBASE</a> <a href="#cmd-frombase">FROMBASE</a></div>
     </div>
   </div>
 
@@ -1015,7 +1451,8 @@ MAKE &#34;NOM [ JEAN DUPONT ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: CHOSE</div>
       <p>Outputs the thing (value) named by word. :word is short for THING &#34;word.</p>
-      <div class="cmd-example"><pre><code>MAKE &#34;AGE 10 PRINT THING &#34;AGE</code></pre></div>
+      <div class="cmd-example"><pre><code>MAKE &#34;AGE 10 PRINT THING &#34;AGE
+  -&gt; 10</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-make">MAKE</a></div>
     </div>
   </div>
@@ -1024,7 +1461,8 @@ MAKE &#34;NOM [ JEAN DUPONT ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: NAMEP NOM?</div>
       <p>Outputs TRUE if word names a thing (defined variable).</p>
-      <div class="cmd-example"><pre><code>PRINT NAME? &#34;AGE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT NAME? &#34;AGE
+  -&gt; FAUX</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-local">
@@ -1080,7 +1518,8 @@ LOCAL [ X Y ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: PROC? PROCEDUREP</div>
       <p>Outputs TRUE if word is the name of a user procedure.</p>
-      <div class="cmd-example"><pre><code>PRINT PROCEDURE? &#34;CARRE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PROCEDURE? &#34;CARRE
+  -&gt; FAUX</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-primitive?">
@@ -1088,7 +1527,8 @@ LOCAL [ X Y ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: PRIM? PRIMITIVEP</div>
       <p>Outputs TRUE if word is the name of a primitive.</p>
-      <div class="cmd-example"><pre><code>PRINT PRIMITIVE? &#34;AVANCE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT PRIMITIVE? &#34;AVANCE
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-edit">
@@ -1115,7 +1555,8 @@ DEFINE &#34;POLY [ NB LG ] [ REPEAT :NB [ FD :LG RT 360 / :NB ] ]</code></pre></
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TEXTE</div>
       <p>Outputs the definition of procedure name as a list [ [inputs] [body] ]. Inverse of DEFINE.</p>
-      <div class="cmd-example"><pre><code>TO CARRE REPEAT 4 [ FD 50 RT 90 ] END SHOW TEXT &#34;CARRE</code></pre></div>
+      <div class="cmd-example"><pre><code>TO CARRE REPEAT 4 [ FD 50 RT 90 ] END SHOW TEXT &#34;CARRE
+  -&gt; VOUS VENEZ DE DEFINIR CARRE [[] [REPEAT 4 [FD 50 RT 90]]]</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-define">DEFINE</a> <a href="#cmd-po">PO</a></div>
     </div>
   </div>
@@ -1127,6 +1568,7 @@ DEFINE &#34;POLY [ NB LG ] [ REPEAT :NB [ FD :LG RT 360 / :NB ] ]</code></pre></
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: SI</div>
       <p>Conditional: runs list if pred is TRUE, otherwise does nothing. For an else branch, see IFELSE.</p>
       <div class="cmd-example"><pre><code>IF 2 &gt; 1 [ PRINT &#34;OUI ]
+  -&gt; OUI
 IF :N = 0 [ PRINT &#34;ZERO ]</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-ifelse">IFELSE</a> <a href="#cmd-while">WHILE</a> <a href="#cmd-stop">STOP</a></div>
     </div>
@@ -1155,7 +1597,8 @@ REPEAT 36 [ FD 20 RT 10 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: COMPTEUR</div>
       <p>Outputs the current iteration number of REPEAT (1 to n), or -1 outside a loop.</p>
-      <div class="cmd-example"><pre><code>REPEAT 3 [ PRINT REPCOUNT ]</code></pre></div>
+      <div class="cmd-example"><pre><code>REPEAT 3 [ PRINT REPCOUNT ]
+  -&gt; 1 2 3</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-repeat">REPEAT</a></div>
     </div>
   </div>
@@ -1191,7 +1634,9 @@ REPEAT 36 [ FD 20 RT 10 ]</code></pre></div>
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: EXECRESULTAT</div>
       <p>Runs list like RUN, but wraps the result: outputs [value] if it was an operation, [ ] (empty list) if it was a command. Lets you test whether anything was output.</p>
       <div class="cmd-example"><pre><code>SHOW RUNRESULT [ SUM 2 3 ]
-SHOW RUNRESULT [ FD 50 ]</code></pre></div>
+  -&gt; [5]
+SHOW RUNRESULT [ FD 50 ]
+  -&gt; []</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-run">RUN</a></div>
     </div>
   </div>
@@ -1225,7 +1670,9 @@ SHOW RUNRESULT [ FD 50 ]</code></pre></div>
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: POURCHAQUE</div>
       <p>Runs instr for each member of a list (or character of a word). Two forms: our form FOREACH list [instr] with the current item in :? ; or the XLogo form FOREACH &#34;var list-or-word [instr] with a named variable (:var).</p>
       <div class="cmd-example"><pre><code>FOREACH [ 1 2 3 ] [ PRINT :? ]
-FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
+  -&gt; 1 2 3
+FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]
+  -&gt; 1 2 3</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-map">MAP</a> <a href="#cmd-filter">FILTER</a> <a href="#cmd-for">FOR</a></div>
     </div>
   </div>
@@ -1234,7 +1681,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: APPLIQUE</div>
       <p>Outputs the list of the template&#39;s results applied to each member (:? = member).</p>
-      <div class="cmd-example"><pre><code>PRINT MAP [ 1 2 3 ] [ :? * :? ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT MAP [ 1 2 3 ] [ :? * :? ]
+  -&gt; 1 4 9</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-filter">FILTER</a> <a href="#cmd-reduce">REDUCE</a> <a href="#cmd-foreach">FOREACH</a></div>
     </div>
   </div>
@@ -1243,7 +1691,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FILTRE</div>
       <p>Outputs the members of list for which the predicate (:?) is TRUE.</p>
-      <div class="cmd-example"><pre><code>PRINT FILTER [ 1 2 3 4 ] [ :? &gt; 2 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT FILTER [ 1 2 3 4 ] [ :? &gt; 2 ]
+  -&gt; 3 4</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-map">MAP</a> <a href="#cmd-reduce">REDUCE</a> <a href="#cmd-foreach">FOREACH</a></div>
     </div>
   </div>
@@ -1252,7 +1701,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: REDUIS</div>
       <p>Folds the list into one value: :?1 = accumulator, :?2 = current member.</p>
-      <div class="cmd-example"><pre><code>PRINT REDUCE [ 1 2 3 4 ] [ :?1 + :?2 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT REDUCE [ 1 2 3 4 ] [ :?1 + :?2 ]
+  -&gt; 10</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-map">MAP</a> <a href="#cmd-filter">FILTER</a></div>
     </div>
   </div>
@@ -1279,7 +1729,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TESTE</div>
       <p>Remembers a predicate&#39;s result, for IFTRUE / IFFALSE.</p>
-      <div class="cmd-example"><pre><code>TEST 2 &gt; 1 IFTRUE [ PRINT &#34;OUI ]</code></pre></div>
+      <div class="cmd-example"><pre><code>TEST 2 &gt; 1 IFTRUE [ PRINT &#34;OUI ]
+  -&gt; OUI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-iftrue">IFTRUE</a> <a href="#cmd-iffalse">IFFALSE</a> <a href="#cmd-if">IF</a></div>
     </div>
   </div>
@@ -1288,7 +1739,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: IFT SIVRAI</div>
       <p>Runs instr if the last TEST was TRUE.</p>
-      <div class="cmd-example"><pre><code>TEST 2 &gt; 1 IFTRUE [ PRINT &#34;OUI ]</code></pre></div>
+      <div class="cmd-example"><pre><code>TEST 2 &gt; 1 IFTRUE [ PRINT &#34;OUI ]
+  -&gt; OUI</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-test">TEST</a> <a href="#cmd-iffalse">IFFALSE</a></div>
     </div>
   </div>
@@ -1297,7 +1749,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: IFF SIFAUX</div>
       <p>Runs instr if the last TEST was FALSE.</p>
-      <div class="cmd-example"><pre><code>TEST 1 &gt; 2 IFFALSE [ PRINT &#34;NON ]</code></pre></div>
+      <div class="cmd-example"><pre><code>TEST 1 &gt; 2 IFFALSE [ PRINT &#34;NON ]
+  -&gt; NON</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-test">TEST</a> <a href="#cmd-iftrue">IFTRUE</a></div>
     </div>
   </div>
@@ -1317,7 +1770,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: PROP</div>
       <p>Outputs the value of property prop of object obj, or the empty list [ ] if it does not exist.</p>
-      <div class="cmd-example"><pre><code>PPROP &#34;TINTIN &#34;AGE 17 PRINT GPROP &#34;TINTIN &#34;AGE</code></pre></div>
+      <div class="cmd-example"><pre><code>PPROP &#34;TINTIN &#34;AGE 17 PRINT GPROP &#34;TINTIN &#34;AGE
+  -&gt; 17</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-pprop">PPROP</a> <a href="#cmd-remprop">REMPROP</a> <a href="#cmd-plist">PLIST</a></div>
     </div>
   </div>
@@ -1335,7 +1789,8 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: LISTEPROP</div>
       <p>Outputs the property list of obj: [ prop1 value1 prop2 value2 ... ], or [ ] if obj has no property.</p>
-      <div class="cmd-example"><pre><code>PPROP &#34;TINTIN &#34;AGE 17 SHOW PLIST &#34;TINTIN</code></pre></div>
+      <div class="cmd-example"><pre><code>PPROP &#34;TINTIN &#34;AGE 17 SHOW PLIST &#34;TINTIN
+  -&gt; [AGE 17]</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-pprop">PPROP</a> <a href="#cmd-gprop">GPROP</a> <a href="#cmd-remprop">REMPROP</a></div>
     </div>
   </div>
@@ -1347,8 +1802,11 @@ FOREACH &#34;I [ 1 2 3 ] [ PRINT :I ]</code></pre></div>
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: EC ECRIS PR</div>
       <p>Prints obj in the text area, then starts a new line. In parentheses, prints several objects separated by a space: (PRINT a b c).</p>
       <div class="cmd-example"><pre><code>PRINT 5 + 7
+  -&gt; 12
 PRINT [ BONJOUR LE MONDE ]
-( PRINT &#34;VALEUR 42 )</code></pre></div>
+  -&gt; BONJOUR LE MONDE
+( PRINT &#34;VALEUR 42 )
+  -&gt; VALEUR 42</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-type">TYPE</a> <a href="#cmd-show">SHOW</a></div>
     </div>
   </div>
@@ -1358,7 +1816,9 @@ PRINT [ BONJOUR LE MONDE ]
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: TAPE</div>
       <p>Prints obj without a new line. In parentheses: (TYPE a b c).</p>
       <div class="cmd-example"><pre><code>TYPE &#34;BONJOUR
-( TYPE &#34;A &#34;B )</code></pre></div>
+  -&gt; BONJOUR
+( TYPE &#34;A &#34;B )
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-print">PRINT</a> <a href="#cmd-show">SHOW</a></div>
     </div>
   </div>
@@ -1367,7 +1827,8 @@ PRINT [ BONJOUR LE MONDE ]
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: MONTRE</div>
       <p>Like PRINT, but keeps the brackets around lists: SHOW [ A B ] prints [A B]. Variadic in parentheses.</p>
-      <div class="cmd-example"><pre><code>SHOW [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>SHOW [ A B C ]
+  -&gt; [A B C]</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-print">PRINT</a> <a href="#cmd-type">TYPE</a></div>
     </div>
   </div>
@@ -1396,7 +1857,8 @@ SETTEXTLINES 5</code></pre></div>
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: FCURS</div>
       <p>Places the text cursor: column col (0-39), line lig (0-24). The next PRINT/TYPE writes there.</p>
       <div class="cmd-example"><pre><code>SETCURSOR [ 10 5 ]
-CLEARTEXT SETCURSOR [ 0 24 ] TYPE &#34;BAS</code></pre></div>
+CLEARTEXT SETCURSOR [ 0 24 ] TYPE &#34;BAS
+  -&gt; BAS</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-settextlines">SETTEXTLINES</a> <a href="#cmd-cleartext">CLEARTEXT</a></div>
     </div>
   </div>
@@ -1564,7 +2026,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: CONTENU</div>
       <p>Outputs the list of all known words (procedures and names).</p>
-      <div class="cmd-example"><pre><code>PRINT CONTENTS</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT CONTENTS
+  -&gt; .CHB .DEP .EFT .EXA .RES .ROUT .SER AIDE AJOUTE ANGLAIS ANIME APPLIQUE ARC ARCTAN ARRONDI ASCII ATAN ATTENDS AV AVANCE AVANT? BC BC? BINAIRE BOUTON? CADENCE CAP CAR CATALOGUE CATALOGUEEX CC CERCLE CF CHARGE CHARGEEX CHOSE CLOS COLLISION? COMPTE COMPTEUR CONTACT CONTACT? CONTENU COPIE COPIETABLEAU COS COSINUS CR CT DECOUPE DEF DEFILE DEFINIS DEFSPRITE DEMANDE DEPILE DEPUISBASE DER DERNIER DETRUIS DIF DIFF DISTANCE DISTORTUE DIV DIVISE DONNE DONNEPROP DUREE EC ECH ECRIS ED EFN EFP EFPROP EGAL? EMPILE ENFILE ENR ENT ENTREE ET ETIQUETTE EXEC EXECRESULTAT EXP FAUX FCAP FCB FCC FCFG FCFT FCR FCT FCURS FECH FEN FERME FERMETOUT FICHIERVERSTABLEAU FILTRE FIN FINFICHIER? FINLIGNE FIXE FIXEECRITURE FIXEFINLIGNE FIXEITEM FIXEITEMMD FIXELECTURE FIXEPOSECRITURE FIXEPOSLECTURE FIXETAILLECRAYON FIXETORTUE FLECTEUR FLI FLUXECRITURE FLUXLECTURE FORMATE FPOS FR FRANCAIS FXY HASARD HEXA IM IMNS IMTOUT IMTS INIT INVERSE ITEM ITEMMD JOUE LANCE LC LECTEUR LIS LISCAR LISCARS LISLIGNE LISMOT LISTE LISTE? LISTEPROP LISTEVERSTABLEAU LL LN LOCAL LOG10 LOGO MAJUSCULE MANETTE MD ME MEMBRE MEMBRE? METSDERNIER METSPREMIER MINUSCULE MODULO MOINS MONTRE MOT MOT? MP MT NBTORTUES NETTOIE NOM? NOMBRE? NON OCTAVE ORDONNE ORIGINE OTE OTETOUT OU OUEX OUVREAJOUT OUVREECRITURE OUVRELECTURE OUVREMAJ PH PHRASE PI PIEGE PIOCHE PLACE PLG? PLP? POINT POS POSECRITURE POSITION POSLECTURE POSOPT POUR POURCHAQUE PREM PREMIER PRIM? PROC? PROD PRODUIT PROP PUISSANCE QUITTE QUITTER QUOT RAC RACINE RAMENE RAMENEEX RAZ RC RE RECULE RECYCLE REDUIS REGLE REMPLACE REMPLIS RENDS REPETE REPETEPOUR RESTE RET RETOURNE ROGNE ROGNEDEBUT ROGNEFIN SANSDOUBLONS SAUFDERNIER SAUFPREMIER SAUVE SAUVED SAUVEPNG SCENE SD SI SIFAUX SIN SINUS SISINON SIVRAI SOMME SORTIE SOURISPOS SOURISPRESSEE SOUSCHAINE? SP SPRITE STOP STOPANIME STOPTOUT SUBSTITUE TABLEAU TABLEAU? TABLEAUMD TABLEAUVERSLISTE TAN TANGENTE TANTQUE TAPE TD TEMPO TESTE TEXTE TG TIMBRE TORTUE TOUCHE? TOURNEDROITE TOURNEGAUCHE TOUSOUVERTS TRANCHE TRIE TRONQUE VALABS VE VERSBASE VERSCAP VIDE? VISIBLE? VRAI VT XCOR YCOR</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-po">
@@ -1634,7 +2097,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: PLACE</div>
       <p>Outputs the number of free memory cells.</p>
-      <div class="cmd-example"><pre><code>PRINT NODES</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT NODES
+  -&gt; 60000</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-recycle">
@@ -1696,7 +2160,7 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">ERASEFILE</span> <span class="cmd-params">word</span><span class="cmd-kind">command</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: DETRUIS</div>
-      <p>Permanently deletes file word.</p>
+      <p>Permanently deletes file word. Refuses to delete an open file.</p>
       <div class="cmd-example"><pre><code>ERASEFILE &#34;DESSIN</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-catalog">CATALOG</a> <a href="#cmd-erase">ERASE</a></div>
     </div>
@@ -1758,7 +2222,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Compatibility (no effect)  ·  Aliases: LECTEUR</div>
       <p>Returned the current disk drive. Not applicable here (outputs 1).</p>
-      <div class="cmd-example"><pre><code>PRINT DRIVE</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT DRIVE
+  -&gt; 1</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-setdrive">
@@ -1767,6 +2232,203 @@ TIMBRE 200</code></pre></div>
       <div class="cmd-aliases">Compatibility (no effect)  ·  Aliases: FLECTEUR</div>
       <p>Selected the disk drive. No effect here.</p>
       <div class="cmd-example"><pre><code>SETDRIVE 0</code></pre></div>
+    </div>
+  </div>
+
+  <h2 id="fichiers-donnees">Data files (streams)</h2>
+  <div class="cmd-entry" id="cmd-openread">
+    <div class="cmd-header"><span class="cmd-name">OPENREAD</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OUVRELECTURE</div>
+      <p>Opens the file for reading (position at the start). Error if the file is missing or already open. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setread">SETREAD</a> <a href="#cmd-close">CLOSE</a> <a href="#cmd-readrawline">READRAWLINE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-openwrite">
+    <div class="cmd-header"><span class="cmd-name">OPENWRITE</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OUVREECRITURE</div>
+      <p>Opens the file for writing, overwriting any existing content WITHOUT asking (FMSLogo fidelity). Creates it if absent. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENWRITE &#34;SORTIE.TXT CLOSE &#34;SORTIE.TXT</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setwrite">SETWRITE</a> <a href="#cmd-close">CLOSE</a> <a href="#cmd-openappend">OPENAPPEND</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-openappend">
+    <div class="cmd-header"><span class="cmd-name">OPENAPPEND</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OUVREAJOUT</div>
+      <p>Opens the file for writing, position at the end (append). Creates it if absent. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENAPPEND &#34;JOURNAL.TXT CLOSE &#34;JOURNAL.TXT</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-openwrite">OPENWRITE</a> <a href="#cmd-setwrite">SETWRITE</a> <a href="#cmd-close">CLOSE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-openupdate">
+    <div class="cmd-header"><span class="cmd-name">OPENUPDATE</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: OUVREMAJ</div>
+      <p>Opens the file for reading AND writing (a single, shared position). Creates it if absent. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENUPDATE &#34;DESSIN.GLG CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-openread">OPENREAD</a> <a href="#cmd-openwrite">OPENWRITE</a> <a href="#cmd-readpos">READPOS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-close">
+    <div class="cmd-header"><span class="cmd-name">CLOSE</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FERME</div>
+      <p>Closes the file. If it was the current read/write stream, we revert to keyboard/console. Error if the file is not open. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-closeall">CLOSEALL</a> <a href="#cmd-openread">OPENREAD</a> <a href="#cmd-allopen">ALLOPEN</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-closeall">
+    <div class="cmd-header"><span class="cmd-name">CLOSEALL</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FERMETOUT</div>
+      <p>Closes all open files. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG CLOSEALL</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-close">CLOSE</a> <a href="#cmd-allopen">ALLOPEN</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-allopen">
+    <div class="cmd-header"><span class="cmd-name">ALLOPEN</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TOUSOUVERTS</div>
+      <p>Outputs the list of names of currently open files. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW ALLOPEN
+  -&gt; []</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-close">CLOSE</a> <a href="#cmd-closeall">CLOSEALL</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-setread">
+    <div class="cmd-header"><span class="cmd-name">SETREAD</span> <span class="cmd-params">nomfichier or list</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXELECTURE</div>
+      <p>Sets the current read stream: READCHAR/READWORD/READLIST/READRAWLINE will read from this file. An empty list [ ] reverts to the keyboard. Error if the file is not open for reading. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG SETREAD &#34;DESSIN.GLG SETREAD [ ] CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-openread">OPENREAD</a> <a href="#cmd-reader">READER</a> <a href="#cmd-readrawline">READRAWLINE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-setwrite">
+    <div class="cmd-header"><span class="cmd-name">SETWRITE</span> <span class="cmd-params">nomfichier or list</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXEECRITURE</div>
+      <p>Sets the current write stream: PRINT/SHOW/TYPE will write to this file. An empty list [ ] reverts to the console. Error if the file is not open for writing. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENWRITE &#34;SORTIE.TXT SETWRITE &#34;SORTIE.TXT SETWRITE [ ] CLOSE &#34;SORTIE.TXT</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-openwrite">OPENWRITE</a> <a href="#cmd-writer">WRITER</a> <a href="#cmd-print">PRINT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-reader">
+    <div class="cmd-header"><span class="cmd-name">READER</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FLUXLECTURE</div>
+      <p>Outputs the name of the current read stream, or [ ] if it is the keyboard. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW READER
+  -&gt; []</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setread">SETREAD</a> <a href="#cmd-writer">WRITER</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-writer">
+    <div class="cmd-header"><span class="cmd-name">WRITER</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FLUXECRITURE</div>
+      <p>Outputs the name of the current write stream, or [ ] if it is the console. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>SHOW WRITER
+  -&gt; []</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setwrite">SETWRITE</a> <a href="#cmd-reader">READER</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-eof?">
+    <div class="cmd-header"><span class="cmd-name">EOF?</span><span class="cmd-kind">predicate</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: EOFP FINFICHIER?</div>
+      <p>Outputs TRUE if there is nothing left to read in the current read stream. On the keyboard, always FALSE. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>PRINT EOF?
+  -&gt; FAUX</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-readrawline">READRAWLINE</a> <a href="#cmd-setread">SETREAD</a> <a href="#cmd-readchar">READCHAR</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-readpos">
+    <div class="cmd-header"><span class="cmd-name">READPOS</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: POSLECTURE</div>
+      <p>Outputs the current read byte position, or -1 if the stream is the keyboard. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>PRINT READPOS
+  -&gt; -1</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setreadpos">SETREADPOS</a> <a href="#cmd-writepos">WRITEPOS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-writepos">
+    <div class="cmd-header"><span class="cmd-name">WRITEPOS</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: POSECRITURE</div>
+      <p>Outputs the current write byte position, or -1 if the stream is the console. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>PRINT WRITEPOS
+  -&gt; -1</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setwritepos">SETWRITEPOS</a> <a href="#cmd-readpos">READPOS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-setreadpos">
+    <div class="cmd-header"><span class="cmd-name">SETREADPOS</span> <span class="cmd-params">octet</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXEPOSLECTURE</div>
+      <p>Moves the current read pointer to byte position (0-based). Error if the position is out of file or in the middle of a character. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG SETREAD &#34;DESSIN.GLG SETREADPOS 0 CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-readpos">READPOS</a> <a href="#cmd-setwritepos">SETWRITEPOS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-setwritepos">
+    <div class="cmd-header"><span class="cmd-name">SETWRITEPOS</span> <span class="cmd-params">octet</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXEPOSECRITURE</div>
+      <p>Moves the current write pointer to byte position (0-based). From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENWRITE &#34;SORTIE.TXT SETWRITE &#34;SORTIE.TXT SETWRITEPOS 0 CLOSE &#34;SORTIE.TXT</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-writepos">WRITEPOS</a> <a href="#cmd-setreadpos">SETREADPOS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-readrawline">
+    <div class="cmd-header"><span class="cmd-name">READRAWLINE</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: LISLIGNE</div>
+      <p>Reads a raw line from the current read stream and outputs it as a single word (no interpretation). This is THE receiver to walk a file line by line. [ ] at end of file. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG SETREAD &#34;DESSIN.GLG PRINT READRAWLINE SETREAD [ ] CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-setread">SETREAD</a> <a href="#cmd-eof?">EOF?</a> <a href="#cmd-readchars">READCHARS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-readchars">
+    <div class="cmd-header"><span class="cmd-name">READCHARS</span> <span class="cmd-params">n</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: LISCARS RCS</div>
+      <p>Reads n characters from the current read stream and outputs them as a word. [ ] at end of file. From FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OPENREAD &#34;DESSIN.GLG SETREAD &#34;DESSIN.GLG PRINT READCHARS 4 SETREAD [ ] CLOSE &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-readrawline">READRAWLINE</a> <a href="#cmd-readchar">READCHAR</a> <a href="#cmd-setread">SETREAD</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-filetoarray">
+    <div class="cmd-header"><span class="cmd-name">FILETOARRAY</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FICHIERVERSTABLEAU</div>
+      <p>Loads a whole text file at once and outputs an array whose cells are its lines (first line in cell 1). COUNT gives the number of lines, for easy iteration. Opens, reads and closes the file on its own. Refuses a binary file (BINARY FILE). gologo extension.</p>
+      <div class="cmd-example"><pre><code>SHOW FILETOARRAY &#34;DESSIN.GLG
+MAKE &#34;L FILETOARRAY &#34;DESSIN.GLG PRINT COUNT :L</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-readrawline">READRAWLINE</a> <a href="#cmd-array">ARRAY</a> <a href="#cmd-count">COUNT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-seteol">
+    <div class="cmd-header"><span class="cmd-name">SETEOL</span> <span class="cmd-params">&#34;LF or &#34;CRLF</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FIXEFINLIGNE</div>
+      <p>Sets the line ending written to files: &#34;LF (default, Unix-style) or &#34;CRLF (Windows-style). Reading always accepts both. gologo extension.</p>
+      <div class="cmd-example"><pre><code>SETEOL &#34;CRLF</code></pre></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-eol">
+    <div class="cmd-header"><span class="cmd-name">EOL</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FINLIGNE</div>
+      <p>Outputs the current line-ending setting: &#34;LF or &#34;CRLF. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT EOL
+  -&gt; LF</code></pre></div>
     </div>
   </div>
 
@@ -1848,7 +2510,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Compatibility (no effect)</div>
       <p>Read a byte in memory. Compatibility: always outputs 0.</p>
-      <div class="cmd-example"><pre><code>PRINT .EXA 0</code></pre></div>
+      <div class="cmd-example"><pre><code>PRINT .EXA 0
+  -&gt; 0</code></pre></div>
     </div>
   </div>
 

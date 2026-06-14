@@ -290,6 +290,17 @@
 <span class="kw">ECRIS</span> <span class="kw">COS</span> <span class="num">60</span>         <span class="cmt">; cosinus de 60° → 0.5</span>
 <span class="kw">ECRIS</span> <span class="kw">PI</span>             <span class="cmt">; constante π → 3.14159...</span></code></pre>
 
+  <div class="note">
+    <strong>Priorité&nbsp;: une fonction «&nbsp;avale&nbsp;» l'expression qui la suit.</strong>
+    Une fonction préfixée (comme <code>COMPTE</code>, <code>ENT</code>,
+    <code>VALABS</code>, <code>RC</code>...) prend pour argument <em>toute</em>
+    l'expression placée à sa droite, opérateurs compris. Ainsi
+    <code>COMPTE :MOT - 1</code> est lu <code>COMPTE ( :MOT - 1 )</code>, et non
+    <code>( COMPTE :MOT ) - 1</code>. Pour retrancher 1 <em>au résultat</em> de la
+    fonction, il faut parenthéser&nbsp;: <code>( COMPTE :MOT ) - 1</code>. En cas de
+    doute, ajoutez des parenthèses autour de l'appel.
+  </div>
+
   <h3>Les mots</h3>
 
   <p>Un mot est une suite de caractères. Pour écrire un mot littéral, on le
@@ -330,6 +341,77 @@
 <span class="kw">ECRIS</span> <span class="kw">LISTE</span> <span class="str">"A</span> <span class="str">"B</span>             <span class="cmt">; construit [A B]</span>
 <span class="kw">ECRIS</span> <span class="kw">INVERSE</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]       <span class="cmt">; → [C B A]</span>
 <span class="kw">ECRIS</span> <span class="kw">TRIE</span> [ <span class="num">3</span> <span class="num">1</span> <span class="num">2</span> ]          <span class="cmt">; → [1 2 3]</span></code></pre>
+
+  <h3>Les tableaux</h3>
+
+  <p>Au-delà des trois types de base, GoLogo propose aussi les
+  <strong>tableaux</strong>. Une liste est souple, mais pour atteindre son centième
+  élément il faut parcourir les quatre-vingt-dix-neuf premiers. Un tableau, lui, donne
+  un accès <em>direct</em> à n'importe quelle case par son numéro, et on peut changer
+  une case sur place. C'est le bon outil dès qu'on manipule beaucoup de valeurs
+  repérées par une position&nbsp;: une table de scores, un plateau de jeu, une grille.</p>
+
+  <p><code>TABLEAU n</code> crée un tableau de <code>n</code> cases, numérotées à partir
+  de 1 (chaque case vaut la liste vide au départ). On lit une case avec
+  <code>ITEM</code>, on la modifie avec <code>FIXEITEM</code>, et <code>COMPTE</code>
+  donne le nombre de cases&nbsp;:</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"SCORES</span> <span class="kw">TABLEAU</span> <span class="num">3</span>
+<span class="kw">FIXEITEM</span> <span class="num">1</span> <span class="var">:SCORES</span> <span class="num">50</span>      <span class="cmt">; range 50 dans la case 1</span>
+<span class="kw">FIXEITEM</span> <span class="num">2</span> <span class="var">:SCORES</span> <span class="num">80</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="num">2</span> <span class="var">:SCORES</span>      <span class="cmt">; → 80</span>
+<span class="kw">ECRIS</span> <span class="kw">COMPTE</span> <span class="var">:SCORES</span>        <span class="cmt">; → 3</span></code></pre>
+
+  <p>On peut aussi écrire un tableau directement entre accolades. Par défaut la
+  première case porte le numéro 1&nbsp;; pour démarrer à 0 (souvent plus commode quand
+  on calcule des indices), on ajoute <code>@0</code> juste après l'accolade
+  fermante&nbsp;:</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"JOURS</span> { <span class="str">LUN</span> <span class="str">MAR</span> <span class="str">MER</span> <span class="str">JEU</span> <span class="str">VEN</span> }
+<span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="num">3</span> <span class="var">:JOURS</span>        <span class="cmt">; → MER</span>
+<span class="kw">DONNE</span> <span class="str">"T</span> { <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> }@<span class="num">0</span>          <span class="cmt">; cases numérotées 0, 1, 2</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="num">0</span> <span class="var">:T</span>            <span class="cmt">; → A</span></code></pre>
+
+  <div class="attention">
+    <strong>Un tableau se partage, une liste se recopie.</strong> Contrairement aux
+    listes, un tableau est passé <em>par référence</em>. Si vous écrivez
+    <code>DONNE "U :SCORES</code>, alors <code>:U</code> et <code>:SCORES</code>
+    désignent le <em>même</em> tableau, et un <code>FIXEITEM</code> sur l'un se voit
+    aussi sur l'autre. C'est voulu (cela évite de recopier un gros tableau à chaque
+    passage dans une procédure), mais ça surprend la première fois. Pour obtenir une
+    copie vraiment indépendante, utilisez <code>COPIETABLEAU</code>.
+  </div>
+
+  <p>Quelques compagnons utiles&nbsp;: <code>TABLEAU? :X</code> dit si <code>:X</code>
+  est un tableau, <code>ORDONNE :T</code> trie ses cases sur place, et les deux ponts
+  <code>LISTEVERSTABLEAU</code> et <code>TABLEAUVERSLISTE</code> font passer de l'un à
+  l'autre. Ce dernier est pratique pour traiter un tableau avec <code>POURCHAQUE</code>
+  ou <code>APPLIQUE</code>, qui travaillent sur des listes.</p>
+
+  <p>Pour une grille à deux dimensions (un damier, un labyrinthe, un écran de points),
+  <code>TABLEAUMD</code> crée un tableau multi-dimensionnel, et <code>ITEMMD</code> /
+  <code>FIXEITEMMD</code> accèdent à une case par une liste d'indices&nbsp;:</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"GRILLE</span> <span class="kw">TABLEAUMD</span> [ <span class="num">3</span> <span class="num">3</span> ]   <span class="cmt">; 3 sur 3</span>
+<span class="kw">FIXEITEMMD</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:GRILLE</span> <span class="str">"X</span>      <span class="cmt">; la case du milieu</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEMMD</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:GRILLE</span>      <span class="cmt">; → X</span></code></pre>
+
+  <h3>Piles et files</h3>
+
+  <p>Deux petits outils bien commodes travaillent sur une <em>variable</em> qui
+  contient une liste (au départ la liste vide <code>[ ]</code>). Une
+  <strong>pile</strong> empile et dépile par le même bout, donc le dernier arrivé sort
+  le premier&nbsp;; une <strong>file</strong> ajoute d'un côté et retire de l'autre,
+  donc premier arrivé, premier servi.</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"P</span> [ ]
+<span class="kw">EMPILE</span> <span class="str">"P</span> <span class="num">1</span>   <span class="kw">EMPILE</span> <span class="str">"P</span> <span class="num">2</span>   <span class="kw">EMPILE</span> <span class="str">"P</span> <span class="num">3</span>
+<span class="kw">ECRIS</span> <span class="kw">DEPILE</span> <span class="str">"P</span>      <span class="cmt">; → 3  (le dernier empilé)</span>
+<span class="kw">ECRIS</span> <span class="kw">DEPILE</span> <span class="str">"P</span>      <span class="cmt">; → 2</span>
+
+<span class="kw">DONNE</span> <span class="str">"F</span> [ ]
+<span class="kw">ENFILE</span> <span class="str">"F</span> <span class="str">"A</span>   <span class="kw">ENFILE</span> <span class="str">"F</span> <span class="str">"B</span>
+<span class="kw">ECRIS</span> <span class="kw">DEFILE</span> <span class="str">"F</span>      <span class="cmt">; → A  (le premier entré)</span></code></pre>
 
   <h3>Afficher des objets</h3>
 
@@ -411,11 +493,91 @@
 <span class="kw">ECRIS</span> <span class="kw">DOUBLE</span> <span class="num">5</span>       <span class="cmt">; → 10</span>
 <span class="kw">AV</span> <span class="kw">DOUBLE</span> <span class="num">30</span>          <span class="cmt">; avance de 60 pas</span></code></pre>
 
-  <h3>Variables locales</h3>
+  <!-- ============================================================ -->
+  <h2 id="portee">5. Portée des variables&nbsp;: locale ou globale&nbsp;?</h2>
 
-  <p>À l'intérieur d'une procédure, il est souvent utile de déclarer des variables
-  locales, des variables qui n'existent que dans cette procédure et qui n'affectent
-  pas les variables globales du même nom&nbsp;:</p>
+  <p>Voici un point qui surprend souvent les débutants, et qui est pourtant au cœur
+  de la façon dont Logo fonctionne. <strong>Par défaut, une variable créée avec
+  <code>DONNE</code> est globale</strong>&nbsp;: elle existe partout, y compris à
+  l'intérieur des autres procédures. C'est commode, mais ça cache un piège.</p>
+
+  <h3>Le piège&nbsp;: une procédure peut écraser la variable d'une autre</h3>
+
+  <p>Imaginons deux procédures qui utilisent chacune une variable nommée
+  <code>RES</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> TRIPLE <span class="var">:X</span>
+  <span class="kw">DONNE</span> <span class="str">"RES</span> <span class="var">:X</span> * <span class="num">3</span>
+  <span class="kw">RENDS</span> <span class="var">:RES</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> CALCUL
+  <span class="kw">DONNE</span> <span class="str">"RES</span> <span class="num">100</span>
+  <span class="kw">ECRIS</span> <span class="kw">TRIPLE</span> <span class="num">5</span>     <span class="cmt">; → 15</span>
+  <span class="kw">ECRIS</span> <span class="var">:RES</span>          <span class="cmt">; → 15  (et non 100 !)</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>On s'attendait à ce que <code>:RES</code> vaille encore <code>100</code> à la fin
+  de <code>CALCUL</code>. Mais comme <code>TRIPLE</code> a fait <code>DONNE "RES</code>
+  sur la <em>même</em> variable globale, il a remplacé le <code>100</code> de
+  <code>CALCUL</code> par <code>15</code>. La procédure appelée a abîmé une variable de
+  la procédure appelante, sans prévenir.</p>
+
+  <h3>La solution&nbsp;: <code>LOCAL</code></h3>
+
+  <p><code>LOCAL "RES</code> dit à GoLogo&nbsp;: «&nbsp;dans cette procédure,
+  <code>RES</code> est à moi, je ne touche pas à celui des autres&nbsp;». Une seule
+  ligne change tout&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> TRIPLE <span class="var">:X</span>
+  <span class="kw">LOCAL</span> <span class="str">"RES</span>           <span class="cmt">; RES devient privé à TRIPLE</span>
+  <span class="kw">DONNE</span> <span class="str">"RES</span> <span class="var">:X</span> * <span class="num">3</span>
+  <span class="kw">RENDS</span> <span class="var">:RES</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> CALCUL
+  <span class="kw">DONNE</span> <span class="str">"RES</span> <span class="num">100</span>
+  <span class="kw">ECRIS</span> <span class="kw">TRIPLE</span> <span class="num">5</span>     <span class="cmt">; → 15</span>
+  <span class="kw">ECRIS</span> <span class="var">:RES</span>          <span class="cmt">; → 100  (préservé !)</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Maintenant chaque <code>RES</code> vit dans sa propre procédure&nbsp;: celui de
+  <code>TRIPLE</code> disparaît dès qu'il a fini, celui de <code>CALCUL</code> reste
+  intact.</p>
+
+  <h3>Le même piège dans une boucle</h3>
+
+  <p>C'est encore plus sournois quand l'appelant utilise une variable de boucle comme
+  <code>I</code> et qu'une procédure appelée écrase ce même <code>I</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> AFFICHE <span class="var">:X</span>
+  <span class="kw">DONNE</span> <span class="str">"I</span> <span class="var">:X</span> * <span class="num">10</span>      <span class="cmt">; oups : I est aussi la variable de boucle de l'appelant</span>
+  <span class="kw">ECRIS</span> <span class="var">:I</span>
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> BOUCLE
+  <span class="kw">REPETEPOUR</span> [ I <span class="num">1</span> <span class="num">3</span> ] [ <span class="kw">AFFICHE</span> <span class="var">:I</span>   <span class="kw">ECRIS</span> <span class="var">:I</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">BOUCLE</span>     <span class="cmt">; affiche 10 10 20 20 30 30 (le second nombre devrait être 1 2 3 !)</span></code></pre>
+
+  <p>En ajoutant <code>LOCAL "I</code> dans <code>AFFICHE</code>, la boucle retrouve son
+  compte&nbsp;: <code>10 1 20 2 30 3</code>. <strong>Règle simple&nbsp;: toute variable
+  de travail (compteur, total, résultat intermédiaire) créée dans une procédure mérite
+  un <code>LOCAL</code>.</strong></p>
+
+  <div class="conseil">
+    <strong>Bonne nouvelle&nbsp;: les paramètres sont déjà locaux.</strong> Les
+    paramètres d'une procédure (le <code>:N</code> de <code>POUR DOUBLE :N</code>) sont
+    <em>automatiquement</em> privés&nbsp;: les modifier ne touche jamais une variable
+    globale du même nom. Le <code>LOCAL</code> n'est utile que pour les variables que
+    <em>vous</em> créez avec <code>DONNE</code> à l'intérieur de la procédure.
+  </div>
+
+  <h3>Un exemple bien écrit</h3>
+
+  <p>Une procédure soignée déclare ses variables de travail en local dès le
+  départ&nbsp;:</p>
 
   <pre><code><span class="kw">POUR</span> CERCLE_APPROX <span class="var">:R</span>
   <span class="kw">LOCAL</span> <span class="str">"PAS</span>
@@ -423,8 +585,15 @@
   <span class="kw">REPETE</span> <span class="num">360</span> [ <span class="kw">AV</span> <span class="var">:PAS</span> <span class="kw">TD</span> <span class="num">1</span> ]
 <span class="kw">FIN</span></code></pre>
 
+  <div class="note">
+    <strong>Pourquoi ce comportement&nbsp;?</strong> Cette portée «&nbsp;dynamique&nbsp;»
+    (global par défaut, <code>LOCAL</code> pour se réserver un nom) est celle du Logo
+    d'origine&nbsp;: GoLogo y reste fidèle. Le réflexe <code>LOCAL</code> fait partie des
+    bases du langage.
+  </div>
+
   <!-- ============================================================ -->
-  <h2 id="boucles">5. Les boucles</h2>
+  <h2 id="boucles">6. Les boucles</h2>
 
   <h3>REPETE</h3>
 
@@ -480,7 +649,7 @@
 ]</code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="conditions">6. Les conditions</h2>
+  <h2 id="conditions">7. Les conditions</h2>
 
   <h3>SI</h3>
 
@@ -511,8 +680,25 @@
   <pre><code><span class="kw">SI</span> <span class="kw">ET</span> <span class="kw">PLP?</span> <span class="var">:N</span> <span class="num">0</span> <span class="kw">PLG?</span> <span class="var">:N</span> <span class="num">100</span> [ <span class="kw">ECRIS</span> <span class="str">"ENTRE_0_ET_100</span> ]
 <span class="kw">SI</span> <span class="kw">NON</span> <span class="kw">VIDE?</span> <span class="var">:LISTE</span> [ <span class="kw">ECRIS</span> <span class="kw">PREM</span> <span class="var">:LISTE</span> ]</code></pre>
 
+  <h3>Comparaisons et casse</h3>
+
+  <p>Les comparaisons de mots <strong>ignorent la casse</strong>&nbsp;:
+  <code>EGAL? "a "A</code> rend <code>VRAI</code>. Il en va de même pour
+  <code>=</code>, <code>AVANT?</code>, <code>SOUSCHAINE?</code> et
+  <code>MEMBRE?</code>. C'est commode d'ordinaire, mais gênant lorsque la casse
+  porte un sens, par exemple pour distinguer une case <code>a</code> d'une
+  case <code>A</code> dans une grille.</p>
+
+  <div class="note">
+    <strong>Quand la casse compte&nbsp;:</strong> comparez les <em>codes</em> des
+    caractères avec <code>ASCII</code> plutôt que les caractères eux-mêmes.
+    <code>EGAL? ASCII :C1 ASCII :C2</code> n'est vrai que pour deux caractères
+    rigoureusement identiques (<code>ASCII "a</code> vaut 97, <code>ASCII "A</code>
+    vaut 65).
+  </div>
+
   <!-- ============================================================ -->
-  <h2 id="recursion">7. La récursion</h2>
+  <h2 id="recursion">8. La récursion</h2>
 
   <p>En Logo, une procédure peut <em>s'appeler elle-même</em>. C'est ce qu'on
   appelle la <strong>récursion</strong>. C'est l'outil idéal pour des structures
@@ -547,7 +733,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <h2 id="arret">8. Contrôle du flux dans les procédures</h2>
+  <h2 id="arret">9. Contrôle du flux dans les procédures</h2>
 
   <p>Trois instructions permettent de quitter une procédure en cours
   d'exécution&nbsp;:</p>
@@ -572,7 +758,7 @@
 <span class="kw">FIN</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="graphisme">9. Graphisme avancé</h2>
+  <h2 id="graphisme">10. Graphisme avancé</h2>
 
   <h3>Cercle et arc</h3>
 
@@ -611,7 +797,7 @@
 <span class="kw">COPIE</span>                        <span class="cmt">; capture d'écran numérotée dans Logo/PRINTER/</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="texte">10. Zone de texte et affichage</h2>
+  <h2 id="texte">11. Zone de texte et affichage</h2>
 
   <p>En dehors du champ graphique, GoLogo dispose d'une zone de texte avec une
   grille de 40 colonnes sur 25 lignes. C'est là que les commandes <code>ECRIS</code>
@@ -625,7 +811,7 @@
 <span class="kw">FCFT</span> <span class="num">0</span>         <span class="cmt">; fond du texte en noir</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="clavier">11. Lire le clavier et la souris</h2>
+  <h2 id="clavier">12. Lire le clavier et la souris</h2>
 
   <h3>Clavier</h3>
 
@@ -644,7 +830,7 @@
 <span class="kw">SI</span> <span class="kw">SOURISPRESSEE</span> [ <span class="kw">ECRIS</span> <span class="str">"CLIC</span> ]</code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="musique">12. Musique</h2>
+  <h2 id="musique">13. Musique</h2>
 
   <p>GoLogo peut jouer des notes. Les notes s'écrivent avec leurs noms de solfège&nbsp;:</p>
 
@@ -661,7 +847,7 @@
 <span class="kw">JOUE</span> [ <span class="str">DO</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">DO</span> ]</code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="fichiers">13. Fichiers</h2>
+  <h2 id="fichiers">14. Fichiers</h2>
 
   <p>Les fichiers Logo (<code>.GLG</code>) sont stockés dans le dossier
   <code>~/Logo/</code> sous Linux/macOS, ou dans <code>Documents\Logo\</code>
@@ -686,8 +872,62 @@
   <p>L'emplacement du dossier d'exemples dépend du système (il est installé avec
   GoLogo). Si le dossier ou le fichier demandé est introuvable, la commande le signale.</p>
 
+  <h3>Lire et écrire des fichiers de données</h3>
+
+  <p>Tout ce qui précède concerne les fichiers de <em>programme</em>. Mais on a souvent
+  besoin de lire ou d'écrire ses propres <strong>données</strong>&nbsp;: une liste de
+  scores, un texte, des nombres à traiter. GoLogo fonctionne alors avec des
+  <strong>flux</strong>, à la manière de FMSLogo. Le principe est simple&nbsp;: on
+  ouvre un fichier, on en fait le flux courant, puis les commandes de lecture
+  habituelles (<code>LISCAR</code>, <code>LISMOT</code>, <code>LL</code>, et surtout
+  <code>LISLIGNE</code>) lisent dedans au lieu de lire le clavier. C'est pareil pour
+  l'écriture&nbsp;: une fois un fichier choisi comme flux d'écriture, <code>ECRIS</code>,
+  <code>TAPE</code> et <code>MONTRE</code> écrivent dedans plutôt qu'à l'écran.</p>
+
+  <p>Pour parcourir un fichier texte ligne par ligne, le motif habituel est une boucle
+  <code>TANTQUE</code> qui s'arrête à la fin du fichier, repérée par
+  <code>FINFICHIER?</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">OUVRELECTURE</span> <span class="str">"DONNEES.TXT</span>        <span class="cmt">; ouvre le fichier en lecture</span>
+<span class="kw">FIXELECTURE</span> <span class="str">"DONNEES.TXT</span>         <span class="cmt">; il devient le flux de lecture courant</span>
+<span class="kw">TANTQUE</span> [ <span class="kw">NON</span> <span class="kw">FINFICHIER?</span> ] [
+  <span class="kw">DONNE</span> <span class="str">"LIGNE</span> <span class="kw">LISLIGNE</span>        <span class="cmt">; lit une ligne entière, telle quelle</span>
+  <span class="kw">ECRIS</span> <span class="var">:LIGNE</span>                <span class="cmt">; … et on en fait ce qu'on veut …</span>
+]
+<span class="kw">FERME</span> <span class="str">"DONNEES.TXT</span>               <span class="cmt">; on referme une fois fini</span></code></pre>
+
+  <p>Pour écrire, c'est le même esprit&nbsp;: on ouvre en écriture, ce qui crée le
+  fichier ou écrase l'ancien (ou bien <code>OUVREAJOUT</code> pour ajouter à la suite),
+  on dirige l'écriture vers ce flux, puis on revient à l'écran en passant la liste vide
+  à <code>FIXEECRITURE</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">OUVREECRITURE</span> <span class="str">"NOTES.TXT</span>
+<span class="kw">FIXEECRITURE</span> <span class="str">"NOTES.TXT</span>
+<span class="kw">ECRIS</span> [ <span class="num">12</span> <span class="num">15</span> <span class="num">9</span> ]            <span class="cmt">; cette ligne part dans le fichier</span>
+<span class="kw">FIXEECRITURE</span> [ ]                  <span class="cmt">; retour à l'affichage normal</span>
+<span class="kw">FERME</span> <span class="str">"NOTES.TXT</span></code></pre>
+
+  <p>Quand on veut simplement avaler tout un fichier texte d'un coup,
+  <code>FICHIERVERSTABLEAU</code> le lit en une fois et rend un tableau dont chaque case
+  est une ligne (la première ligne en case 1). C'est le compagnon naturel des tableaux
+  vus plus haut&nbsp;: <code>COMPTE</code> donne le nombre de lignes, et on atteint
+  n'importe laquelle par son numéro.</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"LIGNES</span> <span class="kw">FICHIERVERSTABLEAU</span> <span class="str">"DONNEES.TXT</span>
+<span class="kw">ECRIS</span> <span class="kw">COMPTE</span> <span class="var">:LIGNES</span>        <span class="cmt">; combien de lignes ?</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="num">1</span> <span class="var">:LIGNES</span>        <span class="cmt">; la première ligne</span></code></pre>
+
+  <div class="note">
+    <strong>Où vivent ces fichiers&nbsp;?</strong> Comme les fichiers <code>.GLG</code>,
+    les fichiers de données restent dans le dossier de travail (<code>~/Logo/</code> ou
+    <code>Documents\Logo\</code>)&nbsp;: on donne un nom, pas un chemin complet, et on
+    ne peut pas sortir de ce dossier. Par défaut les fins de ligne écrites sont à la
+    mode Unix (LF)&nbsp;; <code>FIXEFINLIGNE "CRLF</code> bascule au format Windows si
+    le fichier doit être relu ailleurs.
+  </div>
+
   <!-- ============================================================ -->
-  <h2 id="espacedetravail">14. Espace de travail</h2>
+  <h2 id="espacedetravail">15. Espace de travail</h2>
 
   <p>GoLogo conserve en mémoire toutes les procédures et variables définies pendant
   la session. On peut les consulter et les gérer&nbsp;:</p>
@@ -701,7 +941,7 @@
 <span class="kw">RAZ</span>                <span class="cmt">; remet tout à zéro (demande confirmation)</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="messages">15. Messages d'erreur courants</h2>
+  <h2 id="messages">16. Messages d'erreur courants</h2>
 
   <p>Quand GoLogo ne comprend pas ce qu'on lui demande, il répond avec un
   message d'erreur explicite&nbsp;:</p>

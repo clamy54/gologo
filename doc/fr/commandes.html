@@ -36,7 +36,7 @@
   </div>
 
   <p>Chaque fiche indique son type (<strong>C</strong> commande qui produit un effet, <strong>O</strong> opération qui retourne une valeur, <strong>P</strong> prédicat qui retourne VRAI/FAUX) et son origine&nbsp;: <em>Logo SOLI</em> (le Logo d'origine), <em>Extension</em> (ajout moderne) ou <em>Compatibilité</em> (matériel d'époque sans effet).</p>
-  <div class="conseil">Sections : <a href="#deplacements">La tortue : déplacements</a> · <a href="#champ">La tortue : le champ graphique</a> · <a href="#tortues">Plusieurs tortues</a> · <a href="#animation">Animer les tortues</a> · <a href="#crayon">La tortue : le crayon</a> · <a href="#examiner">Mots et listes : examiner</a> · <a href="#demonter">Mots et listes : démonter</a> · <a href="#construire">Mots et listes : construire et transformer</a> · <a href="#logique">Valeurs logiques</a> · <a href="#arithmetique">Arithmétique</a> · <a href="#variables">Les noms (variables)</a> · <a href="#procedures">Procédures</a> · <a href="#controle">Contrôle d&#39;exécution</a> · <a href="#proprietes">Listes de propriétés</a> · <a href="#texte">Sortie texte</a> · <a href="#clavier">Clavier</a> · <a href="#souris">Souris</a> · <a href="#manettes">Manettes de jeu</a> · <a href="#musique">Musique</a> · <a href="#travail">Espace de travail</a> · <a href="#fichiers">Fichiers</a> · <a href="#compat">Matériel d&#39;origine (compatibilité)</a> · <a href="#divers">Divers</a></div>
+  <div class="conseil">Sections : <a href="#deplacements">La tortue : déplacements</a> · <a href="#champ">La tortue : le champ graphique</a> · <a href="#tortues">Plusieurs tortues</a> · <a href="#animation">Animer les tortues</a> · <a href="#crayon">La tortue : le crayon</a> · <a href="#examiner">Mots et listes : examiner</a> · <a href="#demonter">Mots et listes : démonter</a> · <a href="#construire">Mots et listes : construire et transformer</a> · <a href="#chaines">Chaînes : recherche, découpe, nettoyage</a> · <a href="#tableaux">Tableaux, piles et files</a> · <a href="#logique">Valeurs logiques</a> · <a href="#arithmetique">Arithmétique</a> · <a href="#variables">Les noms (variables)</a> · <a href="#procedures">Procédures</a> · <a href="#controle">Contrôle d&#39;exécution</a> · <a href="#proprietes">Listes de propriétés</a> · <a href="#texte">Sortie texte</a> · <a href="#clavier">Clavier</a> · <a href="#souris">Souris</a> · <a href="#manettes">Manettes de jeu</a> · <a href="#musique">Musique</a> · <a href="#travail">Espace de travail</a> · <a href="#fichiers">Fichiers</a> · <a href="#fichiers-donnees">Fichiers de données (flux)</a> · <a href="#compat">Matériel d&#39;origine (compatibilité)</a> · <a href="#divers">Divers</a></div>
 
   <h2 id="deplacements">La tortue : déplacements</h2>
   <div class="cmd-entry" id="cmd-avance">
@@ -89,7 +89,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI</div>
       <p>Retourne la position courante [x y].</p>
-      <div class="cmd-example"><pre><code>ECRIS POS</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS POS
+  -&gt; 0 0</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fpos">FPOS</a> <a href="#cmd-xcor">XCOR</a> <a href="#cmd-ycor">YCOR</a></div>
     </div>
   </div>
@@ -116,7 +117,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Retourne l&#39;abscisse x de la tortue.</p>
-      <div class="cmd-example"><pre><code>ECRIS XCOR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS XCOR
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-ycor">YCOR</a> <a href="#cmd-pos">POS</a></div>
     </div>
   </div>
@@ -125,7 +127,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Retourne l&#39;ordonnée y de la tortue.</p>
-      <div class="cmd-example"><pre><code>ECRIS YCOR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS YCOR
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-xcor">XCOR</a> <a href="#cmd-pos">POS</a></div>
     </div>
   </div>
@@ -134,7 +137,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : HEADING</div>
       <p>Retourne le cap courant, entre 0 et 359.9 (boussole, Nord = 0 = haut).</p>
-      <div class="cmd-example"><pre><code>ECRIS CAP</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS CAP
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fcap">FCAP</a></div>
     </div>
   </div>
@@ -161,7 +165,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Retourne la distance entre la tortue et le point [x y].</p>
-      <div class="cmd-example"><pre><code>ECRIS DISTANCE [ 30 40 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS DISTANCE [ 30 40 ]
+  -&gt; 50</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-verscap">VERSCAP</a> <a href="#cmd-pos">POS</a></div>
     </div>
   </div>
@@ -208,7 +213,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : SHOWN? SHOWNP</div>
       <p>Retourne VRAI si la tortue est visible.</p>
-      <div class="cmd-example"><pre><code>ECRIS VISIBLE?</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS VISIBLE?
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-mt">MT</a> <a href="#cmd-ct">CT</a></div>
     </div>
   </div>
@@ -253,7 +259,8 @@
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : BACKGROUND BG SCREENCOLOR</div>
       <p>Retourne le code couleur du fond graphique.</p>
-      <div class="cmd-example"><pre><code>ECRIS CF</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS CF
+  -&gt; 4</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fcfg">FCFG</a></div>
     </div>
   </div>
@@ -281,7 +288,8 @@ FCB [ 80 80 80 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : SCALE</div>
       <p>Retourne les échelles [horizontale verticale] en pourcentage.</p>
-      <div class="cmd-example"><pre><code>ECRIS ECH</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS ECH
+  -&gt; 100 100</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-fech">
@@ -352,7 +360,8 @@ FCB [ 80 80 80 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TURTLE</div>
       <p>Retourne le numéro de la tortue active.</p>
-      <div class="cmd-example"><pre><code>ECRIS TORTUE</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS TORTUE
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixetortue">FIXETORTUE</a> <a href="#cmd-nbtortues">NBTORTUES</a></div>
     </div>
   </div>
@@ -361,7 +370,8 @@ FCB [ 80 80 80 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TURTLES</div>
       <p>Retourne le nombre de tortues existantes.</p>
-      <div class="cmd-example"><pre><code>ECRIS NBTORTUES</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS NBTORTUES
+  -&gt; 1</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixetortue">FIXETORTUE</a> <a href="#cmd-distortue">DISTORTUE</a></div>
     </div>
   </div>
@@ -389,7 +399,8 @@ DEMANDE [ 0 1 ] [ TD 90 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : COLLIDE? COLLIDEP</div>
       <p>Retourne VRAI si les deux tortues de la liste [ a b ] existent, sont visibles et se chevauchent (boîtes englobantes ajustées à la taille de chaque sprite). Sinon FAUX.</p>
-      <div class="cmd-example"><pre><code>ECRIS COLLISION? [ 0 1 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS COLLISION? [ 0 1 ]
+  -&gt; FAUX</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixetortue">FIXETORTUE</a> <a href="#cmd-visible?">VISIBLE?</a></div>
     </div>
   </div>
@@ -449,7 +460,8 @@ DEMANDE [ 0 1 ] [ TD 90 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : PENDOWN? PENDOWNP</div>
       <p>Retourne VRAI si le crayon est baissé.</p>
-      <div class="cmd-example"><pre><code>ECRIS BC?</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS BC?
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-bc">BC</a> <a href="#cmd-lc">LC</a></div>
     </div>
   </div>
@@ -458,7 +470,8 @@ DEMANDE [ 0 1 ] [ TD 90 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : PC PENCOLOR</div>
       <p>Retourne le code couleur du crayon.</p>
-      <div class="cmd-example"><pre><code>ECRIS CC</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS CC
+  -&gt; 6</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fcc">FCC</a></div>
     </div>
   </div>
@@ -505,7 +518,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : FLOODCOLOR</div>
       <p>Retourne le code de la couleur de remplissage (FCR). Si elle n&#39;a pas été fixée, retourne la couleur du crayon (couleur effective de REMPLIS).</p>
-      <div class="cmd-example"><pre><code>ECRIS CR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS CR
+  -&gt; 6</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-fcr">FCR</a> <a href="#cmd-remplis">REMPLIS</a></div>
     </div>
   </div>
@@ -524,8 +538,9 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">EGAL?</span> <span class="cmd-params">obj1 obj2</span><span class="cmd-kind">prédicat</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : EQUAL? EQUALP</div>
-      <p>Retourne VRAI si obj1 et obj2 sont égaux. Opérateur infixe : =.</p>
-      <div class="cmd-example"><pre><code>ECRIS EGAL? 2 2</code></pre></div>
+      <p>Retourne VRAI si obj1 et obj2 sont égaux. Opérateur infixe : =. La comparaison de mots ignore la casse (EGAL? &#34;a &#34;A rend VRAI) ; quand la casse compte, comparer les codes : EGAL? ASCII :c1 ASCII :c2.</p>
+      <div class="cmd-example"><pre><code>ECRIS EGAL? 2 2
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-vide?">
@@ -533,7 +548,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : EMPTY? EMPTYP</div>
       <p>Retourne VRAI si obj est le mot vide ou la liste vide.</p>
-      <div class="cmd-example"><pre><code>ECRIS VIDE? [ ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS VIDE? [ ]
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-liste?">
@@ -541,7 +557,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : LIST? LISTP</div>
       <p>Retourne VRAI si obj est une liste.</p>
-      <div class="cmd-example"><pre><code>ECRIS LISTE? [ A B ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS LISTE? [ A B ]
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-mot?">
@@ -549,7 +566,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : WORD? WORDP</div>
       <p>Retourne VRAI si obj est un mot.</p>
-      <div class="cmd-example"><pre><code>ECRIS MOT? &#34;BONJOUR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MOT? &#34;BONJOUR
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-nombre?">
@@ -557,7 +575,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : NUMBER? NUMBERP</div>
       <p>Retourne VRAI si obj est un nombre.</p>
-      <div class="cmd-example"><pre><code>ECRIS NOMBRE? 42</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS NOMBRE? 42
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-membre?">
@@ -565,15 +584,17 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : MEMBER? MEMBERP</div>
       <p>Retourne VRAI si obj est un membre de liste.</p>
-      <div class="cmd-example"><pre><code>ECRIS MEMBRE? &#34;A [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MEMBRE? &#34;A [ A B C ]
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-compte">
-    <div class="cmd-header"><span class="cmd-name">COMPTE</span> <span class="cmd-params">liste</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-header"><span class="cmd-name">COMPTE</span> <span class="cmd-params">chose</span><span class="cmd-kind">opération</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : COUNT</div>
-      <p>Retourne le nombre de membres d&#39;une liste (ou de caractères d&#39;un mot).</p>
-      <div class="cmd-example"><pre><code>ECRIS COMPTE [ A B C ]</code></pre></div>
+      <p>Retourne le nombre de membres d&#39;une liste, de caractères d&#39;un mot, ou de cases d&#39;un tableau.</p>
+      <div class="cmd-example"><pre><code>ECRIS COMPTE [ A B C ]
+  -&gt; 3</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-ascii">
@@ -581,7 +602,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI</div>
       <p>Retourne le code ASCII du 1er caractère de mot (mot vide -&gt; 0).</p>
-      <div class="cmd-example"><pre><code>ECRIS ASCII &#34;A</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS ASCII &#34;A
+  -&gt; 65</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-car">
@@ -589,7 +611,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : CHAR</div>
       <p>Retourne le caractère de code n (modulo 256 ; 0 -&gt; mot vide).</p>
-      <div class="cmd-example"><pre><code>ECRIS CAR 65</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS CAR 65
+  -&gt; A</code></pre></div>
     </div>
   </div>
 
@@ -599,7 +622,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : FIRST PREMIER</div>
       <p>Retourne le 1er membre d&#39;une liste (ou le 1er caractère d&#39;un mot).</p>
-      <div class="cmd-example"><pre><code>ECRIS PREM [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PREM [ A B C ]
+  -&gt; A</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-der">DER</a> <a href="#cmd-sp">SP</a> <a href="#cmd-sd">SD</a></div>
     </div>
   </div>
@@ -608,7 +632,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : DERNIER LAST</div>
       <p>Retourne le dernier membre d&#39;une liste (ou le dernier caractère d&#39;un mot).</p>
-      <div class="cmd-example"><pre><code>ECRIS DER [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS DER [ A B C ]
+  -&gt; C</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-prem">PREM</a> <a href="#cmd-sp">SP</a> <a href="#cmd-sd">SD</a></div>
     </div>
   </div>
@@ -617,7 +642,8 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : BF BUTFIRST SAUFPREMIER</div>
       <p>Retourne obj sauf son premier élément.</p>
-      <div class="cmd-example"><pre><code>ECRIS SP [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS SP [ A B C ]
+  -&gt; B C</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-sd">SD</a> <a href="#cmd-prem">PREM</a> <a href="#cmd-der">DER</a></div>
     </div>
   </div>
@@ -626,17 +652,20 @@ FCR [ 255 128 0 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : BL BUTLAST SAUFDERNIER</div>
       <p>Retourne obj sauf son dernier élément.</p>
-      <div class="cmd-example"><pre><code>ECRIS SD [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS SD [ A B C ]
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-sp">SP</a> <a href="#cmd-prem">PREM</a> <a href="#cmd-der">DER</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-item">
-    <div class="cmd-header"><span class="cmd-name">ITEM</span> <span class="cmd-params">n liste ou mot</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-header"><span class="cmd-name">ITEM</span> <span class="cmd-params">n chose</span><span class="cmd-kind">opération</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI</div>
-      <p>Retourne le n-ième membre d&#39;une liste, ou le n-ième caractère d&#39;un mot (n entier &gt;= 1).</p>
+      <p>Retourne le n-ième membre d&#39;une liste, le n-ième caractère d&#39;un mot, ou la case n d&#39;un tableau (n entier ; pour un tableau on tient compte de l&#39;origine).</p>
       <div class="cmd-example"><pre><code>ECRIS ITEM 2 [ A B C ]
-ECRIS ITEM 2 &#34;CHAT</code></pre></div>
+  -&gt; B
+ECRIS ITEM 2 &#34;CHAT
+  -&gt; H</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-pioche">
@@ -644,7 +673,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : PICK</div>
       <p>Retourne un membre d&#39;une liste (ou un caractère d&#39;un mot) tiré au hasard. (Compat FMSLogo.)</p>
-      <div class="cmd-example"><pre><code>ECRIS PIOCHE [ PILE FACE ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PIOCHE [ PILE FACE ]
+  -&gt; FACE</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-item">ITEM</a> <a href="#cmd-hasard">HASARD</a> <a href="#cmd-compte">COMPTE</a></div>
     </div>
   </div>
@@ -655,7 +685,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : WORD</div>
       <p>Concatène mot1 et mot2 en un seul mot.</p>
-      <div class="cmd-example"><pre><code>ECRIS MOT &#34;BON &#34;JOUR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MOT &#34;BON &#34;JOUR
+  -&gt; BONJOUR</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-phrase">PHRASE</a> <a href="#cmd-liste">LISTE</a></div>
     </div>
   </div>
@@ -664,7 +695,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : PH SE SENTENCE</div>
       <p>Construit une liste à partir de obj1 et obj2 (aplatit les listes).</p>
-      <div class="cmd-example"><pre><code>ECRIS PHRASE &#34;A &#34;B</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PHRASE &#34;A &#34;B
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-mot">MOT</a> <a href="#cmd-liste">LISTE</a></div>
     </div>
   </div>
@@ -673,7 +705,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : LIST</div>
       <p>Construit la liste [obj1 obj2].</p>
-      <div class="cmd-example"><pre><code>ECRIS LISTE &#34;A &#34;B</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS LISTE &#34;A &#34;B
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-mot">MOT</a> <a href="#cmd-phrase">PHRASE</a></div>
     </div>
   </div>
@@ -682,7 +715,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : FPUT METSPREMIER</div>
       <p>Ajoute obj en tête de liste.</p>
-      <div class="cmd-example"><pre><code>ECRIS MP &#34;A [ B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MP &#34;A [ B C ]
+  -&gt; A B C</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-md">
@@ -690,7 +724,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : LPUT METSDERNIER</div>
       <p>Ajoute obj en queue de liste.</p>
-      <div class="cmd-example"><pre><code>ECRIS MD &#34;C [ A B ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MD &#34;C [ A B ]
+  -&gt; A B C</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-inverse">
@@ -698,7 +733,8 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : REVERSE</div>
       <p>Retourne la liste (ou le mot) avec ses éléments en ordre inverse.</p>
-      <div class="cmd-example"><pre><code>ECRIS INVERSE [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS INVERSE [ A B C ]
+  -&gt; C B A</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-trie">
@@ -707,8 +743,10 @@ ECRIS ITEM 2 &#34;CHAT</code></pre></div>
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SORT</div>
       <p>Retourne la liste triée : les nombres par valeur croissante, sinon par ordre alphabétique. Tri stable.</p>
       <div class="cmd-example"><pre><code>ECRIS TRIE [ 3 1 2 ]
-ECRIS TRIE [ POMME CERISE BANANE ]</code></pre></div>
-      <div class="cmd-aliases">Voir aussi : <a href="#cmd-inverse">INVERSE</a> <a href="#cmd-item">ITEM</a></div>
+  -&gt; 1 2 3
+ECRIS TRIE [ POMME CERISE BANANE ]
+  -&gt; BANANE CERISE POMME</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-inverse">INVERSE</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-ordonne">ORDONNE</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-majuscule">
@@ -716,7 +754,8 @@ ECRIS TRIE [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : UPPERCASE</div>
       <p>Retourne le mot tout en majuscules.</p>
-      <div class="cmd-example"><pre><code>ECRIS MAJUSCULE &#34;bonjour</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MAJUSCULE &#34;bonjour
+  -&gt; BONJOUR</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-minuscule">MINUSCULE</a> <a href="#cmd-mot">MOT</a></div>
     </div>
   </div>
@@ -725,8 +764,322 @@ ECRIS TRIE [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : LOWERCASE</div>
       <p>Retourne le mot tout en minuscules.</p>
-      <div class="cmd-example"><pre><code>ECRIS MINUSCULE &#34;BONJOUR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MINUSCULE &#34;BONJOUR
+  -&gt; bonjour</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-majuscule">MAJUSCULE</a> <a href="#cmd-mot">MOT</a></div>
+    </div>
+  </div>
+
+  <h2 id="chaines">Chaînes : recherche, découpe, nettoyage</h2>
+  <div class="cmd-entry" id="cmd-membre">
+    <div class="cmd-header"><span class="cmd-name">MEMBRE</span> <span class="cmd-params">chose1 chose2</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MEMBER</div>
+      <p>Retourne la portion de chose2 (mot ou liste) depuis la première occurrence de chose1 jusqu&#39;à la fin, ou le vide si chose1 est absent. Sur un mot, chose1 est un seul caractère.</p>
+      <div class="cmd-example"><pre><code>ECRIS MEMBRE &#34;C &#34;ABCDE
+  -&gt; CDE
+ECRIS MEMBRE &#34;B [ A B C ]
+  -&gt; B C</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-souschaine?">SOUSCHAINE?</a> <a href="#cmd-membre?">MEMBRE?</a> <a href="#cmd-item">ITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-souschaine?">
+    <div class="cmd-header"><span class="cmd-name">SOUSCHAINE?</span> <span class="cmd-params">chose1 chose2</span><span class="cmd-kind">prédicat</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SUBSTRING? SUBSTRINGP</div>
+      <p>Retourne VRAI si chose1 est une sous-chaîne du mot chose2 (casse ignorée). FAUX si l&#39;un des deux est une liste.</p>
+      <div class="cmd-example"><pre><code>ECRIS SOUSCHAINE? &#34;bc &#34;abc
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-membre">MEMBRE</a> <a href="#cmd-membre?">MEMBRE?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-avant?">
+    <div class="cmd-header"><span class="cmd-name">AVANT?</span> <span class="cmd-params">mot1 mot2</span><span class="cmd-kind">prédicat</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : BEFORE? BEFOREP</div>
+      <p>Retourne VRAI si mot1 vient avant mot2 dans l&#39;ordre alphabétique (casse ignorée).</p>
+      <div class="cmd-example"><pre><code>ECRIS AVANT? &#34;abc &#34;abd
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-egal?">EGAL?</a> <a href="#cmd-trie">TRIE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-position">
+    <div class="cmd-header"><span class="cmd-name">POSITION</span> <span class="cmd-params">chose chaine</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)</div>
+      <p>Retourne le rang (à partir de 1) de la première occurrence de chose dans chaine, ou 0 si absent. Dans un mot, chose peut être une sous-chaîne ; dans une liste, un élément. Casse ignorée. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS POSITION &#34;n &#34;bonjour
+  -&gt; 3
+ECRIS POSITION &#34;B [ A B C ]
+  -&gt; 2</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-membre">MEMBRE</a> <a href="#cmd-souschaine?">SOUSCHAINE?</a> <a href="#cmd-item">ITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-decoupe">
+    <div class="cmd-header"><span class="cmd-name">DECOUPE</span> <span class="cmd-params">mot separateur</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SPLIT</div>
+      <p>Découpe mot sur le separateur et retourne la liste des morceaux (les morceaux vides sont gardés). Le separateur peut être un seul caractère ou une chaîne entière. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS DECOUPE &#34;1-2-3 &#34;-
+  -&gt; 1 2 3
+ECRIS DECOUPE &#34;a::b::c &#34;::
+  -&gt; a b c</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-mot">MOT</a> <a href="#cmd-phrase">PHRASE</a> <a href="#cmd-tranche">TRANCHE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-substitue">
+    <div class="cmd-header"><span class="cmd-name">SUBSTITUE</span> <span class="cmd-params">ancien nouveau chaine</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SUBSTITUTE</div>
+      <p>Retourne chaine où toutes les occurrences de la sous-chaîne ancien sont remplacées par nouveau. Entre parenthèses, (SUBSTITUE ancien nouveau chaine n) en remplace au plus n. ancien vide est une erreur. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS SUBSTITUE &#34;an &#34;AN &#34;banane
+  -&gt; bANANe
+ECRIS ( SUBSTITUE &#34;a &#34;o &#34;ananas 1 )
+  -&gt; onanas</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-membre">MEMBRE</a> <a href="#cmd-mot">MOT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-rogne">
+    <div class="cmd-header"><span class="cmd-name">ROGNE</span> <span class="cmd-params">mot</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TRIM</div>
+      <p>Retourne mot sans les blancs (espaces, tabulations) de début et de fin. Utile sur une ligne lue au clavier. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS ROGNE &#34;bonjour
+  -&gt; bonjour</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-rognedebut">ROGNEDEBUT</a> <a href="#cmd-rognefin">ROGNEFIN</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-rognedebut">
+    <div class="cmd-header"><span class="cmd-name">ROGNEDEBUT</span> <span class="cmd-params">mot</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : LTRIM</div>
+      <p>Retourne mot sans les blancs de début. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS ROGNEDEBUT &#34;bonjour
+  -&gt; bonjour</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-rogne">ROGNE</a> <a href="#cmd-rognefin">ROGNEFIN</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-rognefin">
+    <div class="cmd-header"><span class="cmd-name">ROGNEFIN</span> <span class="cmd-params">mot</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : RTRIM</div>
+      <p>Retourne mot sans les blancs de fin. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS ROGNEFIN &#34;bonjour
+  -&gt; bonjour</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-rogne">ROGNE</a> <a href="#cmd-rognedebut">ROGNEDEBUT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-otetout">
+    <div class="cmd-header"><span class="cmd-name">OTETOUT</span> <span class="cmd-params">chose elements</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : REMOVE</div>
+      <p>Retourne elements (liste ou mot) privé de tous les membres égaux à chose. Sur un mot, chose est un seul caractère.</p>
+      <div class="cmd-example"><pre><code>ECRIS OTETOUT &#34;A [ A B A C ]
+  -&gt; B C</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-sansdoublons">SANSDOUBLONS</a> <a href="#cmd-membre?">MEMBRE?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ote">
+    <div class="cmd-header"><span class="cmd-name">OTE</span> <span class="cmd-params">sequence debut longueur</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : DELETE</div>
+      <p>Retourne sequence (mot ou liste) privée de longueur éléments à partir de debut (indices à partir de 1). Retire par position (≠ OTETOUT qui retire par valeur). Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS OTE &#34;bonjour 2 3
+  -&gt; bour
+ECRIS OTE [ A B C D ] 2 2
+  -&gt; A D</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-tranche">TRANCHE</a> <a href="#cmd-otetout">OTETOUT</a> <a href="#cmd-substitue">SUBSTITUE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-sansdoublons">
+    <div class="cmd-header"><span class="cmd-name">SANSDOUBLONS</span> <span class="cmd-params">elements</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : REMDUP</div>
+      <p>Retourne une copie de elements sans doublons : si un membre apparaît plusieurs fois, on garde celui le plus à droite.</p>
+      <div class="cmd-example"><pre><code>ECRIS SANSDOUBLONS [ A B C C B ]
+  -&gt; A C B</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-otetout">OTETOUT</a> <a href="#cmd-trie">TRIE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-remplace">
+    <div class="cmd-header"><span class="cmd-name">REMPLACE</span> <span class="cmd-params">sequence n arg</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : REPLACE</div>
+      <p>Retourne sequence (mot ou liste) où l&#39;élément n° n est remplacé par arg (n à partir de 1). Version non destructive (rend une nouvelle valeur). Repris de XLogo.</p>
+      <div class="cmd-example"><pre><code>ECRIS REMPLACE [ A B C ] 2 8
+  -&gt; A 8 C
+ECRIS REMPLACE &#34;chat 1 &#34;r
+  -&gt; rhat</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ajoute">AJOUTE</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-tranche">TRANCHE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ajoute">
+    <div class="cmd-header"><span class="cmd-name">AJOUTE</span> <span class="cmd-params">sequence n arg</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : INSERTITEM</div>
+      <p>Retourne sequence (mot ou liste) avec arg inséré en position n (n de 1 à longueur+1). Repris de XLogo.</p>
+      <div class="cmd-example"><pre><code>ECRIS AJOUTE [ A B C ] 2 8
+  -&gt; A 8 B C
+ECRIS AJOUTE &#34;cat 2 &#34;h
+  -&gt; chat</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-remplace">REMPLACE</a> <a href="#cmd-mp">MP</a> <a href="#cmd-md">MD</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-tranche">
+    <div class="cmd-header"><span class="cmd-name">TRANCHE</span> <span class="cmd-params">sequence debut fin</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SLICE</div>
+      <p>Retourne la sous-séquence de debut à fin inclus (indices à partir de 1, comme ITEM) ; le type suit l&#39;entrée (mot ou liste). (TRANCHE sequence debut) va jusqu&#39;au bout. Bornes hors limites ramenées proprement. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS TRANCHE &#34;bonjour 2 4
+  -&gt; onj
+ECRIS ( TRANCHE &#34;bonjour 4 )
+  -&gt; jour
+ECRIS TRANCHE [ A B C D ] 2 3
+  -&gt; B C</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-item">ITEM</a> <a href="#cmd-prem">PREM</a> <a href="#cmd-der">DER</a> <a href="#cmd-decoupe">DECOUPE</a></div>
+    </div>
+  </div>
+
+  <h2 id="tableaux">Tableaux, piles et files</h2>
+  <div class="cmd-entry" id="cmd-tableau">
+    <div class="cmd-header"><span class="cmd-name">TABLEAU</span> <span class="cmd-params">taille</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ARRAY</div>
+      <p>Retourne un tableau de taille cases, chacune initialisée à la liste vide (et non 0 : pensez à initialiser les cases avant de vous en servir comme compteurs ou drapeaux). (TABLEAU taille origine) fixe l&#39;indice de la 1re case (1 par défaut). Un tableau est mutable et partagé par référence. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE TABLEAU 3
+  -&gt; { }
+DONNE &#34;T ( TABLEAU 3 0 )</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixeitem">FIXEITEM</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-listeverstableau">LISTEVERSTABLEAU</a> <a href="#cmd-tableau?">TABLEAU?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-tableaumd">
+    <div class="cmd-header"><span class="cmd-name">TABLEAUMD</span> <span class="cmd-params">listetailles</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MDARRAY</div>
+      <p>Retourne un tableau multi-dimensionnel : une dimension par taille de la liste (tailles positives). (TABLEAUMD listetailles origine) fixe l&#39;origine. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE TABLEAUMD [ 2 2 ]
+  -&gt; {{ } { }}</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-tableau">TABLEAU</a> <a href="#cmd-fixeitemmd">FIXEITEMMD</a> <a href="#cmd-itemmd">ITEMMD</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-listeverstableau">
+    <div class="cmd-header"><span class="cmd-name">LISTEVERSTABLEAU</span> <span class="cmd-params">liste</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : LISTTOARRAY</div>
+      <p>Retourne un tableau ayant les mêmes éléments que liste. (LISTEVERSTABLEAU liste origine) fixe l&#39;origine. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE LISTEVERSTABLEAU [ 1 2 3 ]
+  -&gt; {1 2 3}</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-tableauversliste">TABLEAUVERSLISTE</a> <a href="#cmd-tableau">TABLEAU</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-tableauversliste">
+    <div class="cmd-header"><span class="cmd-name">TABLEAUVERSLISTE</span> <span class="cmd-params">tableau</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ARRAYTOLIST</div>
+      <p>Retourne la liste des cases du tableau (1re case en tête, quelle que soit l&#39;origine). Pratique pour traiter un tableau avec APPLIQUE/FILTRE. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE TABLEAUVERSLISTE LISTEVERSTABLEAU [ 1 2 3 ]
+  -&gt; [1 2 3]</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-listeverstableau">LISTEVERSTABLEAU</a> <a href="#cmd-tableau">TABLEAU</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-itemmd">
+    <div class="cmd-header"><span class="cmd-name">ITEMMD</span> <span class="cmd-params">listeindices tableaumd</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MDITEM</div>
+      <p>Retourne la case d&#39;un tableau multi-dimensionnel, repérée par une liste d&#39;indices. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>ECRIS ITEMMD [ 1 ] LISTEVERSTABLEAU [ 7 8 9 ]
+  -&gt; 7</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixeitemmd">FIXEITEMMD</a> <a href="#cmd-item">ITEM</a> <a href="#cmd-tableaumd">TABLEAUMD</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixeitem">
+    <div class="cmd-header"><span class="cmd-name">FIXEITEM</span> <span class="cmd-params">indice tableau valeur</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SETITEM</div>
+      <p>Remplace la case indice du tableau par valeur (modifie le tableau en place). Refuse de créer un cycle (valeur ne doit pas contenir le tableau modifié). Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;T TABLEAU 3 FIXEITEM 2 :T 9 ECRIS ITEM 2 :T
+  -&gt; 9</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-item">ITEM</a> <a href="#cmd-tableau">TABLEAU</a> <a href="#cmd-copietableau">COPIETABLEAU</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixeitemmd">
+    <div class="cmd-header"><span class="cmd-name">FIXEITEMMD</span> <span class="cmd-params">listeindices tableaumd valeur</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MDSETITEM</div>
+      <p>Remplace une case d&#39;un tableau multi-dimensionnel (repérée par une liste d&#39;indices) par valeur. Refuse les cycles. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;T TABLEAUMD [ 2 2 ] FIXEITEMMD [ 1 2 ] :T 5 ECRIS ITEMMD [ 1 2 ] :T
+  -&gt; 5</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-itemmd">ITEMMD</a> <a href="#cmd-tableaumd">TABLEAUMD</a> <a href="#cmd-fixeitem">FIXEITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-tableau?">
+    <div class="cmd-header"><span class="cmd-name">TABLEAU?</span> <span class="cmd-params">chose</span><span class="cmd-kind">prédicat</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ARRAY? ARRAYP</div>
+      <p>Retourne VRAI si chose est un tableau.</p>
+      <div class="cmd-example"><pre><code>ECRIS TABLEAU? TABLEAU 3
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-tableau">TABLEAU</a> <a href="#cmd-liste?">LISTE?</a> <a href="#cmd-mot?">MOT?</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-copietableau">
+    <div class="cmd-header"><span class="cmd-name">COPIETABLEAU</span> <span class="cmd-params">tableau</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : COPYARRAY</div>
+      <p>Retourne une copie PROFONDE du tableau (récursive sur les sous-tableaux, partage préservé), pour modifier la copie sans toucher l&#39;original. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;T TABLEAU 3 DONNE &#34;C COPIETABLEAU :T ECRIS TABLEAU? :C
+  -&gt; VRAI</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-tableau">TABLEAU</a> <a href="#cmd-fixeitem">FIXEITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ordonne">
+    <div class="cmd-header"><span class="cmd-name">ORDONNE</span> <span class="cmd-params">tableau</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SORTARRAY</div>
+      <p>Trie les cases du tableau sur place (nombres par valeur croissante, sinon ordre alphabétique). Modifie le tableau, comme FIXEITEM ; tri stable. Plus rapide que TRIE sur de gros volumes.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;T LISTEVERSTABLEAU [ 3 1 2 ] ORDONNE :T MONTRE :T
+  -&gt; {1 2 3}</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-trie">TRIE</a> <a href="#cmd-tableau">TABLEAU</a> <a href="#cmd-fixeitem">FIXEITEM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-empile">
+    <div class="cmd-header"><span class="cmd-name">EMPILE</span> <span class="cmd-params">nomvar valeur</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : PUSH</div>
+      <p>Ajoute valeur en tête de la liste nommée nomvar (pile). À dépiler avec DEPILE. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;P [ ] EMPILE &#34;P 1 EMPILE &#34;P 2 MONTRE :P
+  -&gt; [2 1]</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-depile">DEPILE</a> <a href="#cmd-enfile">ENFILE</a> <a href="#cmd-mp">MP</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-depile">
+    <div class="cmd-header"><span class="cmd-name">DEPILE</span> <span class="cmd-params">nomvar</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : POP</div>
+      <p>Retire et retourne l&#39;élément de tête de la liste nommée nomvar (pile, dernier entré premier sorti). Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;P [ ] EMPILE &#34;P 1 EMPILE &#34;P 2 ECRIS DEPILE &#34;P
+  -&gt; 2</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-empile">EMPILE</a> <a href="#cmd-defile">DEFILE</a> <a href="#cmd-prem">PREM</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-enfile">
+    <div class="cmd-header"><span class="cmd-name">ENFILE</span> <span class="cmd-params">nomvar valeur</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : QUEUE</div>
+      <p>Ajoute valeur en fin de la liste nommée nomvar (file). À défiler avec DEFILE. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;F [ ] ENFILE &#34;F 1 ENFILE &#34;F 2 MONTRE :F
+  -&gt; [1 2]</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-defile">DEFILE</a> <a href="#cmd-empile">EMPILE</a> <a href="#cmd-md">MD</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-defile">
+    <div class="cmd-header"><span class="cmd-name">DEFILE</span> <span class="cmd-params">nomvar</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : DEQUEUE</div>
+      <p>Retire et retourne le plus ancien élément (en tête) de la liste nommée nomvar (file, premier entré premier sorti). Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>DONNE &#34;F [ ] ENFILE &#34;F 1 ENFILE &#34;F 2 ECRIS DEFILE &#34;F
+  -&gt; 1</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-enfile">ENFILE</a> <a href="#cmd-depile">DEPILE</a> <a href="#cmd-prem">PREM</a></div>
     </div>
   </div>
 
@@ -736,7 +1089,8 @@ ECRIS TRIE [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : TRUE</div>
       <p>Retourne le mot VRAI.</p>
-      <div class="cmd-example"><pre><code>ECRIS VRAI</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS VRAI
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-faux">FAUX</a></div>
     </div>
   </div>
@@ -745,7 +1099,8 @@ ECRIS TRIE [ POMME CERISE BANANE ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : FALSE</div>
       <p>Retourne le mot FAUX.</p>
-      <div class="cmd-example"><pre><code>ECRIS FAUX</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS FAUX
+  -&gt; FAUX</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-vrai">VRAI</a></div>
     </div>
   </div>
@@ -755,7 +1110,9 @@ ECRIS TRIE [ POMME CERISE BANANE ]</code></pre></div>
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : AND</div>
       <p>ET logique : VRAI si les deux prédicats sont VRAI. Entre parenthèses, accepte plusieurs prédicats : (ET a b c).</p>
       <div class="cmd-example"><pre><code>ECRIS ET VRAI FAUX
-ECRIS ( ET VRAI VRAI VRAI )</code></pre></div>
+  -&gt; FAUX
+ECRIS ( ET VRAI VRAI VRAI )
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-ou">OU</a> <a href="#cmd-non">NON</a></div>
     </div>
   </div>
@@ -765,7 +1122,9 @@ ECRIS ( ET VRAI VRAI VRAI )</code></pre></div>
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : OR</div>
       <p>OU logique : VRAI si au moins un prédicat est VRAI. Entre parenthèses : (OU a b c).</p>
       <div class="cmd-example"><pre><code>ECRIS OU VRAI FAUX
-ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
+  -&gt; VRAI
+ECRIS ( OU FAUX FAUX VRAI )
+  -&gt; VRAI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-et">ET</a> <a href="#cmd-non">NON</a></div>
     </div>
   </div>
@@ -774,7 +1133,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : NOT</div>
       <p>Négation logique.</p>
-      <div class="cmd-example"><pre><code>ECRIS NON VRAI</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS NON VRAI
+  -&gt; FAUX</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-et">ET</a> <a href="#cmd-ou">OU</a></div>
     </div>
   </div>
@@ -783,7 +1143,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : LESS? LESSP</div>
       <p>Retourne VRAI si n1 &lt; n2. Opérateur infixe : &lt;.</p>
-      <div class="cmd-example"><pre><code>ECRIS PLP? 3 5</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PLP? 3 5
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-plg?">
@@ -791,7 +1152,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : GREATER? GREATERP</div>
       <p>Retourne VRAI si n1 &gt; n2. Opérateur infixe : &gt;.</p>
-      <div class="cmd-example"><pre><code>ECRIS PLG? 5 3</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PLG? 5 3
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
 
@@ -801,7 +1163,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : SUM</div>
       <p>Somme n1 + n2. Opérateur infixe : +.</p>
-      <div class="cmd-example"><pre><code>ECRIS SOMME 3 4</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS SOMME 3 4
+  -&gt; 7</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-diff">DIFF</a> <a href="#cmd-prod">PROD</a> <a href="#cmd-div">DIV</a></div>
     </div>
   </div>
@@ -810,7 +1173,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : DIF DIFFERENCE</div>
       <p>Différence n1 - n2. Opérateur infixe : -.</p>
-      <div class="cmd-example"><pre><code>ECRIS DIFF 10 4</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS DIFF 10 4
+  -&gt; 6</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-somme">SOMME</a></div>
     </div>
   </div>
@@ -819,7 +1183,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : PRODUCT PRODUIT</div>
       <p>Produit n1 * n2. Opérateur infixe : *.</p>
-      <div class="cmd-example"><pre><code>ECRIS PROD 6 7</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PROD 6 7
+  -&gt; 42</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-div">DIV</a> <a href="#cmd-somme">SOMME</a></div>
     </div>
   </div>
@@ -828,7 +1193,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : DIVISE QUOTIENT</div>
       <p>Quotient n1 / n2 (n2 different de 0). Opérateur infixe : /.</p>
-      <div class="cmd-example"><pre><code>ECRIS DIV 20 4</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS DIV 20 4
+  -&gt; 5</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-prod">PROD</a> <a href="#cmd-quot">QUOT</a> <a href="#cmd-reste">RESTE</a></div>
     </div>
   </div>
@@ -837,7 +1203,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : INTQUOTIENT</div>
       <p>Quotient entier de n1 par n2 (n2 different de 0).</p>
-      <div class="cmd-example"><pre><code>ECRIS QUOT 17 5</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS QUOT 17 5
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-div">DIV</a> <a href="#cmd-reste">RESTE</a></div>
     </div>
   </div>
@@ -846,7 +1213,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : REMAINDER</div>
       <p>Reste de la division entière de n1 par n2 (n2 different de 0).</p>
-      <div class="cmd-example"><pre><code>ECRIS RESTE 17 5</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS RESTE 17 5
+  -&gt; 2</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-div">DIV</a> <a href="#cmd-quot">QUOT</a></div>
     </div>
   </div>
@@ -855,7 +1223,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MOD</div>
       <p>Reste de la division de n1 par n2, du signe de n2 (différent de RESTE pour les négatifs).</p>
-      <div class="cmd-example"><pre><code>ECRIS MODULO -17 5</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MODULO -17 5
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-reste">RESTE</a> <a href="#cmd-div">DIV</a></div>
     </div>
   </div>
@@ -864,7 +1233,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : POWER</div>
       <p>Retourne n1 élevé à la puissance n2.</p>
-      <div class="cmd-example"><pre><code>ECRIS PUISSANCE 2 10</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PUISSANCE 2 10
+  -&gt; 1024</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-rc">
@@ -872,7 +1242,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : RAC RACINE SQRT</div>
       <p>Racine carrée de n (n &gt;= 0).</p>
-      <div class="cmd-example"><pre><code>ECRIS RC 16</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS RC 16
+  -&gt; 4</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-valabs">
@@ -880,7 +1251,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ABS</div>
       <p>Valeur absolue de n.</p>
-      <div class="cmd-example"><pre><code>ECRIS VALABS -7</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS VALABS -7
+  -&gt; 7</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-arrondi">ARRONDI</a> <a href="#cmd-tronque">TRONQUE</a></div>
     </div>
   </div>
@@ -889,7 +1261,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MINUS</div>
       <p>Retourne l&#39;opposé de n (-n).</p>
-      <div class="cmd-example"><pre><code>ECRIS MOINS 5</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS MOINS 5
+  -&gt; -5</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-ent">
@@ -897,7 +1270,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : INT</div>
       <p>Partie entière de n (arrondi vers le bas : ENT -1.5 = -2).</p>
-      <div class="cmd-example"><pre><code>ECRIS ENT 3.7</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS ENT 3.7
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-arrondi">ARRONDI</a> <a href="#cmd-tronque">TRONQUE</a></div>
     </div>
   </div>
@@ -906,7 +1280,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ROUND</div>
       <p>Retourne l&#39;entier le plus proche de n.</p>
-      <div class="cmd-example"><pre><code>ECRIS ARRONDI 3.6</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS ARRONDI 3.6
+  -&gt; 4</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-tronque">TRONQUE</a> <a href="#cmd-ent">ENT</a></div>
     </div>
   </div>
@@ -915,7 +1290,8 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TRUNCATE</div>
       <p>Retourne la partie entière de n (troncature vers zéro).</p>
-      <div class="cmd-example"><pre><code>ECRIS TRONQUE 3.9</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS TRONQUE 3.9
+  -&gt; 3</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-arrondi">ARRONDI</a> <a href="#cmd-ent">ENT</a></div>
     </div>
   </div>
@@ -925,7 +1301,9 @@ ECRIS ( OU FAUX FAUX VRAI )</code></pre></div>
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : RANDOM</div>
       <p>Retourne un entier aléatoire entre 0 et n-1 (n &gt;= 1). Entre parenthèses, (HASARD debut fin) tire entre debut et fin inclus.</p>
       <div class="cmd-example"><pre><code>ECRIS HASARD 6
-ECRIS ( HASARD 1 6 )</code></pre></div>
+  -&gt; 5
+ECRIS ( HASARD 1 6 )
+  -&gt; 6</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-sin">
@@ -933,7 +1311,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : SINUS</div>
       <p>Sinus de n (n en degrés).</p>
-      <div class="cmd-example"><pre><code>ECRIS SIN 30</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS SIN 30
+  -&gt; 0.5</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-cos">COS</a> <a href="#cmd-tangente">TANGENTE</a> <a href="#cmd-arctan">ARCTAN</a></div>
     </div>
   </div>
@@ -942,7 +1321,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : COSINUS</div>
       <p>Cosinus de n (n en degrés).</p>
-      <div class="cmd-example"><pre><code>ECRIS COS 60</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS COS 60
+  -&gt; 0.5</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-sin">SIN</a> <a href="#cmd-tangente">TANGENTE</a> <a href="#cmd-arctan">ARCTAN</a></div>
     </div>
   </div>
@@ -951,7 +1331,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TAN</div>
       <p>Tangente de n (n en degrés).</p>
-      <div class="cmd-example"><pre><code>ECRIS TAN 45</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS TAN 45
+  -&gt; 1</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-sin">SIN</a> <a href="#cmd-cos">COS</a> <a href="#cmd-arctan">ARCTAN</a></div>
     </div>
   </div>
@@ -960,7 +1341,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ARCTANGENTE ATAN</div>
       <p>Arc tangente de n, en degrés.</p>
-      <div class="cmd-example"><pre><code>ECRIS ARCTAN 1</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS ARCTAN 1
+  -&gt; 45</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-tangente">TANGENTE</a> <a href="#cmd-sin">SIN</a> <a href="#cmd-cos">COS</a></div>
     </div>
   </div>
@@ -969,7 +1351,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Exponentielle : e à la puissance n.</p>
-      <div class="cmd-example"><pre><code>ECRIS EXP 1</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS EXP 1
+  -&gt; 2.7182818285</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-ln">LN</a> <a href="#cmd-log10">LOG10</a> <a href="#cmd-puissance">PUISSANCE</a></div>
     </div>
   </div>
@@ -978,7 +1361,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Logarithme naturel de n (n &gt; 0).</p>
-      <div class="cmd-example"><pre><code>ECRIS LN 1</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS LN 1
+  -&gt; 0</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-exp">EXP</a> <a href="#cmd-log10">LOG10</a></div>
     </div>
   </div>
@@ -987,7 +1371,8 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Logarithme en base 10 de n (n &gt; 0).</p>
-      <div class="cmd-example"><pre><code>ECRIS LOG10 100</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS LOG10 100
+  -&gt; 2</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-ln">LN</a> <a href="#cmd-exp">EXP</a></div>
     </div>
   </div>
@@ -996,7 +1381,58 @@ ECRIS ( HASARD 1 6 )</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)</div>
       <p>Retourne la constante pi (3.14159...).</p>
-      <div class="cmd-example"><pre><code>ECRIS PI</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PI
+  -&gt; 3.141592653589793</code></pre></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ouex">
+    <div class="cmd-header"><span class="cmd-name">OUEX</span> <span class="cmd-params">n1 n2</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : XOR</div>
+      <p>Ou exclusif bit à bit de deux entiers positifs (OUEX 6 3 = 5).</p>
+      <div class="cmd-example"><pre><code>ECRIS OUEX 6 3
+  -&gt; 5</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-et">ET</a> <a href="#cmd-ou">OU</a> <a href="#cmd-reste">RESTE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-versbase">
+    <div class="cmd-header"><span class="cmd-name">VERSBASE</span> <span class="cmd-params">n base</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TOBASE</div>
+      <p>Écrit l&#39;entier n dans la base donnée (2 à 36), en majuscules : VERSBASE 255 16 donne FF. Voir HEXA et BINAIRE pour les cas courants.</p>
+      <div class="cmd-example"><pre><code>ECRIS VERSBASE 255 16
+  -&gt; FF</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-depuisbase">DEPUISBASE</a> <a href="#cmd-hexa">HEXA</a> <a href="#cmd-binaire">BINAIRE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-depuisbase">
+    <div class="cmd-header"><span class="cmd-name">DEPUISBASE</span> <span class="cmd-params">mot base</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : FROMBASE</div>
+      <p>Lit le mot comme un nombre écrit dans la base donnée (2 à 36) et retourne sa valeur : DEPUISBASE &#34;FF 16 donne 255.</p>
+      <div class="cmd-example"><pre><code>ECRIS DEPUISBASE &#34;FF 16
+  -&gt; 255</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-versbase">VERSBASE</a> <a href="#cmd-hexa">HEXA</a> <a href="#cmd-binaire">BINAIRE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-hexa">
+    <div class="cmd-header"><span class="cmd-name">HEXA</span> <span class="cmd-params">n</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : HEX</div>
+      <p>Montre l&#39;entier n en hexadécimal (base 16). Raccourci de VERSBASE n 16.</p>
+      <div class="cmd-example"><pre><code>ECRIS HEXA 255
+  -&gt; FF</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-binaire">BINAIRE</a> <a href="#cmd-versbase">VERSBASE</a> <a href="#cmd-depuisbase">DEPUISBASE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-binaire">
+    <div class="cmd-header"><span class="cmd-name">BINAIRE</span> <span class="cmd-params">n</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : BIN</div>
+      <p>Montre l&#39;entier n en binaire (base 2). Raccourci de VERSBASE n 2.</p>
+      <div class="cmd-example"><pre><code>ECRIS BINAIRE 10
+  -&gt; 1010</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-hexa">HEXA</a> <a href="#cmd-versbase">VERSBASE</a> <a href="#cmd-depuisbase">DEPUISBASE</a></div>
     </div>
   </div>
 
@@ -1016,7 +1452,8 @@ DONNE &#34;NOM [ JEAN DUPONT ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : THING</div>
       <p>Retourne la chose (valeur) désignée par mot. :mot est l&#39;abréviation de CHOSE &#34;mot.</p>
-      <div class="cmd-example"><pre><code>DONNE &#34;AGE 10 ECRIS CHOSE &#34;AGE</code></pre></div>
+      <div class="cmd-example"><pre><code>DONNE &#34;AGE 10 ECRIS CHOSE &#34;AGE
+  -&gt; 10</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-donne">DONNE</a></div>
     </div>
   </div>
@@ -1025,7 +1462,8 @@ DONNE &#34;NOM [ JEAN DUPONT ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : NAME? NAMEP</div>
       <p>Retourne VRAI si mot désigne une chose (variable définie).</p>
-      <div class="cmd-example"><pre><code>ECRIS NOM? &#34;AGE</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS NOM? &#34;AGE
+  -&gt; FAUX</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-local">
@@ -1081,7 +1519,8 @@ LOCAL [ X Y ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : PROCEDURE? PROCEDUREP</div>
       <p>Retourne VRAI si mot est le nom d&#39;une procédure utilisateur.</p>
-      <div class="cmd-example"><pre><code>ECRIS PROC? &#34;CARRE</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PROC? &#34;CARRE
+  -&gt; FAUX</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-prim?">
@@ -1089,7 +1528,8 @@ LOCAL [ X Y ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : PRIMITIVE? PRIMITIVEP</div>
       <p>Retourne VRAI si mot est le nom d&#39;une primitive.</p>
-      <div class="cmd-example"><pre><code>ECRIS PRIM? &#34;AVANCE</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PRIM? &#34;AVANCE
+  -&gt; VRAI</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-ed">
@@ -1105,7 +1545,7 @@ LOCAL [ X Y ]</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">DEFINIS</span> <span class="cmd-params">nom texte</span><span class="cmd-kind">commande</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : DEF DEFINE</div>
-      <p>Définit la procédure nom à partir de données (procédures vues comme données, façon Logo adulte). Deux formes acceptées : imbriquée façon UCBLogo, DEFINIS &#34;nom [ [paramètres] [corps] ] ; ou à 3 arguments façon XLogo, DEFINIS &#34;nom [paramètres] [corps]. Inverse de TEXTE.</p>
+      <p>Définit la procédure nom à partir de données (procédures vues comme données, façon Logo étendu). Deux formes acceptées : imbriquée façon UCBLogo, DEFINIS &#34;nom [ [paramètres] [corps] ] ; ou à 3 arguments façon XLogo, DEFINIS &#34;nom [paramètres] [corps]. Inverse de TEXTE.</p>
       <div class="cmd-example"><pre><code>DEFINIS &#34;CARRE [ [ ] [ REPETE 4 [ AV 50 TD 90 ] ] ]
 DEFINIS &#34;POLY [ NB LG ] [ REPETE :NB [ AV :LG TD 360 / :NB ] ]</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-texte">TEXTE</a> <a href="#cmd-pour">POUR</a></div>
@@ -1116,7 +1556,8 @@ DEFINIS &#34;POLY [ NB LG ] [ REPETE :NB [ AV :LG TD 360 / :NB ] ]</code></pre><
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TEXT</div>
       <p>Rend la définition de la procédure nom sous forme de liste [ [paramètres] [corps] ]. Inverse de DEFINIS.</p>
-      <div class="cmd-example"><pre><code>POUR CARRE REPETE 4 [ AV 50 TD 90 ] FIN MONTRE TEXTE &#34;CARRE</code></pre></div>
+      <div class="cmd-example"><pre><code>POUR CARRE REPETE 4 [ AV 50 TD 90 ] FIN MONTRE TEXTE &#34;CARRE
+  -&gt; VOUS VENEZ DE DEFINIR CARRE [[] [REPETE 4 [AV 50 TD 90]]]</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-definis">DEFINIS</a> <a href="#cmd-im">IM</a></div>
     </div>
   </div>
@@ -1128,6 +1569,7 @@ DEFINIS &#34;POLY [ NB LG ] [ REPETE :NB [ AV :LG TD 360 / :NB ] ]</code></pre><
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : IF</div>
       <p>Conditionnelle : exécute liste si pred est VRAI, sinon ne fait rien. Pour un cas « sinon », voir SISINON.</p>
       <div class="cmd-example"><pre><code>SI 2 &gt; 1 [ ECRIS &#34;OUI ]
+  -&gt; OUI
 SI :N = 0 [ ECRIS &#34;ZERO ]</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-sisinon">SISINON</a> <a href="#cmd-tantque">TANTQUE</a> <a href="#cmd-stop">STOP</a></div>
     </div>
@@ -1156,7 +1598,8 @@ REPETE 36 [ AV 20 TD 10 ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : REPCOUNT</div>
       <p>Retourne le numéro de l&#39;itération en cours de REPETE (1 à n), ou -1 hors d&#39;une boucle.</p>
-      <div class="cmd-example"><pre><code>REPETE 3 [ ECRIS COMPTEUR ]</code></pre></div>
+      <div class="cmd-example"><pre><code>REPETE 3 [ ECRIS COMPTEUR ]
+  -&gt; 1 2 3</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-repete">REPETE</a></div>
     </div>
   </div>
@@ -1192,7 +1635,9 @@ REPETE 36 [ AV 20 TD 10 ]</code></pre></div>
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : RUNRESULT</div>
       <p>Exécute liste comme EXEC, mais emballe le résultat : rend [valeur] si c&#39;était une opération, [ ] (liste vide) si c&#39;était une commande. Permet de tester si quelque chose a été rendu.</p>
       <div class="cmd-example"><pre><code>MONTRE EXECRESULTAT [ SOMME 2 3 ]
-MONTRE EXECRESULTAT [ AV 50 ]</code></pre></div>
+  -&gt; [5]
+MONTRE EXECRESULTAT [ AV 50 ]
+  -&gt; []</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-exec">EXEC</a></div>
     </div>
   </div>
@@ -1226,7 +1671,9 @@ MONTRE EXECRESULTAT [ AV 50 ]</code></pre></div>
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : FOREACH</div>
       <p>Exécute instr pour chaque élément de liste (ou caractère d&#39;un mot). Deux formes : notre forme POURCHAQUE liste [instr] avec l&#39;élément courant dans :? ; ou la forme XLogo POURCHAQUE &#34;var liste-ou-mot [instr] avec une variable nommée (:var).</p>
       <div class="cmd-example"><pre><code>POURCHAQUE [ 1 2 3 ] [ ECRIS :? ]
-POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
+  -&gt; 1 2 3
+POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]
+  -&gt; 1 2 3</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-applique">APPLIQUE</a> <a href="#cmd-filtre">FILTRE</a> <a href="#cmd-repetepour">REPETEPOUR</a></div>
     </div>
   </div>
@@ -1235,7 +1682,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : MAP</div>
       <p>Retourne la liste des résultats du gabarit appliqué à chaque élément (:? = élément).</p>
-      <div class="cmd-example"><pre><code>ECRIS APPLIQUE [ 1 2 3 ] [ :? * :? ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS APPLIQUE [ 1 2 3 ] [ :? * :? ]
+  -&gt; 1 4 9</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-filtre">FILTRE</a> <a href="#cmd-reduis">REDUIS</a> <a href="#cmd-pourchaque">POURCHAQUE</a></div>
     </div>
   </div>
@@ -1244,7 +1692,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : FILTER</div>
       <p>Retourne les éléments de liste pour lesquels le prédicat (:?) est VRAI.</p>
-      <div class="cmd-example"><pre><code>ECRIS FILTRE [ 1 2 3 4 ] [ :? &gt; 2 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS FILTRE [ 1 2 3 4 ] [ :? &gt; 2 ]
+  -&gt; 3 4</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-applique">APPLIQUE</a> <a href="#cmd-reduis">REDUIS</a> <a href="#cmd-pourchaque">POURCHAQUE</a></div>
     </div>
   </div>
@@ -1253,7 +1702,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : REDUCE</div>
       <p>Replie la liste en une valeur : :?1 = accumulateur, :?2 = élément courant.</p>
-      <div class="cmd-example"><pre><code>ECRIS REDUIS [ 1 2 3 4 ] [ :?1 + :?2 ]</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS REDUIS [ 1 2 3 4 ] [ :?1 + :?2 ]
+  -&gt; 10</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-applique">APPLIQUE</a> <a href="#cmd-filtre">FILTRE</a></div>
     </div>
   </div>
@@ -1280,7 +1730,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : TEST</div>
       <p>Mémorise le résultat d&#39;un prédicat, pour SIVRAI / SIFAUX.</p>
-      <div class="cmd-example"><pre><code>TESTE 2 &gt; 1 SIVRAI [ ECRIS &#34;OUI ]</code></pre></div>
+      <div class="cmd-example"><pre><code>TESTE 2 &gt; 1 SIVRAI [ ECRIS &#34;OUI ]
+  -&gt; OUI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-sivrai">SIVRAI</a> <a href="#cmd-sifaux">SIFAUX</a> <a href="#cmd-si">SI</a></div>
     </div>
   </div>
@@ -1289,7 +1740,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : IFT IFTRUE</div>
       <p>Exécute instr si le dernier TESTE était VRAI.</p>
-      <div class="cmd-example"><pre><code>TESTE 2 &gt; 1 SIVRAI [ ECRIS &#34;OUI ]</code></pre></div>
+      <div class="cmd-example"><pre><code>TESTE 2 &gt; 1 SIVRAI [ ECRIS &#34;OUI ]
+  -&gt; OUI</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-teste">TESTE</a> <a href="#cmd-sifaux">SIFAUX</a></div>
     </div>
   </div>
@@ -1298,7 +1750,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : IFF IFFALSE</div>
       <p>Exécute instr si le dernier TESTE était FAUX.</p>
-      <div class="cmd-example"><pre><code>TESTE 1 &gt; 2 SIFAUX [ ECRIS &#34;NON ]</code></pre></div>
+      <div class="cmd-example"><pre><code>TESTE 1 &gt; 2 SIFAUX [ ECRIS &#34;NON ]
+  -&gt; NON</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-teste">TESTE</a> <a href="#cmd-sivrai">SIVRAI</a></div>
     </div>
   </div>
@@ -1308,7 +1761,7 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">DONNEPROP</span> <span class="cmd-params">obj prop valeur</span><span class="cmd-kind">commande</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : PPROP</div>
-      <p>Donne à l&#39;objet obj la propriété prop = valeur (listes de propriétés, façon Logo adulte). Remplace si la propriété existe déjà.</p>
+      <p>Donne à l&#39;objet obj la propriété prop = valeur (listes de propriétés, façon Logo étendu). Remplace si la propriété existe déjà.</p>
       <div class="cmd-example"><pre><code>DONNEPROP &#34;TINTIN &#34;AGE 17</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-prop">PROP</a> <a href="#cmd-efprop">EFPROP</a> <a href="#cmd-listeprop">LISTEPROP</a></div>
     </div>
@@ -1318,7 +1771,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : GPROP</div>
       <p>Rend la valeur de la propriété prop de l&#39;objet obj, ou la liste vide [ ] si elle n&#39;existe pas.</p>
-      <div class="cmd-example"><pre><code>DONNEPROP &#34;TINTIN &#34;AGE 17 ECRIS PROP &#34;TINTIN &#34;AGE</code></pre></div>
+      <div class="cmd-example"><pre><code>DONNEPROP &#34;TINTIN &#34;AGE 17 ECRIS PROP &#34;TINTIN &#34;AGE
+  -&gt; 17</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-donneprop">DONNEPROP</a> <a href="#cmd-efprop">EFPROP</a> <a href="#cmd-listeprop">LISTEPROP</a></div>
     </div>
   </div>
@@ -1336,7 +1790,8 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : PLIST</div>
       <p>Rend la liste des propriétés de obj : [ prop1 valeur1 prop2 valeur2 ... ], ou [ ] si obj n&#39;a aucune propriété.</p>
-      <div class="cmd-example"><pre><code>DONNEPROP &#34;TINTIN &#34;AGE 17 MONTRE LISTEPROP &#34;TINTIN</code></pre></div>
+      <div class="cmd-example"><pre><code>DONNEPROP &#34;TINTIN &#34;AGE 17 MONTRE LISTEPROP &#34;TINTIN
+  -&gt; [AGE 17]</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-donneprop">DONNEPROP</a> <a href="#cmd-prop">PROP</a> <a href="#cmd-efprop">EFPROP</a></div>
     </div>
   </div>
@@ -1348,8 +1803,11 @@ POURCHAQUE &#34;I [ 1 2 3 ] [ ECRIS :I ]</code></pre></div>
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : EC PR PRINT</div>
       <p>Écrit obj dans la zone de texte, puis passe à la ligne. Entre parenthèses, écrit plusieurs objets séparés par une espace : (ECRIS a b c).</p>
       <div class="cmd-example"><pre><code>ECRIS 5 + 7
+  -&gt; 12
 ECRIS [ BONJOUR LE MONDE ]
-( ECRIS &#34;VALEUR 42 )</code></pre></div>
+  -&gt; BONJOUR LE MONDE
+( ECRIS &#34;VALEUR 42 )
+  -&gt; VALEUR 42</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-tape">TAPE</a> <a href="#cmd-montre">MONTRE</a></div>
     </div>
   </div>
@@ -1359,7 +1817,9 @@ ECRIS [ BONJOUR LE MONDE ]
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : TYPE</div>
       <p>Écrit obj sans passer à la ligne. Entre parenthèses : (TAPE a b c).</p>
       <div class="cmd-example"><pre><code>TAPE &#34;BONJOUR
-( TAPE &#34;A &#34;B )</code></pre></div>
+  -&gt; BONJOUR
+( TAPE &#34;A &#34;B )
+  -&gt; A B</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-ecris">ECRIS</a> <a href="#cmd-montre">MONTRE</a></div>
     </div>
   </div>
@@ -1368,7 +1828,8 @@ ECRIS [ BONJOUR LE MONDE ]
     <div class="cmd-body">
       <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SHOW</div>
       <p>Comme ECRIS, mais garde les crochets autour des listes : MONTRE [ A B ] affiche [A B]. Variable entre parenthèses.</p>
-      <div class="cmd-example"><pre><code>MONTRE [ A B C ]</code></pre></div>
+      <div class="cmd-example"><pre><code>MONTRE [ A B C ]
+  -&gt; [A B C]</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-ecris">ECRIS</a> <a href="#cmd-tape">TAPE</a></div>
     </div>
   </div>
@@ -1397,7 +1858,8 @@ ME 5</code></pre></div>
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : SETCURSOR</div>
       <p>Place le curseur texte : colonne col (0-39) et ligne lig (0-24). Le prochain ECRIS/TAPE écrit à cet endroit.</p>
       <div class="cmd-example"><pre><code>FCURS [ 10 5 ]
-VT FCURS [ 0 24 ] TAPE &#34;BAS</code></pre></div>
+VT FCURS [ 0 24 ] TAPE &#34;BAS
+  -&gt; BAS</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-me">ME</a> <a href="#cmd-vt">VT</a></div>
     </div>
   </div>
@@ -1565,7 +2027,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : CONTENTS</div>
       <p>Retourne la liste de tous les mots connus (procédures et noms).</p>
-      <div class="cmd-example"><pre><code>ECRIS CONTENU</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS CONTENU
+  -&gt; .CHB .DEP .EFT .EXA .RES .ROUT .SER AIDE AJOUTE ANGLAIS ANIME APPLIQUE ARC ARCTAN ARRONDI ASCII ATAN ATTENDS AV AVANCE AVANT? BC BC? BINAIRE BOUTON? CADENCE CAP CAR CATALOGUE CATALOGUEEX CC CERCLE CF CHARGE CHARGEEX CHOSE CLOS COLLISION? COMPTE COMPTEUR CONTACT CONTACT? CONTENU COPIE COPIETABLEAU COS COSINUS CR CT DECOUPE DEF DEFILE DEFINIS DEFSPRITE DEMANDE DEPILE DEPUISBASE DER DERNIER DETRUIS DIF DIFF DISTANCE DISTORTUE DIV DIVISE DONNE DONNEPROP DUREE EC ECH ECRIS ED EFN EFP EFPROP EGAL? EMPILE ENFILE ENR ENT ENTREE ET ETIQUETTE EXEC EXECRESULTAT EXP FAUX FCAP FCB FCC FCFG FCFT FCR FCT FCURS FECH FEN FERME FERMETOUT FICHIERVERSTABLEAU FILTRE FIN FINFICHIER? FINLIGNE FIXE FIXEECRITURE FIXEFINLIGNE FIXEITEM FIXEITEMMD FIXELECTURE FIXEPOSECRITURE FIXEPOSLECTURE FIXETAILLECRAYON FIXETORTUE FLECTEUR FLI FLUXECRITURE FLUXLECTURE FORMATE FPOS FR FRANCAIS FXY HASARD HEXA IM IMNS IMTOUT IMTS INIT INVERSE ITEM ITEMMD JOUE LANCE LC LECTEUR LIS LISCAR LISCARS LISLIGNE LISMOT LISTE LISTE? LISTEPROP LISTEVERSTABLEAU LL LN LOCAL LOG10 LOGO MAJUSCULE MANETTE MD ME MEMBRE MEMBRE? METSDERNIER METSPREMIER MINUSCULE MODULO MOINS MONTRE MOT MOT? MP MT NBTORTUES NETTOIE NOM? NOMBRE? NON OCTAVE ORDONNE ORIGINE OTE OTETOUT OU OUEX OUVREAJOUT OUVREECRITURE OUVRELECTURE OUVREMAJ PH PHRASE PI PIEGE PIOCHE PLACE PLG? PLP? POINT POS POSECRITURE POSITION POSLECTURE POSOPT POUR POURCHAQUE PREM PREMIER PRIM? PROC? PROD PRODUIT PROP PUISSANCE QUITTE QUITTER QUOT RAC RACINE RAMENE RAMENEEX RAZ RC RE RECULE RECYCLE REDUIS REGLE REMPLACE REMPLIS RENDS REPETE REPETEPOUR RESTE RET RETOURNE ROGNE ROGNEDEBUT ROGNEFIN SANSDOUBLONS SAUFDERNIER SAUFPREMIER SAUVE SAUVED SAUVEPNG SCENE SD SI SIFAUX SIN SINUS SISINON SIVRAI SOMME SORTIE SOURISPOS SOURISPRESSEE SOUSCHAINE? SP SPRITE STOP STOPANIME STOPTOUT SUBSTITUE TABLEAU TABLEAU? TABLEAUMD TABLEAUVERSLISTE TAN TANGENTE TANTQUE TAPE TD TEMPO TESTE TEXTE TG TIMBRE TORTUE TOUCHE? TOURNEDROITE TOURNEGAUCHE TOUSOUVERTS TRANCHE TRIE TRONQUE VALABS VE VERSBASE VERSCAP VIDE? VISIBLE? VRAI VT XCOR YCOR</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-im">
@@ -1635,7 +2098,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : NODES</div>
       <p>Retourne le nombre de cellules mémoire disponibles.</p>
-      <div class="cmd-example"><pre><code>ECRIS PLACE</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS PLACE
+  -&gt; 60000</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-recycle">
@@ -1697,7 +2161,7 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">DETRUIS</span> <span class="cmd-params">mot</span><span class="cmd-kind">commande</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : ERASEFILE</div>
-      <p>Supprime définitivement le fichier mot.</p>
+      <p>Supprime définitivement le fichier mot. Refuse de supprimer un fichier ouvert.</p>
       <div class="cmd-example"><pre><code>DETRUIS &#34;DESSIN</code></pre></div>
       <div class="cmd-aliases">Voir aussi : <a href="#cmd-catalogue">CATALOGUE</a> <a href="#cmd-efp">EFP</a></div>
     </div>
@@ -1759,7 +2223,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Compatibilité (sans effet)  ·  Alias : DRIVE</div>
       <p>Retournait le lecteur de disquette courant. Sans objet ici (rend 1).</p>
-      <div class="cmd-example"><pre><code>ECRIS LECTEUR</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS LECTEUR
+  -&gt; 1</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-flecteur">
@@ -1768,6 +2233,203 @@ TIMBRE 200</code></pre></div>
       <div class="cmd-aliases">Compatibilité (sans effet)  ·  Alias : SETDRIVE</div>
       <p>Choisissait le lecteur de disquette. Sans effet ici.</p>
       <div class="cmd-example"><pre><code>FLECTEUR 0</code></pre></div>
+    </div>
+  </div>
+
+  <h2 id="fichiers-donnees">Fichiers de données (flux)</h2>
+  <div class="cmd-entry" id="cmd-ouvrelecture">
+    <div class="cmd-header"><span class="cmd-name">OUVRELECTURE</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : OPENREAD</div>
+      <p>Ouvre le fichier en lecture (position au début). Erreur si le fichier est introuvable ou déjà ouvert. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixelecture">FIXELECTURE</a> <a href="#cmd-ferme">FERME</a> <a href="#cmd-lisligne">LISLIGNE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ouvreecriture">
+    <div class="cmd-header"><span class="cmd-name">OUVREECRITURE</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : OPENWRITE</div>
+      <p>Ouvre le fichier en écriture, en écrasant son contenu existant SANS demander confirmation (fidélité FMSLogo). Le crée s&#39;il n&#39;existe pas. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVREECRITURE &#34;SORTIE.TXT FERME &#34;SORTIE.TXT</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixeecriture">FIXEECRITURE</a> <a href="#cmd-ferme">FERME</a> <a href="#cmd-ouvreajout">OUVREAJOUT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ouvreajout">
+    <div class="cmd-header"><span class="cmd-name">OUVREAJOUT</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : OPENAPPEND</div>
+      <p>Ouvre le fichier en écriture, position à la fin (ajout). Le crée s&#39;il n&#39;existe pas. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVREAJOUT &#34;JOURNAL.TXT FERME &#34;JOURNAL.TXT</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ouvreecriture">OUVREECRITURE</a> <a href="#cmd-fixeecriture">FIXEECRITURE</a> <a href="#cmd-ferme">FERME</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ouvremaj">
+    <div class="cmd-header"><span class="cmd-name">OUVREMAJ</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : OPENUPDATE</div>
+      <p>Ouvre le fichier en lecture ET écriture (une seule position, partagée). Le crée s&#39;il n&#39;existe pas. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVREMAJ &#34;DESSIN.GLG FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ouvrelecture">OUVRELECTURE</a> <a href="#cmd-ouvreecriture">OUVREECRITURE</a> <a href="#cmd-poslecture">POSLECTURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-ferme">
+    <div class="cmd-header"><span class="cmd-name">FERME</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : CLOSE</div>
+      <p>Ferme le fichier. S&#39;il était le flux de lecture/écriture courant, on repasse au clavier/à la console. Erreur si le fichier n&#39;est pas ouvert. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fermetout">FERMETOUT</a> <a href="#cmd-ouvrelecture">OUVRELECTURE</a> <a href="#cmd-tousouverts">TOUSOUVERTS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fermetout">
+    <div class="cmd-header"><span class="cmd-name">FERMETOUT</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : CLOSEALL</div>
+      <p>Ferme tous les fichiers ouverts. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FERMETOUT</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ferme">FERME</a> <a href="#cmd-tousouverts">TOUSOUVERTS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-tousouverts">
+    <div class="cmd-header"><span class="cmd-name">TOUSOUVERTS</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : ALLOPEN</div>
+      <p>Retourne la liste des noms des fichiers actuellement ouverts. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE TOUSOUVERTS
+  -&gt; []</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ferme">FERME</a> <a href="#cmd-fermetout">FERMETOUT</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixelecture">
+    <div class="cmd-header"><span class="cmd-name">FIXELECTURE</span> <span class="cmd-params">nomfichier ou liste</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SETREAD</div>
+      <p>Choisit le flux de lecture courant : LISCAR/LISMOT/LL/LISLIGNE liront dans ce fichier. Une liste vide [ ] revient au clavier. Erreur si le fichier n&#39;est pas ouvert en lecture. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FIXELECTURE &#34;DESSIN.GLG FIXELECTURE [ ] FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ouvrelecture">OUVRELECTURE</a> <a href="#cmd-fluxlecture">FLUXLECTURE</a> <a href="#cmd-lisligne">LISLIGNE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixeecriture">
+    <div class="cmd-header"><span class="cmd-name">FIXEECRITURE</span> <span class="cmd-params">nomfichier ou liste</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SETWRITE</div>
+      <p>Choisit le flux d&#39;écriture courant : ECRIS/MONTRE/TAPE écriront dans ce fichier. Une liste vide [ ] revient à la console. Erreur si le fichier n&#39;est pas ouvert en écriture. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVREECRITURE &#34;SORTIE.TXT FIXEECRITURE &#34;SORTIE.TXT FIXEECRITURE [ ] FERME &#34;SORTIE.TXT</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-ouvreecriture">OUVREECRITURE</a> <a href="#cmd-fluxecriture">FLUXECRITURE</a> <a href="#cmd-ecris">ECRIS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fluxlecture">
+    <div class="cmd-header"><span class="cmd-name">FLUXLECTURE</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : READER</div>
+      <p>Retourne le nom du flux de lecture courant, ou [ ] si c&#39;est le clavier. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE FLUXLECTURE
+  -&gt; []</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixelecture">FIXELECTURE</a> <a href="#cmd-fluxecriture">FLUXECRITURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fluxecriture">
+    <div class="cmd-header"><span class="cmd-name">FLUXECRITURE</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : WRITER</div>
+      <p>Retourne le nom du flux d&#39;écriture courant, ou [ ] si c&#39;est la console. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>MONTRE FLUXECRITURE
+  -&gt; []</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixeecriture">FIXEECRITURE</a> <a href="#cmd-fluxlecture">FLUXLECTURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-finfichier?">
+    <div class="cmd-header"><span class="cmd-name">FINFICHIER?</span><span class="cmd-kind">prédicat</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : EOF? EOFP</div>
+      <p>Retourne VRAI s&#39;il n&#39;y a plus rien à lire dans le flux de lecture courant. Au clavier, retourne toujours FAUX. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>ECRIS FINFICHIER?
+  -&gt; FAUX</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-lisligne">LISLIGNE</a> <a href="#cmd-fixelecture">FIXELECTURE</a> <a href="#cmd-liscar">LISCAR</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-poslecture">
+    <div class="cmd-header"><span class="cmd-name">POSLECTURE</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : READPOS</div>
+      <p>Retourne la position d&#39;octet courante en lecture, ou -1 si le flux est le clavier. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>ECRIS POSLECTURE
+  -&gt; -1</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixeposlecture">FIXEPOSLECTURE</a> <a href="#cmd-posecriture">POSECRITURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-posecriture">
+    <div class="cmd-header"><span class="cmd-name">POSECRITURE</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : WRITEPOS</div>
+      <p>Retourne la position d&#39;octet courante en écriture, ou -1 si le flux est la console. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>ECRIS POSECRITURE
+  -&gt; -1</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixeposecriture">FIXEPOSECRITURE</a> <a href="#cmd-poslecture">POSLECTURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixeposlecture">
+    <div class="cmd-header"><span class="cmd-name">FIXEPOSLECTURE</span> <span class="cmd-params">octet</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SETREADPOS</div>
+      <p>Déplace le pointeur de lecture du flux courant à la position octet (à partir de 0). Erreur si la position est hors fichier ou au milieu d&#39;un caractère. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FIXELECTURE &#34;DESSIN.GLG FIXEPOSLECTURE 0 FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-poslecture">POSLECTURE</a> <a href="#cmd-fixeposecriture">FIXEPOSECRITURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixeposecriture">
+    <div class="cmd-header"><span class="cmd-name">FIXEPOSECRITURE</span> <span class="cmd-params">octet</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SETWRITEPOS</div>
+      <p>Déplace le pointeur d&#39;écriture du flux courant à la position octet (à partir de 0). Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVREECRITURE &#34;SORTIE.TXT FIXEECRITURE &#34;SORTIE.TXT FIXEPOSECRITURE 0 FERME &#34;SORTIE.TXT</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-posecriture">POSECRITURE</a> <a href="#cmd-fixeposlecture">FIXEPOSLECTURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-lisligne">
+    <div class="cmd-header"><span class="cmd-name">LISLIGNE</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : READRAWLINE</div>
+      <p>Lit une ligne brute du flux de lecture courant et la retourne comme un seul mot (aucune interprétation). C&#39;est LE bon récepteur pour parcourir un fichier ligne par ligne. [ ] en fin de fichier. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FIXELECTURE &#34;DESSIN.GLG ECRIS LISLIGNE FIXELECTURE [ ] FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-fixelecture">FIXELECTURE</a> <a href="#cmd-finfichier?">FINFICHIER?</a> <a href="#cmd-liscars">LISCARS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-liscars">
+    <div class="cmd-header"><span class="cmd-name">LISCARS</span> <span class="cmd-params">n</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : RCS READCHARS</div>
+      <p>Lit n caractères du flux de lecture courant et les retourne comme un mot. [ ] en fin de fichier. Repris de FMSLogo.</p>
+      <div class="cmd-example"><pre><code>OUVRELECTURE &#34;DESSIN.GLG FIXELECTURE &#34;DESSIN.GLG ECRIS LISCARS 4 FIXELECTURE [ ] FERME &#34;DESSIN.GLG</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-lisligne">LISLIGNE</a> <a href="#cmd-liscar">LISCAR</a> <a href="#cmd-fixelecture">FIXELECTURE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fichierverstableau">
+    <div class="cmd-header"><span class="cmd-name">FICHIERVERSTABLEAU</span> <span class="cmd-params">nomfichier</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : FILETOARRAY</div>
+      <p>Charge tout un fichier texte d&#39;un coup et retourne un tableau dont chaque case est une ligne (1re ligne en case 1). COMPTE donne le nombre de lignes, pour itérer facilement. Ouvre, lit et ferme le fichier tout seul. Refuse un fichier binaire (FICHIER BINAIRE). Extension gologo.</p>
+      <div class="cmd-example"><pre><code>MONTRE FICHIERVERSTABLEAU &#34;DESSIN.GLG
+DONNE &#34;L FICHIERVERSTABLEAU &#34;DESSIN.GLG ECRIS COMPTE :L</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-lisligne">LISLIGNE</a> <a href="#cmd-tableau">TABLEAU</a> <a href="#cmd-compte">COMPTE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-fixefinligne">
+    <div class="cmd-header"><span class="cmd-name">FIXEFINLIGNE</span> <span class="cmd-params">&#34;LF ou &#34;CRLF</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : SETEOL</div>
+      <p>Choisit la fin de ligne écrite dans les fichiers : &#34;LF (défaut, façon Unix) ou &#34;CRLF (façon Windows). La lecture accepte toujours les deux. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>FIXEFINLIGNE &#34;CRLF</code></pre></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-finligne">
+    <div class="cmd-header"><span class="cmd-name">FINLIGNE</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : EOL</div>
+      <p>Retourne le réglage courant de fin de ligne : &#34;LF ou &#34;CRLF. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS FINLIGNE
+  -&gt; LF</code></pre></div>
     </div>
   </div>
 
@@ -1849,7 +2511,8 @@ TIMBRE 200</code></pre></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Compatibilité (sans effet)</div>
       <p>Lisait un octet en mémoire. Compatibilité : rend toujours 0.</p>
-      <div class="cmd-example"><pre><code>ECRIS .EXA 0</code></pre></div>
+      <div class="cmd-example"><pre><code>ECRIS .EXA 0
+  -&gt; 0</code></pre></div>
     </div>
   </div>
 

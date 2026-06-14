@@ -286,6 +286,16 @@
 <span class="kw">PRINT</span> <span class="kw">COS</span> <span class="num">60</span>         <span class="cmt">; cosine of 60 degrees -> 0.5</span>
 <span class="kw">PRINT</span> <span class="kw">PI</span>             <span class="cmt">; the constant pi -> 3.14159...</span></code></pre>
 
+  <div class="note">
+    <strong>Precedence: a function «&nbsp;swallows&nbsp;» the expression that follows it.</strong>
+    A prefix function (such as <code>COUNT</code>, <code>INT</code>,
+    <code>ABS</code>, <code>SQRT</code>...) takes as its argument the <em>whole</em>
+    expression to its right, operators included. So <code>COUNT :WORD - 1</code> is
+    read as <code>COUNT ( :WORD - 1 )</code>, not <code>( COUNT :WORD ) - 1</code>.
+    To subtract 1 <em>from the function's result</em>, add parentheses:
+    <code>( COUNT :WORD ) - 1</code>. When in doubt, parenthesise the call.
+  </div>
+
   <h3>Words</h3>
 
   <p>A word is a string of characters. To write a literal word, you put a quote
@@ -326,6 +336,72 @@
 <span class="kw">PRINT</span> <span class="kw">LIST</span> <span class="str">"A</span> <span class="str">"B</span>              <span class="cmt">; builds [A B]</span>
 <span class="kw">PRINT</span> <span class="kw">REVERSE</span> [ <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> ]        <span class="cmt">; -> [C B A]</span>
 <span class="kw">PRINT</span> <span class="kw">SORT</span> [ <span class="num">3</span> <span class="num">1</span> <span class="num">2</span> ]           <span class="cmt">; -> [1 2 3]</span></code></pre>
+
+  <h3>Arrays</h3>
+
+  <p>Beyond the three basic types, GoLogo also offers <strong>arrays</strong>. A list is
+  flexible, but to reach its hundredth element you have to walk past the ninety-nine
+  before it. An array gives <em>direct</em> access to any cell by its number, and you can
+  change a cell in place. It is the right tool as soon as you juggle many values pinned
+  to a position&nbsp;: a score table, a game board, a grid.</p>
+
+  <p><code>ARRAY n</code> builds an array of <code>n</code> cells, numbered from 1 (each
+  cell starts out as the empty list). You read a cell with <code>ITEM</code>, change it
+  with <code>SETITEM</code>, and <code>COUNT</code> gives the number of cells&nbsp;:</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"SCORES</span> <span class="kw">ARRAY</span> <span class="num">3</span>
+<span class="kw">SETITEM</span> <span class="num">1</span> <span class="var">:SCORES</span> <span class="num">50</span>       <span class="cmt">; store 50 in cell 1</span>
+<span class="kw">SETITEM</span> <span class="num">2</span> <span class="var">:SCORES</span> <span class="num">80</span>
+<span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="num">2</span> <span class="var">:SCORES</span>       <span class="cmt">; -> 80</span>
+<span class="kw">PRINT</span> <span class="kw">COUNT</span> <span class="var">:SCORES</span>         <span class="cmt">; -> 3</span></code></pre>
+
+  <p>You can also write an array directly between braces. By default the first cell is
+  numbered 1&nbsp;; to start at 0 (often handier when you compute indices), add
+  <code>@0</code> right after the closing brace&nbsp;:</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"DAYS</span> { <span class="str">MON</span> <span class="str">TUE</span> <span class="str">WED</span> <span class="str">THU</span> <span class="str">FRI</span> }
+<span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="num">3</span> <span class="var">:DAYS</span>          <span class="cmt">; -> WED</span>
+<span class="kw">MAKE</span> <span class="str">"T</span> { <span class="str">A</span> <span class="str">B</span> <span class="str">C</span> }@<span class="num">0</span>            <span class="cmt">; cells numbered 0, 1, 2</span>
+<span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="num">0</span> <span class="var">:T</span>             <span class="cmt">; -> A</span></code></pre>
+
+  <div class="attention">
+    <strong>An array is shared, a list is copied.</strong> Unlike lists, an array is
+    passed <em>by reference</em>. If you write <code>MAKE "U :SCORES</code>, then
+    <code>:U</code> and <code>:SCORES</code> point to the <em>same</em> array, and a
+    <code>SETITEM</code> on one shows up on the other. This is on purpose (it avoids
+    copying a big array each time it is passed to a procedure), but it catches you out
+    the first time. To get a truly independent copy, use <code>COPYARRAY</code>.
+  </div>
+
+  <p>A few handy companions&nbsp;: <code>ARRAY? :X</code> tells whether <code>:X</code> is
+  an array, <code>SORTARRAY :T</code> sorts its cells in place, and the two bridges
+  <code>LISTTOARRAY</code> and <code>ARRAYTOLIST</code> move from one to the other. The
+  latter is useful to process an array with <code>FOREACH</code> or <code>MAP</code>,
+  which work on lists.</p>
+
+  <p>For a two-dimensional grid (a checkerboard, a maze, a screen of dots),
+  <code>MDARRAY</code> builds a multi-dimensional array, and <code>MDITEM</code> /
+  <code>MDSETITEM</code> reach a cell through a list of indices&nbsp;:</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"GRID</span> <span class="kw">MDARRAY</span> [ <span class="num">3</span> <span class="num">3</span> ]       <span class="cmt">; 3 by 3</span>
+<span class="kw">MDSETITEM</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:GRID</span> <span class="str">"X</span>        <span class="cmt">; the middle cell</span>
+<span class="kw">PRINT</span> <span class="kw">MDITEM</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:GRID</span>        <span class="cmt">; -> X</span></code></pre>
+
+  <h3>Stacks and queues</h3>
+
+  <p>Two small but handy tools work on a <em>variable</em> that holds a list (the empty
+  list <code>[ ]</code> to start with). A <strong>stack</strong> pushes and pops at the
+  same end, so the last in is the first out&nbsp;; a <strong>queue</strong> adds at one
+  end and removes at the other, so first in, first out.</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"P</span> [ ]
+<span class="kw">PUSH</span> <span class="str">"P</span> <span class="num">1</span>   <span class="kw">PUSH</span> <span class="str">"P</span> <span class="num">2</span>   <span class="kw">PUSH</span> <span class="str">"P</span> <span class="num">3</span>
+<span class="kw">PRINT</span> <span class="kw">POP</span> <span class="str">"P</span>         <span class="cmt">; -> 3  (the last pushed)</span>
+<span class="kw">PRINT</span> <span class="kw">POP</span> <span class="str">"P</span>         <span class="cmt">; -> 2</span>
+
+<span class="kw">MAKE</span> <span class="str">"F</span> [ ]
+<span class="kw">QUEUE</span> <span class="str">"F</span> <span class="str">"A</span>   <span class="kw">QUEUE</span> <span class="str">"F</span> <span class="str">"B</span>
+<span class="kw">PRINT</span> <span class="kw">DEQUEUE</span> <span class="str">"F</span>     <span class="cmt">; -> A  (the first in)</span></code></pre>
 
   <h3>Printing objects</h3>
 
@@ -405,11 +481,89 @@
 <span class="kw">PRINT</span> <span class="kw">DOUBLE</span> <span class="num">5</span>       <span class="cmt">; -> 10</span>
 <span class="kw">FD</span> <span class="kw">DOUBLE</span> <span class="num">30</span>          <span class="cmt">; forward 60 steps</span></code></pre>
 
-  <h3>Local variables</h3>
+  <!-- ============================================================ -->
+  <h2 id="scope">5. Variable scope&nbsp;: local or global&nbsp;?</h2>
 
-  <p>Inside a procedure, it is often useful to declare local variables, variables that
-  only exist in that procedure and do not affect global variables of the same
-  name&nbsp;:</p>
+  <p>Here is a point that often surprises beginners, and yet it is at the heart of how
+  Logo works. <strong>By default, a variable created with <code>MAKE</code> is
+  global</strong>&nbsp;: it exists everywhere, including inside other procedures. That is
+  handy, but it hides a trap.</p>
+
+  <h3>The trap&nbsp;: one procedure can overwrite another's variable</h3>
+
+  <p>Imagine two procedures that each use a variable named <code>RES</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> TRIPLE <span class="var">:X</span>
+  <span class="kw">MAKE</span> <span class="str">"RES</span> <span class="var">:X</span> * <span class="num">3</span>
+  <span class="kw">OUTPUT</span> <span class="var">:RES</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> COMPUTE
+  <span class="kw">MAKE</span> <span class="str">"RES</span> <span class="num">100</span>
+  <span class="kw">PRINT</span> <span class="kw">TRIPLE</span> <span class="num">5</span>    <span class="cmt">; -> 15</span>
+  <span class="kw">PRINT</span> <span class="var">:RES</span>         <span class="cmt">; -> 15  (not 100 !)</span>
+<span class="kw">END</span></code></pre>
+
+  <p>We expected <code>:RES</code> to still be <code>100</code> at the end of
+  <code>COMPUTE</code>. But since <code>TRIPLE</code> did <code>MAKE "RES</code> on the
+  <em>same</em> global variable, it replaced <code>COMPUTE</code>'s <code>100</code> with
+  <code>15</code>. The called procedure quietly damaged a variable of the calling
+  one.</p>
+
+  <h3>The fix&nbsp;: <code>LOCAL</code></h3>
+
+  <p><code>LOCAL "RES</code> tells GoLogo&nbsp;: «&nbsp;inside this procedure,
+  <code>RES</code> is mine, I won't touch anyone else's&nbsp;». One line changes
+  everything&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> TRIPLE <span class="var">:X</span>
+  <span class="kw">LOCAL</span> <span class="str">"RES</span>           <span class="cmt">; RES becomes private to TRIPLE</span>
+  <span class="kw">MAKE</span> <span class="str">"RES</span> <span class="var">:X</span> * <span class="num">3</span>
+  <span class="kw">OUTPUT</span> <span class="var">:RES</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> COMPUTE
+  <span class="kw">MAKE</span> <span class="str">"RES</span> <span class="num">100</span>
+  <span class="kw">PRINT</span> <span class="kw">TRIPLE</span> <span class="num">5</span>    <span class="cmt">; -> 15</span>
+  <span class="kw">PRINT</span> <span class="var">:RES</span>         <span class="cmt">; -> 100  (preserved !)</span>
+<span class="kw">END</span></code></pre>
+
+  <p>Now each <code>RES</code> lives in its own procedure&nbsp;: <code>TRIPLE</code>'s one
+  disappears as soon as it is done, <code>COMPUTE</code>'s one stays intact.</p>
+
+  <h3>The same trap in a loop</h3>
+
+  <p>It is even sneakier when the caller uses a loop variable such as <code>I</code> and a
+  called procedure overwrites that same <code>I</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> DISP <span class="var">:X</span>
+  <span class="kw">MAKE</span> <span class="str">"I</span> <span class="var">:X</span> * <span class="num">10</span>      <span class="cmt">; oops: I is also the caller's loop variable</span>
+  <span class="kw">PRINT</span> <span class="var">:I</span>
+<span class="kw">END</span>
+
+<span class="kw">TO</span> LOOP
+  <span class="kw">FOR</span> [ I <span class="num">1</span> <span class="num">3</span> ] [ <span class="kw">DISP</span> <span class="var">:I</span>   <span class="kw">PRINT</span> <span class="var">:I</span> ]
+<span class="kw">END</span>
+
+<span class="kw">LOOP</span>     <span class="cmt">; prints 10 10 20 20 30 30 (the second number should be 1 2 3 !)</span></code></pre>
+
+  <p>Adding <code>LOCAL "I</code> inside <code>DISP</code> brings the loop back to its
+  senses&nbsp;: <code>10 1 20 2 30 3</code>. <strong>Simple rule&nbsp;: any working
+  variable (counter, total, intermediate result) created inside a procedure deserves a
+  <code>LOCAL</code>.</strong></p>
+
+  <div class="conseil">
+    <strong>Good news&nbsp;: parameters are already local.</strong> A procedure's
+    parameters (the <code>:N</code> in <code>TO DOUBLE :N</code>) are
+    <em>automatically</em> private&nbsp;: changing them never touches a global variable of
+    the same name. <code>LOCAL</code> is only needed for variables <em>you</em> create
+    with <code>MAKE</code> inside the procedure.
+  </div>
+
+  <h3>A well-written example</h3>
+
+  <p>A tidy procedure declares its working variables as local right from the
+  start&nbsp;:</p>
 
   <pre><code><span class="kw">TO</span> APPROX_CIRCLE <span class="var">:R</span>
   <span class="kw">LOCAL</span> <span class="str">"STEP</span>
@@ -417,8 +571,15 @@
   <span class="kw">REPEAT</span> <span class="num">360</span> [ <span class="kw">FD</span> <span class="var">:STEP</span> <span class="kw">RT</span> <span class="num">1</span> ]
 <span class="kw">END</span></code></pre>
 
+  <div class="note">
+    <strong>Why this behaviour&nbsp;?</strong> This «&nbsp;dynamic&nbsp;» scope (global by
+    default, <code>LOCAL</code> to reserve a name) is the one of the original Logo, and
+    GoLogo stays faithful to it. The <code>LOCAL</code> habit is part of the language's
+    basics.
+  </div>
+
   <!-- ============================================================ -->
-  <h2 id="loops">5. Loops</h2>
+  <h2 id="loops">6. Loops</h2>
 
   <h3>REPEAT</h3>
 
@@ -473,7 +634,7 @@
 ]</code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="conditionals">6. Conditionals</h2>
+  <h2 id="conditionals">7. Conditionals</h2>
 
   <h3>IF</h3>
 
@@ -504,8 +665,24 @@
   <pre><code><span class="kw">IF</span> <span class="kw">AND</span> <span class="kw">LESS?</span> <span class="num">0</span> <span class="var">:N</span> <span class="kw">GREATER?</span> <span class="num">100</span> <span class="var">:N</span> [ <span class="kw">PRINT</span> <span class="str">"BETWEEN_0_AND_100</span> ]
 <span class="kw">IF</span> <span class="kw">NOT</span> <span class="kw">EMPTY?</span> <span class="var">:LIST</span> [ <span class="kw">PRINT</span> <span class="kw">FIRST</span> <span class="var">:LIST</span> ]</code></pre>
 
+  <h3>Comparisons and letter case</h3>
+
+  <p>Word comparisons <strong>ignore letter case</strong>:
+  <code>EQUAL? "a "A</code> returns <code>TRUE</code>. The same holds for
+  <code>=</code>, <code>BEFORE?</code>, <code>SUBSTRING?</code> and
+  <code>MEMBER?</code>. This is usually convenient, but a problem when case carries
+  meaning, for instance to tell an <code>a</code> cell apart from an
+  <code>A</code> cell in a grid.</p>
+
+  <div class="note">
+    <strong>When case matters:</strong> compare the character <em>codes</em> with
+    <code>ASCII</code> rather than the characters themselves.
+    <code>EQUAL? ASCII :C1 ASCII :C2</code> is true only for two strictly identical
+    characters (<code>ASCII "a</code> is 97, <code>ASCII "A</code> is 65).
+  </div>
+
   <!-- ============================================================ -->
-  <h2 id="recursion">7. Recursion</h2>
+  <h2 id="recursion">8. Recursion</h2>
 
   <p>In Logo, a procedure can <em>call itself</em>. This is called <strong>recursion</strong>.
   It is the ideal tool for structures that repeat at different scales.</p>
@@ -538,7 +715,7 @@
   </div>
 
   <!-- ============================================================ -->
-  <h2 id="flow">8. Controlling the flow inside a procedure</h2>
+  <h2 id="flow">9. Controlling the flow inside a procedure</h2>
 
   <p>Three instructions let you leave a procedure while it is running&nbsp;:</p>
 
@@ -562,7 +739,7 @@
 <span class="kw">END</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="graphics">9. Advanced graphics</h2>
+  <h2 id="graphics">10. Advanced graphics</h2>
 
   <h3>Circle and arc</h3>
 
@@ -600,7 +777,7 @@
   <pre><code><span class="kw">SAVEPNG</span> <span class="str">"MY_DRAWING</span>         <span class="cmt">; saves as MY_DRAWING.PNG</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="text">10. Text area and printing</h2>
+  <h2 id="text">11. Text area and printing</h2>
 
   <p>Outside the graphics field, GoLogo has a text area with a grid of 40 columns by
   25 lines. That is where the <code>PRINT</code> and <code>TYPE</code> commands
@@ -613,7 +790,7 @@
 <span class="kw">SETTEXTCOLOR</span> <span class="num">3</span>      <span class="cmt">; text in yellow</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="keyboard">11. Reading the keyboard and the mouse</h2>
+  <h2 id="keyboard">12. Reading the keyboard and the mouse</h2>
 
   <h3>Keyboard</h3>
 
@@ -632,7 +809,7 @@
 <span class="kw">IF</span> <span class="kw">MOUSEDOWN?</span> [ <span class="kw">PRINT</span> <span class="str">"CLICK</span> ]</code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="music">12. Music</h2>
+  <h2 id="music">13. Music</h2>
 
   <p>GoLogo can play notes. Notes are written with their solfège names&nbsp;:</p>
 
@@ -649,7 +826,7 @@
 <span class="kw">PLAY</span> [ <span class="str">DO</span> <span class="str">MI</span> <span class="str">SOL</span> <span class="str">DO</span> ]</code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="files">13. Files</h2>
+  <h2 id="files">14. Files</h2>
 
   <p>Logo files (<code>.GLG</code>) are stored in the <code>~/Logo/</code> folder on
   Linux/macOS, or in <code>Documents\Logo\</code> on Windows. There is no need to give
@@ -674,8 +851,60 @@
   <p>The location of the examples directory depends on the system (it is installed with
   GoLogo). If the directory or the requested file cannot be found, the command says so.</p>
 
+  <h3>Reading and writing data files</h3>
+
+  <p>Everything above is about <em>program</em> files. But you often need to read or
+  write your own <strong>data</strong>&nbsp;: a list of scores, some text, numbers to
+  process. GoLogo then works with <strong>streams</strong>, the FMSLogo way. The idea is
+  simple&nbsp;: you open a file, make it the current stream, and the usual reading
+  commands (<code>READCHAR</code>, <code>READWORD</code>, <code>READLIST</code>, and
+  above all <code>READRAWLINE</code>) read from it instead of the keyboard. Writing works
+  the same way&nbsp;: once a file is the current write stream, <code>PRINT</code>,
+  <code>TYPE</code> and <code>SHOW</code> write into it rather than to the screen.</p>
+
+  <p>To go through a text file line by line, the usual pattern is a <code>WHILE</code>
+  loop that stops at the end of the file, detected by <code>EOF?</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">OPENREAD</span> <span class="str">"DATA.TXT</span>            <span class="cmt">; open the file for reading</span>
+<span class="kw">SETREAD</span> <span class="str">"DATA.TXT</span>             <span class="cmt">; it becomes the current read stream</span>
+<span class="kw">WHILE</span> [ <span class="kw">NOT</span> <span class="kw">EOF?</span> ] [
+  <span class="kw">MAKE</span> <span class="str">"LINE</span> <span class="kw">READRAWLINE</span>      <span class="cmt">; read one whole line, as is</span>
+  <span class="kw">PRINT</span> <span class="var">:LINE</span>                <span class="cmt">; ... and do whatever with it ...</span>
+]
+<span class="kw">CLOSE</span> <span class="str">"DATA.TXT</span>               <span class="cmt">; close it once done</span></code></pre>
+
+  <p>Writing follows the same spirit&nbsp;: open for writing, which creates the file or
+  overwrites the old one (or <code>OPENAPPEND</code> to add to the end), aim writing at
+  that stream, then come back to the screen by passing the empty list to
+  <code>SETWRITE</code>&nbsp;:</p>
+
+  <pre><code><span class="kw">OPENWRITE</span> <span class="str">"NOTES.TXT</span>
+<span class="kw">SETWRITE</span> <span class="str">"NOTES.TXT</span>
+<span class="kw">PRINT</span> [ <span class="num">12</span> <span class="num">15</span> <span class="num">9</span> ]            <span class="cmt">; this line goes into the file</span>
+<span class="kw">SETWRITE</span> [ ]                     <span class="cmt">; back to normal output</span>
+<span class="kw">CLOSE</span> <span class="str">"NOTES.TXT</span></code></pre>
+
+  <p>When you simply want to swallow a whole text file at once,
+  <code>FILETOARRAY</code> reads it in one go and returns an array whose every cell is a
+  line (the first line in cell 1). It is the natural companion of the arrays seen
+  above&nbsp;: <code>COUNT</code> gives the number of lines, and you reach any of them by
+  its number.</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"LINES</span> <span class="kw">FILETOARRAY</span> <span class="str">"DATA.TXT</span>
+<span class="kw">PRINT</span> <span class="kw">COUNT</span> <span class="var">:LINES</span>          <span class="cmt">; how many lines?</span>
+<span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="num">1</span> <span class="var">:LINES</span>          <span class="cmt">; the first line</span></code></pre>
+
+  <div class="note">
+    <strong>Where do these files live&nbsp;?</strong> Like <code>.GLG</code> files, data
+    files stay in the working directory (<code>~/Logo/</code> or
+    <code>Documents\Logo\</code>)&nbsp;: you give a name, not a full path, and you cannot
+    step outside that directory. Line endings are written Unix-style (LF) by
+    default&nbsp;; <code>SETEOL "CRLF</code> switches to the Windows format if the file is
+    meant to be read elsewhere.
+  </div>
+
   <!-- ============================================================ -->
-  <h2 id="workspace">14. Workspace</h2>
+  <h2 id="workspace">15. Workspace</h2>
 
   <p>GoLogo keeps in memory all the procedures and variables defined during the
   session. You can inspect and manage them&nbsp;:</p>
@@ -689,7 +918,7 @@
 <span class="kw">RESET</span>              <span class="cmt">; resets everything (asks for confirmation)</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="messages">15. Common error messages</h2>
+  <h2 id="messages">16. Common error messages</h2>
 
   <p>When GoLogo does not understand what you ask, it replies with a clear error
   message. The messages keep their original French wording&nbsp;; switch to English with

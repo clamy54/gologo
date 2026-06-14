@@ -47,6 +47,8 @@
     <a href="#colours">colours</a> ·
     <a href="#fractals">fractals (recursion)</a> ·
     <a href="#text">text &amp; computation</a> ·
+    <a href="#arrays">arrays &amp; slices</a> ·
+    <a href="#files">files</a> ·
     <a href="#music">music</a>
   </div>
 
@@ -390,6 +392,119 @@
 
   <p><code>IF PALINDROME? "Level [ PRINT [LEVEL is a palindrome] ]</code> prints
   the message.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="arrays">Arrays &amp; slices</h2>
+
+  <p>An <strong>array</strong> is a row of <em>numbered cells</em>, like a set of
+  lockers side by side. Unlike a list, you read or change any cell <em>directly</em>
+  by its number, without going through the others&nbsp;: fast and handy whenever you
+  know the number of items in advance (a game grid, a list of scores…). The first
+  cell is number&nbsp;1.</p>
+
+  <p>A <strong>slice</strong> is a <em>piece</em> cut out of a word, a list or an
+  array&nbsp;: you give the start and end positions and get just that stretch — a bit
+  like cutting a slice from a loaf of bread.</p>
+
+  <h3>An array of cells</h3>
+  <p>An <em>array</em> has numbered cells you read and change directly (unlike a
+  list). Create it with <code>ARRAY</code>, store a value with <code>SETITEM</code>,
+  read it back with <code>ITEM</code>.</p>
+
+  <pre><code><span class="kw">TO</span> SQUARES
+  <span class="kw">MAKE</span> <span class="str">"T</span> <span class="kw">ARRAY</span> <span class="num">5</span>
+  <span class="kw">FOR</span> [ I <span class="num">1</span> <span class="num">5</span> ] [ <span class="kw">SETITEM</span> <span class="var">:I</span> <span class="var">:T</span> <span class="var">:I</span> * <span class="var">:I</span> ]
+  <span class="kw">FOR</span> [ I <span class="num">1</span> <span class="num">5</span> ] [ <span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="var">:I</span> <span class="var">:T</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p><code>SQUARES</code> stores the squares 1, 4, 9, 16, 25 then prints them. An
+  array is <em>shared</em>&nbsp;: <code>MAKE "U :T</code> does not copy it, both names
+  refer to the same array (for a real copy&nbsp;: <code>COPYARRAY</code>).</p>
+
+  <h3>A two-dimensional grid</h3>
+  <p><code>MDARRAY</code> builds a multi-dimensional array, perfect for a game grid.
+  You reach a cell by its list of indices [ row column ].</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"G</span> <span class="kw">MDARRAY</span> [ <span class="num">3</span> <span class="num">3</span> ]
+<span class="kw">MDSETITEM</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:G</span> <span class="str">"X</span>
+<span class="kw">PRINT</span> <span class="kw">MDITEM</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:G</span></code></pre>
+
+  <p>Prints <code>X</code>&nbsp;: cell (2, 2) of the grid.</p>
+
+  <h3>A stack</h3>
+  <p>A <em>stack</em> pushes and pops from the top (last in, first out), handy for
+  traversals. <code>PUSH</code> and <code>POP</code> work on a variable holding a
+  list. (For a queue&nbsp;: <code>QUEUE</code> / <code>DEQUEUE</code>.)</p>
+
+  <pre><code><span class="kw">MAKE</span> <span class="str">"P</span> [ ]
+<span class="kw">PUSH</span> <span class="str">"P</span> <span class="num">1</span>
+<span class="kw">PUSH</span> <span class="str">"P</span> <span class="num">2</span>
+<span class="kw">PRINT</span> <span class="kw">POP</span> <span class="str">"P</span></code></pre>
+
+  <p>Prints <code>2</code> (the last pushed)&nbsp;; only <code>1</code> remains on
+  the stack.</p>
+
+  <h3>Taking a slice</h3>
+  <p><code>SLICE</code> takes a piece of a word, a list or an array, from position
+  <em>start</em> to <em>end</em> inclusive (the first position is&nbsp;1). With a
+  single number in parentheses, it runs to the end.</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">SLICE</span> <span class="str">"hello</span> <span class="num">1</span> <span class="num">3</span>
+<span class="kw">SHOW</span> <span class="kw">SLICE</span> [ A B C D E ] <span class="num">2</span> <span class="num">4</span>
+<span class="kw">PRINT</span> ( <span class="kw">SLICE</span> <span class="str">"hello</span> <span class="num">4</span> )</code></pre>
+
+  <p>Prints <code>hel</code>, then <code>[B C D]</code>, then <code>lo</code>.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="files">Files</h2>
+
+  <p>GoLogo can <em>read</em> and <em>write</em> text files on disk (in the working
+  directory). The idea is always the same&nbsp;: you <strong>open</strong> a file,
+  make it the “current stream”, and from then on the usual commands work on it
+  instead of the screen or keyboard (<code>PRINT</code> writes to the file,
+  <code>READRAWLINE</code> reads a line from it). Always finish with
+  <code>CLOSE</code>.</p>
+
+  <h3>Writing to a file</h3>
+  <p>Open a file for writing and make it the current stream&nbsp;: from then on,
+  <code>PRINT</code> writes to the file instead of the screen. An empty list
+  <code>[ ]</code> reconnects the screen. Finish with <code>CLOSE</code>.</p>
+
+  <pre><code><span class="kw">TO</span> SAVE_SCORES
+  <span class="kw">OPENWRITE</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">SETWRITE</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">PRINT</span> [ Alice 100 ]
+  <span class="kw">PRINT</span> [ Bob 80 ]
+  <span class="kw">SETWRITE</span> [ ]
+  <span class="kw">CLOSE</span> <span class="str">"SCORES.TXT</span>
+<span class="kw">END</span></code></pre>
+
+  <h3>Reading a file line by line</h3>
+  <p><code>READRAWLINE</code> outputs the next line&nbsp;; <code>EOF?</code> tells
+  whether anything is left. <code>WHILE</code> repeats to the end.</p>
+
+  <pre><code><span class="kw">TO</span> READ_SCORES
+  <span class="kw">OPENREAD</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">SETREAD</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">WHILE</span> [ <span class="kw">NOT</span> <span class="kw">EOF?</span> ] [ <span class="kw">PRINT</span> <span class="kw">READRAWLINE</span> ]
+  <span class="kw">SETREAD</span> [ ]
+  <span class="kw">CLOSE</span> <span class="str">"SCORES.TXT</span>
+<span class="kw">END</span></code></pre>
+
+  <p>Prints the two lines written above.</p>
+
+  <h3>Loading a whole file at once</h3>
+  <p>Simpler still&nbsp;: <code>FILETOARRAY</code> loads a whole text file into an
+  array, one line per cell (no need to open or close). <code>COUNT</code> gives the
+  number of lines to iterate over.</p>
+
+  <pre><code><span class="kw">TO</span> SHOW_FILE
+  <span class="kw">MAKE</span> <span class="str">"L</span> <span class="kw">FILETOARRAY</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">FOR</span> [ I <span class="num">1</span> <span class="kw">COUNT</span> <span class="var">:L</span> ] [ <span class="kw">PRINT</span> <span class="kw">ITEM</span> <span class="var">:I</span> <span class="var">:L</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>The command refuses a binary file (image, executable…)&nbsp;: it only reads
+  text, so it never prints garbage.</p>
 
   <!-- ============================================================ -->
   <h2 id="music">Music</h2>

@@ -47,6 +47,8 @@
     <a href="#couleurs">couleurs</a> ·
     <a href="#fractales">fractales (récursion)</a> ·
     <a href="#texte">texte &amp; calcul</a> ·
+    <a href="#tableaux">tableaux &amp; tranches</a> ·
+    <a href="#fichiers">fichiers</a> ·
     <a href="#musique">musique</a>
   </div>
 
@@ -393,6 +395,123 @@
 
   <p><code>SI PALINDROME? "Radar [ ECRIS [RADAR est un palindrome] ]</code>
   affiche bien le message.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="tableaux">Tableaux &amp; tranches</h2>
+
+  <p>Un <strong>tableau</strong> est une rangée de <em>cases numérotées</em>, comme
+  une série de casiers alignés. Contrairement à une liste, on lit ou on modifie
+  n'importe quelle case <em>directement</em> par son numéro, sans parcourir les
+  autres&nbsp;: c'est rapide et bien pratique dès qu'on connaît le nombre d'éléments
+  à l'avance (une grille de jeu, une liste de scores…). La 1re case porte le
+  numéro&nbsp;1.</p>
+
+  <p>Une <strong>tranche</strong> est un <em>morceau</em> découpé dans un mot, une
+  liste ou un tableau&nbsp;: on donne la position de début et celle de fin, et on
+  récupère juste ce passage — un peu comme couper une tranche dans une miche de
+  pain.</p>
+
+  <h3>Un tableau de cases</h3>
+  <p>Un <em>tableau</em> a des cases numérotées qu'on lit et modifie directement
+  (contrairement à une liste). On le crée avec <code>TABLEAU</code>, on range une
+  valeur avec <code>FIXEITEM</code> et on la relit avec <code>ITEM</code>.</p>
+
+  <pre><code><span class="kw">POUR</span> CARRES
+  <span class="kw">DONNE</span> <span class="str">"T</span> <span class="kw">TABLEAU</span> <span class="num">5</span>
+  <span class="kw">REPETEPOUR</span> [ I <span class="num">1</span> <span class="num">5</span> ] [ <span class="kw">FIXEITEM</span> <span class="var">:I</span> <span class="var">:T</span> <span class="var">:I</span> * <span class="var">:I</span> ]
+  <span class="kw">REPETEPOUR</span> [ I <span class="num">1</span> <span class="num">5</span> ] [ <span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="var">:I</span> <span class="var">:T</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p><code>CARRES</code> range les carrés 1, 4, 9, 16, 25 dans le tableau puis les
+  affiche. Un tableau est <em>partagé</em>&nbsp;: <code>DONNE "U :T</code> ne le
+  copie pas, les deux noms désignent le même tableau (pour une vraie copie&nbsp;:
+  <code>COPIETABLEAU</code>).</p>
+
+  <h3>Une grille à deux dimensions</h3>
+  <p><code>TABLEAUMD</code> crée un tableau à plusieurs dimensions, parfait pour une
+  grille de jeu. On atteint une case par sa liste d'indices [ ligne colonne ].</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"G</span> <span class="kw">TABLEAUMD</span> [ <span class="num">3</span> <span class="num">3</span> ]
+<span class="kw">FIXEITEMMD</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:G</span> <span class="str">"X</span>
+<span class="kw">ECRIS</span> <span class="kw">ITEMMD</span> [ <span class="num">2</span> <span class="num">2</span> ] <span class="var">:G</span></code></pre>
+
+  <p>Affiche <code>X</code>&nbsp;: la case (2, 2) de la grille.</p>
+
+  <h3>Une pile</h3>
+  <p>Une <em>pile</em> empile et dépile par le haut (dernier entré, premier sorti),
+  pratique pour les parcours. <code>EMPILE</code> et <code>DEPILE</code> agissent sur
+  une variable contenant une liste. (Pour une file d'attente&nbsp;: <code>ENFILE</code>
+  / <code>DEFILE</code>.)</p>
+
+  <pre><code><span class="kw">DONNE</span> <span class="str">"P</span> [ ]
+<span class="kw">EMPILE</span> <span class="str">"P</span> <span class="num">1</span>
+<span class="kw">EMPILE</span> <span class="str">"P</span> <span class="num">2</span>
+<span class="kw">ECRIS</span> <span class="kw">DEPILE</span> <span class="str">"P</span></code></pre>
+
+  <p>Affiche <code>2</code> (le dernier empilé)&nbsp;; il ne reste plus que
+  <code>1</code> dans la pile.</p>
+
+  <h3>Extraire une tranche</h3>
+  <p><code>TRANCHE</code> prend un morceau d'un mot, d'une liste ou d'un tableau,
+  des positions <em>début</em> à <em>fin</em> incluses (la 1re position est&nbsp;1).
+  Avec un seul nombre entre parenthèses, on va jusqu'au bout.</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">TRANCHE</span> <span class="str">"bonjour</span> <span class="num">1</span> <span class="num">3</span>
+<span class="kw">MONTRE</span> <span class="kw">TRANCHE</span> [ A B C D E ] <span class="num">2</span> <span class="num">4</span>
+<span class="kw">ECRIS</span> ( <span class="kw">TRANCHE</span> <span class="str">"bonjour</span> <span class="num">4</span> )</code></pre>
+
+  <p>Affiche <code>bon</code>, puis <code>[B C D]</code>, puis <code>jour</code>.</p>
+
+  <!-- ============================================================ -->
+  <h2 id="fichiers">Fichiers</h2>
+
+  <p>GoLogo sait <em>lire</em> et <em>écrire</em> des fichiers texte sur le disque
+  (dans le dossier de travail). Le principe est toujours le même&nbsp;: on
+  <strong>ouvre</strong> un fichier, on en fait le « flux courant », et dès lors les
+  commandes habituelles travaillent dessus au lieu de l'écran ou du clavier
+  (<code>ECRIS</code> écrit dans le fichier, <code>LISLIGNE</code> y lit une ligne).
+  On termine toujours par <code>FERME</code>.</p>
+
+  <h3>Écrire dans un fichier</h3>
+  <p>On ouvre un fichier en écriture et on en fait le flux courant&nbsp;: dès lors,
+  <code>ECRIS</code> écrit dans le fichier au lieu de l'écran. Une liste vide
+  <code>[ ]</code> rebranche l'écran. On termine par <code>FERME</code>.</p>
+
+  <pre><code><span class="kw">POUR</span> SAUVE_SCORES
+  <span class="kw">OUVREECRITURE</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">FIXEECRITURE</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">ECRIS</span> [ Alice 100 ]
+  <span class="kw">ECRIS</span> [ Bob 80 ]
+  <span class="kw">FIXEECRITURE</span> [ ]
+  <span class="kw">FERME</span> <span class="str">"SCORES.TXT</span>
+<span class="kw">FIN</span></code></pre>
+
+  <h3>Relire un fichier ligne par ligne</h3>
+  <p><code>LISLIGNE</code> rend la ligne suivante&nbsp;; <code>FINFICHIER?</code> dit
+  s'il reste quelque chose. <code>TANTQUE</code> répète jusqu'au bout.</p>
+
+  <pre><code><span class="kw">POUR</span> LIRE_SCORES
+  <span class="kw">OUVRELECTURE</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">FIXELECTURE</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">TANTQUE</span> [ <span class="kw">NON</span> <span class="kw">FINFICHIER?</span> ] [ <span class="kw">ECRIS</span> <span class="kw">LISLIGNE</span> ]
+  <span class="kw">FIXELECTURE</span> [ ]
+  <span class="kw">FERME</span> <span class="str">"SCORES.TXT</span>
+<span class="kw">FIN</span></code></pre>
+
+  <p>Affiche les deux lignes écrites plus haut.</p>
+
+  <h3>Charger tout un fichier d'un coup</h3>
+  <p>Plus simple encore&nbsp;: <code>FICHIERVERSTABLEAU</code> charge un fichier texte
+  entier dans un tableau, une ligne par case (pas besoin d'ouvrir ni de fermer).
+  <code>COMPTE</code> donne le nombre de lignes pour itérer dessus.</p>
+
+  <pre><code><span class="kw">POUR</span> AFFICHE_FICHIER
+  <span class="kw">DONNE</span> <span class="str">"L</span> <span class="kw">FICHIERVERSTABLEAU</span> <span class="str">"SCORES.TXT</span>
+  <span class="kw">REPETEPOUR</span> [ I <span class="num">1</span> <span class="kw">COMPTE</span> <span class="var">:L</span> ] [ <span class="kw">ECRIS</span> <span class="kw">ITEM</span> <span class="var">:I</span> <span class="var">:L</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>La commande refuse un fichier binaire (image, exécutable…)&nbsp;: elle ne lit
+  que du texte, pour ne pas afficher n'importe quoi.</p>
 
   <!-- ============================================================ -->
   <h2 id="musique">Musique</h2>

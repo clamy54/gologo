@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GoLogo</title>
+  <title>Documentation GoLogo : interpréteur Logo bilingue français / anglais (tortue graphique)</title>
+  <meta name="description" content="Documentation de GoLogo : le charme d'un Logo old school, la puissance d'un interpréteur moderne. Tortue graphique, langage bilingue français / anglais, procédures, listes, tableaux, fichiers, grands nombres, aide intégrée et exemples. Windows, Linux, macOS.">
+  <link rel="canonical" href="https://gologo.be-root.com/">
+  <link rel="alternate" hreflang="fr" href="https://gologo.be-root.com/fr/index.html">
+  <link rel="alternate" hreflang="en" href="https://gologo.be-root.com/en/index.html">
+  <link rel="alternate" hreflang="x-default" href="https://gologo.be-root.com/">
   <link rel="stylesheet" href="style.css">
   <style>
     /* Page d'accueil : choix de la langue (FR/EN). Mise en page centree, sans nav laterale. */
@@ -30,6 +35,25 @@
       border: none;
       font-size: 2.6rem;
       margin: 12px 0 4px;
+    }
+    .landing .accroche {
+      color: var(--cyan-pale);
+      font-size: 1.3rem;
+      font-weight: 600;
+      max-width: 640px;
+      margin: 14px auto 6px;
+      line-height: 1.4;
+    }
+    .landing .tagline {
+      max-width: 580px;
+      margin: 6px auto 4px;
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+    .landing .tagline.en {
+      color: var(--cyan-pale);
+      font-size: .92rem;
+      margin: 0 auto 26px;
     }
     .landing .sub {
       color: var(--cyan-pale);
@@ -82,8 +106,11 @@
 </head>
 <body class="landing">
   <main>
-    <img src="images/gologo-accueil.png" alt="GoLogo" width="307" height="307">
+    <img src="images/gologo-accueil.png" alt="GoLogo, interpréteur Logo avec tortue graphique" width="307" height="307">
     <h1>GoLogo</h1>
+    <p class="accroche">Le charme d'un Logo old school, la puissance d'un interpréteur moderne.</p>
+    <p class="tagline">Une interface simple et directe pour dessiner, apprendre et expérimenter, avec un langage bilingue, des procédures, listes, tableaux, fichiers, grands nombres, aide intégrée et exemples prêts à lancer.</p>
+    <p class="tagline en" lang="en">The charm of an old-school Logo, the power of a modern interpreter. A simple, direct interface for drawing, learning and experimenting: bilingual language, procedures, lists, arrays, files, big numbers, built-in help and ready-to-run examples.</p>
     <p class="sub">Choisissez votre langue&nbsp;·&nbsp;Choose your language</p>
     <div class="choose-links">
       <a href="fr/index.html">Français<small>Documentation en français</small></a>
