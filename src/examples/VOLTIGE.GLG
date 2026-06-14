@@ -1,0 +1,399 @@
+; VOLTIGE - le jeu d'acrobates 
+; Deux voltigeurs, deux plongeoirs et une bascule. Un voltigeur attend sur
+; un plongeoir : BOUTON (ou ESPACE) pour le faire plonger vers la bascule.
+; S'il touche l'extremite HAUTE, il ejecte son partenaire qui s'envole,
+; creve les ballons et retombe sur le plongeoir d'en face. Mauvais cote de
+; la bascule = il s'ecrase. Les cotes alternent ; vide les trois rangees.
+
+; ---- repere lie au corps d'un voltigeur (centre :PCX :PCY, cap :PANG) ----
+POUR PX :U :R
+RENDS :PCX + ( :U * :SZ * ( SIN :PANG ) ) + ( :R * :SZ * ( COS :PANG ) )
+FIN
+
+POUR PY :U :R
+RENDS :PCY + ( :U * :SZ * ( COS :PANG ) ) - ( :R * :SZ * ( SIN :PANG ) )
+FIN
+
+; un segment entre deux points donnes dans le repere du corps
+POUR TRAIT :U1 :R1 :U2 :R2
+LC FXY ( PX :U1 :R1 ) ( PY :U1 :R1 ) BC FXY ( PX :U2 :R2 ) ( PY :U2 :R2 ) LC
+FIN
+
+; ---- dessine un bonhomme (repere PCX/PCY/PANG/SZ deja pose) ----
+POUR FIGURE :COUL
+FCC :COUL
+DONNE "HX PX 1.1 0
+DONNE "HY PY 1.1 0
+FIXETAILLECRAYON ( :SZ * 0.9 )
+LC FXY ( :HX - 1 ) :HY BC FXY ( :HX + 1 ) :HY LC
+FIXETAILLECRAYON 5
+TRAIT 0.7 0 -0.2 0
+TRAIT 0.45 -0.7 0.45 0.7
+TRAIT -0.2 0 -1.0 -0.45
+TRAIT -0.2 0 -1.0 0.45
+FIN
+
+; couleur d'un voltigeur d'apres son numero
+POUR PEINT :QUI
+SI :QUI = 1 [ FIGURE :CCLOWN1 ] [ FIGURE :CCLOWN2 ]
+FIN
+
+; celui qui est assis sur le creux de la bascule
+POUR ASSIS
+DONNE "PCX ( :SX - :UPSIDE * :HALF )
+DONNE "PCY ( :SY - :RISE + :SZ )
+DONNE "PANG 0
+PEINT :SEATWHO
+FIN
+
+; celui qui se repose sur son plongeoir
+POUR PERCHE
+DONNE "PCX ( :PERCHSIDE * :PLDX )
+DONNE "PCY ( :PLY + :SZ )
+DONNE "PANG 0
+PEINT :PERCHWHO
+FIN
+
+; celui qui vole et culbute
+POUR VOLEUR
+DONNE "PCX :AIRX DONNE "PCY :AIRY DONNE "PANG :AIRSPIN
+PEINT :AIRWHO
+FIN
+
+; celui qui marche vers le bord, debout sur sa plateforme
+POUR MARCHEUR
+DONNE "PCX :AIRX DONNE "PCY ( :PLY + :SZ ) DONNE "PANG 0
+PEINT :AIRWHO
+FIN
+
+; repos = perche ; marche = marcheur ; vol et crash = VOLEUR (a plat si crash)
+POUR ACTEURS
+ASSIS
+SI :PHASE = 0 [ PERCHE ]
+SI :PHASE = 3 [ MARCHEUR ]
+SI :PHASE = 1 [ VOLEUR ]
+SI :PHASE = 2 [ VOLEUR ]
+FIN
+
+; ---- texte centre horizontalement (N = nb de caracteres) ----
+POUR CENTRE :TXT :N :Y :COUL
+FCC :COUL LC FXY ( 0 - :N * 11.67 ) :Y ETIQUETTE :TXT
+FIN
+
+; ---- abscisse courante d'un ballon (les rangees oscillent) ----
+POUR BALX :I
+SI ( ITEM :I :TBR ) = 2 [ RENDS ( ITEM :I :TBX ) - :OSC ] [ RENDS ( ITEM :I :TBX ) + :OSC ]
+FIN
+
+; ---- pose un ballon dans la case courante :K et avance le compteur ----
+POUR POSEBALLON :X :Y :COUL :ROW
+FIXEITEM :K :TBX :X
+FIXEITEM :K :TBY :Y
+FIXEITEM :K :TBC :COUL
+FIXEITEM :K :TBR :ROW
+FIXEITEM :K :TBV 1
+DONNE "K :K + 1
+FIN
+
+; ---- remplit les trois rangees (bleue trouee au milieu) ----
+POUR INITBALLONS
+DONNE "N 22
+DONNE "TBX TABLEAU :N
+DONNE "TBY TABLEAU :N
+DONNE "TBC TABLEAU :N
+DONNE "TBR TABLEAU :N
+DONNE "TBV TABLEAU :N
+DONNE "K 1
+REPETEPOUR [ J 0 7 ] [ POSEBALLON ( -560 + :J * 160 ) 430 :CROUGE 1 ]
+REPETEPOUR [ J 0 7 ] [ POSEBALLON ( -560 + :J * 160 ) 360 :CJAUNE 2 ]
+REPETEPOUR [ J 0 2 ] [ POSEBALLON ( -560 + :J * 160 ) 290 :CBLEU 3 ]
+REPETEPOUR [ J 5 7 ] [ POSEBALLON ( -560 + :J * 160 ) 290 :CBLEU 3 ]
+DONNE "NVIVANTS :N
+DONNE "OSC 0
+DONNE "OSCV :OSCSTEP
+FIN
+
+; ---- scene de depart : 1 attend a gauche, 2 est assis cote droit ----
+POUR DEPART
+DONNE "PERCHWHO 1
+DONNE "PERCHSIDE -1
+DONNE "SEATWHO 2
+DONNE "UPSIDE -1
+DONNE "PHASE 0
+FIN
+
+; ---- bouton : le perche se met a marcher vers le bord de sa plateforme ----
+POUR LANCEPLONGEON
+DONNE "AIRWHO :PERCHWHO
+DONNE "WALKSIDE :PERCHSIDE
+DONNE "AIRX :PERCHSIDE * :PLDX
+DONNE "AIRY :PLY
+DONNE "AIRSPIN 0
+DONNE "PHASE 3
+FIN
+
+; ---- il avance jusqu'au bord interieur, puis bascule en plongeon ----
+POUR MARCHE
+DONNE "AIRX :AIRX - :WALKSIDE * :WALKSTEP
+SI ( ( ( :WALKSIDE * :PLEDGE ) - :AIRX ) * :WALKSIDE ) >= 0 [ DEMARREPLONGEON ]
+FIN
+
+; ---- saute du bord vers la bascule ----
+POUR DEMARREPLONGEON
+DONNE "AIRX :WALKSIDE * :PLEDGE
+DONNE "AIRY :PLY
+DONNE "AIRVX ( 0 - :WALKSIDE ) * :DIVEVX
+DONNE "AIRVY :DIVEVY
+DONNE "AIRSPIN 0
+DONNE "PHASE 1
+FIN
+
+; ---- reception reussie : on ejecte l'assis vers le haut. l'angle depend de
+; OFF = ou le voltigeur a touche la planche (0 au pivot, HALF a la pointe) ----
+POUR BONDIR
+DONNE "OFF ( :AIRX - :SX ) * :UPSIDE
+DONNE "OLDSEAT :SEATWHO
+DONNE "EJSIDE 0 - :UPSIDE
+DONNE "SEATWHO :AIRWHO
+DONNE "AIRWHO :OLDSEAT
+DONNE "AIRX :SX + :EJSIDE * :HALF
+DONNE "AIRY :SY - :RISE
+DONNE "AIRVY :EJVY
+; pres du pivot -> presque vertical ; vers la pointe -> bien plus d'angle
+DONNE "AIRVX :EJSIDE * ( :OFF / :HALF ) * :EJSPREAD
+DONNE "AIRSPIN 0
+DONNE "UPSIDE :EJSIDE
+DONNE "PHASE 1
+FIN
+
+; ---- le voltigeur touche la planche : bon cote (du pivot a la pointe) ou crash.
+; REL = distance au pivot, comptee positive vers l'extremite HAUTE ----
+POUR RECEPTION
+DONNE "REL ( :AIRX - :SX ) * :UPSIDE
+SI ET ( :REL >= ( 0 - :CTOL ) ) ( :REL <= ( :HALF + :MARGE ) ) [ BONDIR ] [ ECRASEMENT ]
+FIN
+
+; ---- mauvais cote : il se vautre a plat sur le bord du bandeau, et la manche
+; s'arrete. -380 = haut du bandeau bleu (ou la couleur du fond change) ----
+POUR ECRASEMENT
+DONNE "AIRSPIN 90
+DONNE "AIRY ( -380 + :SZ )
+DONNE "PHASE 2
+DONNE "PERDU VRAI
+FIN
+
+; ---- il retombe sur une plateforme : il marche jusqu'au bord puis replonge ----
+POUR POSEPLATEFORME
+DONNE "WALKSIDE -1
+SI :AIRX > 0 [ DONNE "WALKSIDE 1 ]
+DONNE "AIRY :PLY
+DONNE "AIRSPIN 0
+DONNE "PHASE 3
+FIN
+
+; ---- creve les ballons touches ; le voltigeur traverse sans changer de
+; vitesse, il garde son elan d'origine ----
+POUR ECLATE
+DONNE "I 1
+TANTQUE [ :I <= :N ] [
+SI ( ITEM :I :TBV ) = 1 [
+DONNE "DX :AIRX - ( BALX :I )
+DONNE "DY :AIRY - ( ITEM :I :TBY )
+SI ( ( :DX * :DX ) + ( :DY * :DY ) ) < :RR [
+FIXEITEM :I :TBV 0
+DONNE "SCORE :SCORE + 10
+DONNE "NVIVANTS :NVIVANTS - 1
+]
+]
+DONNE "I :I + 1
+]
+FIN
+
+; ---- integre le vol : gravite, murs, ballons, puis atterrissage.
+; en descente on teste d'abord la plateforme (en haut) puis la bascule (en bas) ----
+POUR VOL
+DONNE "AYPREV :AIRY
+DONNE "AIRVY :AIRVY - :G
+DONNE "AIRX :AIRX + :AIRVX
+DONNE "AIRY :AIRY + :AIRVY
+DONNE "AIRSPIN :AIRSPIN + :SPIN
+SI :AIRX < -780 [ DONNE "AIRX -780 DONNE "AIRVX 0 - :AIRVX ]
+SI :AIRX > 780 [ DONNE "AIRX 780 DONNE "AIRVX 0 - :AIRVX ]
+SI :AIRY > 480 [ DONNE "AIRY 480 DONNE "AIRVY 0 - :AIRVY ]
+ECLATE
+; passe-t-il sous le niveau d'une plateforme, par-dessus une planche ?
+SI ET ( :AYPREV > :PLY ) ( :AIRY <= :PLY ) [ SI ( VALABS :AIRX ) >= :PLEDGE [ POSEPLATEFORME STOP ] ]
+; sinon, en franchissant le niveau de la bascule : rattrapage ou crash
+SI ET ( :AYPREV > ( :SY + :RISE ) ) ( :AIRY <= ( :SY + :RISE ) ) [ RECEPTION ]
+FIN
+
+; ---- un pas : oscillation des ballons, marche ou vol selon la phase ----
+POUR PHYSIQUE
+DONNE "OSC :OSC + :OSCV
+SI :OSC > :AMP [ DONNE "OSC :AMP DONNE "OSCV 0 - :OSCV ]
+SI :OSC < ( 0 - :AMP ) [ DONNE "OSC 0 - :AMP DONNE "OSCV 0 - :OSCV ]
+SI :PHASE = 3 [ MARCHE ]
+SI :PHASE = 1 [ VOL ]
+FIN
+
+; ---- manette : glisse la bascule ; bouton : lance le plongeon au repos ----
+POUR CONTROLE
+DONNE "J MANETTE 0
+SI :J = 7 [ DONNE "SX :SX - :SXSTEP ]
+SI :J = 3 [ DONNE "SX :SX + :SXSTEP ]
+SI :SX < -700 [ DONNE "SX -700 ]
+SI :SX > 700 [ DONNE "SX 700 ]
+; bouton en detection de front : un nouvel appui seulement, pas le maintien
+DONNE "BT BOUTON? 0
+SI :PHASE = 0 [ SI ET :BT ( NON :LASTBTN ) [ LANCEPLONGEON ] ]
+DONNE "LASTBTN :BT
+FIN
+
+; ---- le bandeau bleu du bas (un gros trait fait l'affaire) ----
+POUR BANDE
+FCC :CBANDE FIXETAILLECRAYON 130
+LC FXY -800 -445 BC FXY 800 -445 LC
+FIN
+
+; ---- les deux plongeoirs (juste la planche, sans pied) ----
+POUR PORTIQUES
+FCC :CBOIS FIXETAILLECRAYON 8
+LC FXY -780 :PLY BC FXY -540 :PLY LC
+LC FXY 780 :PLY BC FXY 540 :PLY LC
+FIN
+
+; ---- la bascule qui penche, et son pivot ----
+POUR BASCULE
+DONNE "LY :SY - :UPSIDE * :RISE
+DONNE "RY :SY + :UPSIDE * :RISE
+FCC :CBOIS FIXETAILLECRAYON 10
+LC FXY ( :SX - :HALF ) :LY BC FXY ( :SX + :HALF ) :RY LC
+FIXETAILLECRAYON 6
+LC FXY :SX :SY BC FXY ( :SX - 26 ) ( :SY - 50 ) FXY ( :SX + 26 ) ( :SY - 50 ) FXY :SX :SY LC
+FIN
+
+; ---- tous les ballons encore vivants ----
+POUR BALLONS
+DONNE "I 1
+TANTQUE [ :I <= :N ] [
+SI ( ITEM :I :TBV ) = 1 [
+FCC ( ITEM :I :TBC ) FIXETAILLECRAYON 42
+DONNE "BXX BALX :I
+DONNE "BYY ITEM :I :TBY
+LC FXY ( :BXX - 1 ) :BYY BC FXY ( :BXX + 1 ) :BYY LC
+]
+DONNE "I :I + 1
+]
+FIN
+
+; ---- score, vies et niveau, dans le bandeau ----
+POUR HUD
+FCC :CTEXTE
+LC FXY -780 -465 ETIQUETTE ( PHRASE [ SCORE ] :SCORE )
+LC FXY -70 -465 ETIQUETTE ( PHRASE [ VIES ] :VIES )
+LC FXY 520 -465 ETIQUETTE ( PHRASE [ NIVEAU ] :NIVEAU )
+FIN
+
+; ---- une image complete (double tampon : pas de clignotement) ----
+POUR DESSINE
+SCENE [ NETTOIE BANDE PORTIQUES BALLONS BASCULE ACTEURS HUD ]
+FIN
+
+; ---- deroule une manche : jusqu'a vider les ballons ou perdre la partie ----
+POUR MANCHE
+DEPART
+DONNE "PERDU FAUX
+DONNE "LASTBTN FAUX
+TANTQUE [ ET ( :VIES > 0 ) ( :NVIVANTS > 0 ) ] [
+CONTROLE
+PHYSIQUE
+DESSINE
+ATTENDS 1
+SI :PERDU [
+DESSINE
+ATTENDS 60
+DONNE "VIES :VIES - 1
+DONNE "PERDU FAUX
+SI :VIES > 0 [ DEPART ]
+]
+]
+FIN
+
+POUR ECRANTITRE
+SCENE [
+NETTOIE BANDE PORTIQUES
+CENTRE [ V O L T I G E ] 13 200 :CJAUNE
+CENTRE [ FLECHES GLISSENT LA BASCULE ] 30 60 :CTEXTE
+CENTRE [ ESPACE LANCE LE VOLTIGEUR ] 28 0 :CTEXTE
+CENTRE [ VISE L EXTREMITE HAUTE POUR EJECTER L AUTRE ] 47 -60 :CTEXTE
+CENTRE [ UNE TOUCHE POUR COMMENCER ] 27 -150 :CTEXTE
+]
+DONNE "K LISCAR
+FIN
+
+POUR ECRANGAGNE
+SCENE [
+NETTOIE BANDE PORTIQUES
+CENTRE [ RANGEES VIDEES ] 14 80 :CGAGNE
+CENTRE ( PHRASE [ SCORE ] :SCORE ) 12 0 :CTEXTE
+CENTRE [ UNE TOUCHE POUR LA SUITE ] 27 -100 :CTEXTE
+]
+DONNE "K LISCAR
+FIN
+
+POUR ECRANFIN
+SCENE [
+NETTOIE BANDE PORTIQUES
+CENTRE [ PARTIE TERMINEE ] 16 80 :CROUGE
+CENTRE ( PHRASE [ SCORE FINAL ] :SCORE ) 16 0 :CTEXTE
+]
+FIN
+
+POUR START
+VE CT FEN
+FCFG [ 8 10 20 ]
+; --- couleurs ---
+DONNE "CROUGE [ 200 70 60 ]
+DONNE "CJAUNE [ 220 200 90 ]
+DONNE "CBLEU [ 70 120 210 ]
+DONNE "CBOIS [ 200 170 110 ]
+DONNE "CBANDE [ 50 70 200 ]
+DONNE "CTEXTE [ 235 235 235 ]
+DONNE "CGAGNE [ 90 210 110 ]
+DONNE "CCLOWN1 [ 230 120 60 ]
+DONNE "CCLOWN2 [ 80 150 230 ]
+; --- bascule et plongeoirs ---
+DONNE "SY -300
+DONNE "RISE 30
+DONNE "HALF 95
+DONNE "CTOL 20
+DONNE "MARGE 28
+DONNE "PLY 150
+DONNE "PLDX 660
+DONNE "PLEDGE 540
+; --- physique ---
+DONNE "G 0.8
+DONNE "DIVEVX 6
+DONNE "DIVEVY 4
+DONNE "EJVY 36
+DONNE "EJSPREAD 7
+DONNE "WALKSTEP 12
+DONNE "SXSTEP 14
+DONNE "SZ 17
+DONNE "SPIN 13
+DONNE "RR 2200
+; --- ballons qui se baladent ---
+DONNE "AMP 80
+DONNE "OSCSTEP 3
+DONNE "SX 0
+ECRANTITRE
+DONNE "VIES 3
+DONNE "SCORE 0
+DONNE "NIVEAU 1
+TANTQUE [ :VIES > 0 ] [
+INITBALLONS
+MANCHE
+SI :NVIVANTS = 0 [ ECRANGAGNE DONNE "NIVEAU :NIVEAU + 1 ] [ ]
+]
+ECRANFIN
+FIN

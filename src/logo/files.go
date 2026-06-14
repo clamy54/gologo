@@ -247,7 +247,8 @@ func (i *Interp) registerFiles() {
 
 	i.registerExamples()
 
-	// DETRUIS mot : supprime le fichier. pas de corbeille, pas de remords
+	// DETRUIS mot : supprime le fichier. pas de corbeille, pas de remords.
+	// refuse de supprimer un fichier ouvert (facon FMSLogo)
 	i.register(cmd(1, func(in *Interp, a []Value) error {
 		name, err := toWord(a[0])
 		if err != nil {
@@ -257,8 +258,18 @@ func (i *Interp) registerFiles() {
 		if err != nil {
 			return err
 		}
+		if in.fio != nil {
+			for _, of := range in.fio.open {
+				if of.path == path {
+					return errFichierOuvert
+				}
+			}
+		}
+		if _, err := os.Stat(path); err != nil {
+			return errIntrouvable
+		}
 		if err := os.Remove(path); err != nil {
-			return fmt.Errorf("LECTURE IMPOSSIBLE")
+			return errEcritureImpossible
 		}
 		return nil
 	}), "DETRUIS")

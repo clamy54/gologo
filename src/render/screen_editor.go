@@ -571,9 +571,9 @@ func (s *Screen) composeEditor() {
 	bgc := rgba(turtle.Bleu)     // fond bleu (4)
 	fgc := rgba(turtle.Color(6)) // cyan (texte + bord)
 	// cadre cyan plein, puis interieur bleu
-	draw.Draw(s.frame, s.frame.Bounds(), image.NewUniform(fgc), image.Point{}, draw.Src)
+	draw.Draw(s.frame, s.frame.Bounds(), uniform(fgc), image.Point{}, draw.Src)
 	inner := image.Rect(edBorder, edBorder, ScreenW-edBorder, ScreenH-edBorder)
-	draw.Draw(s.frame, inner, image.NewUniform(bgc), image.Point{}, draw.Src)
+	draw.Draw(s.frame, inner, uniform(bgc), image.Point{}, draw.Src)
 
 	content := edCols - 1
 	vis := edVisRows(s.edLines)

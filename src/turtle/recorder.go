@@ -12,7 +12,16 @@ type Recorder struct {
 
 func NewRecorder() *Recorder { return &Recorder{} }
 
-func (r *Recorder) DrawSegment(seg Segment) { r.Segments = append(r.Segments, seg) }
+// plafond anti-fuite : le journal sert aux golden tests et au mode headless, pas a
+// stocker une animation infinie. au-dela on cesse d'enregistrer (la tete suffit).
+const maxRecorderSegments = 1 << 20
+
+func (r *Recorder) DrawSegment(seg Segment) {
+	if len(r.Segments) >= maxRecorderSegments {
+		return
+	}
+	r.Segments = append(r.Segments, seg)
+}
 
 func (r *Recorder) Clear() {
 	r.Cleared++

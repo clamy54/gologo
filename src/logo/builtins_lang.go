@@ -3,6 +3,7 @@ package logo
 import (
 	"fmt"
 	"math"
+	"math/big"
 	"math/rand"
 	"sort"
 	"strings"
@@ -23,13 +24,16 @@ func (i *Interp) registerOperations() {
 
 	// arithmetique
 	vop(2, func(in *Interp, a []Value) (Value, error) {
-		return reduceNums(a, 0, func(x, y float64) float64 { return x + y })
+		return reduceNums(a, 0, addInt, func(x, y float64) float64 { return x + y })
 	}, "SOMME")
 	op(2, func(in *Interp, a []Value) (Value, error) {
+		if v, ok := subInt(a[0], a[1]); ok {
+			return v, nil
+		}
 		return numOp(a, func(x, y float64) float64 { return x - y })
 	}, "DIFF", "DIF")
 	vop(2, func(in *Interp, a []Value) (Value, error) {
-		return reduceNums(a, 1, func(x, y float64) float64 { return x * y })
+		return reduceNums(a, 1, mulInt, func(x, y float64) float64 { return x * y })
 	}, "PROD", "PRODUIT")
 	op(2, func(in *Interp, a []Value) (Value, error) {
 		x, y, err := twoNums(a)
@@ -42,6 +46,12 @@ func (i *Interp) registerOperations() {
 		return numResult(x / y), nil
 	}, "DIV", "DIVISE")
 	op(2, func(in *Interp, a []Value) (Value, error) {
+		if bx, by, ok := twoInts(a); ok {
+			if by.Sign() == 0 {
+				return Value{}, fmt.Errorf("QUOT N'AIME PAS 0")
+			}
+			return intResult(new(big.Int).Quo(bx, by)), nil // tronque vers zero
+		}
 		x, y, err := twoNums(a)
 		if err != nil {
 			return Value{}, err
@@ -52,6 +62,12 @@ func (i *Interp) registerOperations() {
 		return numResult(math.Trunc(x / y)), nil
 	}, "QUOT")
 	op(2, func(in *Interp, a []Value) (Value, error) {
+		if bx, by, ok := twoInts(a); ok {
+			if by.Sign() == 0 {
+				return Value{}, fmt.Errorf("RESTE N'AIME PAS 0")
+			}
+			return intResult(new(big.Int).Rem(bx, by)), nil // reste du signe de bx
+		}
 		x, y, err := twoNums(a)
 		if err != nil {
 			return Value{}, err
@@ -61,7 +77,7 @@ func (i *Interp) registerOperations() {
 		}
 		return numResult(math.Mod(x, y)), nil
 	}, "RESTE")
-	op(1, func(in *Interp, a []Value) (Value, error) { return num1(a, math.Floor) }, "ENT")
+	op(1, func(in *Interp, a []Value) (Value, error) { return intIdentityOr(a, math.Floor) }, "ENT")
 	op(1, func(in *Interp, a []Value) (Value, error) {
 		return num1(a, func(x float64) float64 { return math.Sin(x * math.Pi / 180) })
 	}, "SIN", "SINUS")
@@ -108,40 +124,54 @@ func (i *Interp) registerOperations() {
 	// HASARD n -> 0..n-1 ; (HASARD debut fin) -> debut..fin inclus (comme RANDOM)
 	vop(1, func(in *Interp, a []Value) (Value, error) {
 		if len(a) >= 2 {
-			lo, err := toNumber(a[0])
+			lo, err := intArg(a[0])
 			if err != nil {
 				return Value{}, err
 			}
-			hi, err := toNumber(a[1])
+			hi, err := intArg(a[1])
 			if err != nil {
 				return Value{}, err
 			}
-			if hi < lo {
+			// largeur en int64 pour reperer un intervalle vide ou un debordement
+			// (bornes tres ecartees), sinon randN recevrait un n negatif et planterait
+			width := int64(hi) - int64(lo) + 1
+			if width < 1 || width != int64(int(width)) {
 				return Value{}, fmt.Errorf("HASARD N'AIME PAS %s", a[1].String())
 			}
-			return NumberValue(float64(int(lo) + rand.Intn(int(hi)-int(lo)+1))), nil
+			return NumberValue(float64(lo + in.randN(int(width)))), nil
 		}
-		x, err := toNumber(a[0])
+		n, err := intArg(a[0])
 		if err != nil {
 			return Value{}, err
 		}
-		if x < 1 {
+		if n < 1 {
 			return Value{}, fmt.Errorf("HASARD N'AIME PAS %s", a[0].String())
 		}
-		return NumberValue(float64(rand.Intn(int(x)))), nil
+		return NumberValue(float64(in.randN(n))), nil
 	}, "HASARD")
 
 	// arithmetique : extensions
 	op(2, func(in *Interp, a []Value) (Value, error) {
+		// exposant entier >= 0 sur une base entiere : puissance exacte en big,
+		// si le resultat reste sous maxPowBits (sinon calcul flottant, donc Inf
+		// pour les cas demesures - comme avant la v2)
+		if bx, by, ok := twoInts(a); ok && by.Sign() >= 0 {
+			if bits := bx.BitLen(); bits <= 1 || (by.IsInt64() && by.Int64() <= int64(maxPowBits/bits)) {
+				return intResult(new(big.Int).Exp(bx, by, nil)), nil
+			}
+		}
 		return numOp(a, math.Pow) // PUISSANCE a b = a^b
 	}, "PUISSANCE")
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		return num1(a, math.Round) // ARRONDI : entier le plus proche
+		return intIdentityOr(a, math.Round) // ARRONDI : entier le plus proche
 	}, "ARRONDI")
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		return num1(a, math.Trunc) // TRONQUE : partie entiere (vers zero)
+		return intIdentityOr(a, math.Trunc) // TRONQUE : partie entiere (vers zero)
 	}, "TRONQUE")
 	op(1, func(in *Interp, a []Value) (Value, error) {
+		if b, ok := asIntOperand(a[0]); ok { // oppose exact d'un entier
+			return intResult(new(big.Int).Neg(b)), nil
+		}
 		return num1(a, func(x float64) float64 { return -x }) // MOINS : oppose
 	}, "MOINS")
 	op(1, func(in *Interp, a []Value) (Value, error) {
@@ -149,10 +179,64 @@ func (i *Interp) registerOperations() {
 	}, "TANGENTE", "TAN")
 	op(1, func(in *Interp, a []Value) (Value, error) { return reverse(a[0]) }, "INVERSE")
 	op(0, func(in *Interp, a []Value) (Value, error) { return NumberValue(math.Pi), nil }, "PI")
+	// OUEX a b : ou exclusif bit a bit de deux entiers >= 0. petit chemin int64, sinon big
+	op(2, func(in *Interp, a []Value) (Value, error) {
+		bx, ok := asIntOperand(a[0])
+		if !ok {
+			return Value{}, &badData{a[0].String()}
+		}
+		by, ok := asIntOperand(a[1])
+		if !ok {
+			return Value{}, &badData{a[1].String()}
+		}
+		// contrat : entiers non negatifs (sinon le complement infini de big.Int
+		// donnerait un resultat negatif, contraire a la doc)
+		if bx.Sign() < 0 {
+			return Value{}, fmt.Errorf("OUEX N'AIME PAS %s", a[0].String())
+		}
+		if by.Sign() < 0 {
+			return Value{}, fmt.Errorf("OUEX N'AIME PAS %s", a[1].String())
+		}
+		if bx.IsInt64() && by.IsInt64() {
+			return intResultFromInt64(bx.Int64() ^ by.Int64()), nil
+		}
+		return intResult(new(big.Int).Xor(bx, by)), nil
+	}, "OUEX")
+	// VERSBASE n base : ecrit l'entier n dans la base donnee (2 a 36)
+	op(2, func(in *Interp, a []Value) (Value, error) {
+		base, err := baseArg(a[1])
+		if err != nil {
+			return Value{}, err
+		}
+		return toBaseWord(a[0], base)
+	}, "VERSBASE")
+	// DEPUISBASE mot base : lit le mot comme un nombre ecrit dans cette base
+	op(2, func(in *Interp, a []Value) (Value, error) {
+		base, err := baseArg(a[1])
+		if err != nil {
+			return Value{}, err
+		}
+		w, err := toWord(a[0])
+		if err != nil {
+			return Value{}, &badData{a[0].String()}
+		}
+		z, ok := new(big.Int).SetString(strings.TrimSpace(w), base)
+		if !ok {
+			return Value{}, &badData{a[0].String()} // pas un nombre valide dans cette base
+		}
+		return intResult(z), nil
+	}, "DEPUISBASE")
+	// raccourcis "kid-friendly" : montre un nombre en hexa ou en binaire
+	op(1, func(in *Interp, a []Value) (Value, error) { return toBaseWord(a[0], 16) }, "HEXA")
+	op(1, func(in *Interp, a []Value) (Value, error) { return toBaseWord(a[0], 2) }, "BINAIRE")
 
 	// comparaisons
-	op(2, func(in *Interp, a []Value) (Value, error) { return cmpOp(a, func(x, y float64) bool { return x < y }) }, "PLP?")
-	op(2, func(in *Interp, a []Value) (Value, error) { return cmpOp(a, func(x, y float64) bool { return x > y }) }, "PLG?")
+	op(2, func(in *Interp, a []Value) (Value, error) {
+		return cmpOp(a, "<", func(x, y float64) bool { return x < y })
+	}, "PLP?")
+	op(2, func(in *Interp, a []Value) (Value, error) {
+		return cmpOp(a, ">", func(x, y float64) bool { return x > y })
+	}, "PLG?")
 	op(2, func(in *Interp, a []Value) (Value, error) { return BoolValue(valuesEqual(a[0], a[1])), nil }, "EGAL?")
 
 	// logique
@@ -179,7 +263,10 @@ func (i *Interp) registerOperations() {
 	// mots et listes : examiner
 	op(1, func(in *Interp, a []Value) (Value, error) { return BoolValue(isEmpty(a[0])), nil }, "VIDE?")
 	op(1, func(in *Interp, a []Value) (Value, error) { return BoolValue(a[0].Kind == KList), nil }, "LISTE?")
-	op(1, func(in *Interp, a []Value) (Value, error) { return BoolValue(a[0].Kind != KList), nil }, "MOT?")
+	// un tableau n'est ni une liste ni un mot (il a son propre predicat TABLEAU?)
+	op(1, func(in *Interp, a []Value) (Value, error) {
+		return BoolValue(a[0].Kind != KList && a[0].Kind != KArray), nil
+	}, "MOT?")
 	op(1, func(in *Interp, a []Value) (Value, error) {
 		_, err := toNumber(a[0])
 		return BoolValue(err == nil), nil
@@ -207,16 +294,22 @@ func (i *Interp) registerOperations() {
 		return NumberValue(float64([]rune(w)[0])), nil
 	}, "ASCII")
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		n, err := toNumber(a[0])
+		n, err := intArg(a[0])
 		if err != nil {
 			return Value{}, err
 		}
-		return WordValue(string(rune(int(n) % 256))), nil
+		// point de code Unicode valide : pas de negatif, pas au-dela du max, pas de surrogate
+		if n < 0 || n > 0x10FFFF || (n >= 0xD800 && n <= 0xDFFF) {
+			return Value{}, fmt.Errorf("CAR N'AIME PAS %s", a[0].String())
+		}
+		return WordValue(string(rune(n))), nil
 	}, "CAR")
 	op(1, func(in *Interp, a []Value) (Value, error) {
 		switch a[0].Kind {
 		case KList:
 			return NumberValue(float64(len(a[0].List))), nil
+		case KArray:
+			return NumberValue(float64(len(a[0].Arr.Items))), nil
 		default:
 			return NumberValue(float64(len([]rune(a[0].String())))), nil
 		}
@@ -228,16 +321,23 @@ func (i *Interp) registerOperations() {
 	op(1, func(in *Interp, a []Value) (Value, error) { return butFirstLast(a[0], true) }, "SP", "SAUFPREMIER")
 	op(1, func(in *Interp, a []Value) (Value, error) { return butFirstLast(a[0], false) }, "SD", "SAUFDERNIER")
 	op(2, func(in *Interp, a []Value) (Value, error) {
-		n, err := toNumber(a[0])
+		k, err := intArg(a[0]) // indice entier exact : ITEM 1.9 refuse, pas tronque
 		if err != nil {
 			return Value{}, err
 		}
-		k := int(n)
 		if a[1].Kind == KList { // n-ieme membre de la liste
 			if k < 1 || k > len(a[1].List) {
 				return Value{}, fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR ITEM")
 			}
 			return datumToValue(a[1].List[k-1])
+		}
+		if a[1].Kind == KArray { // n-ieme case du tableau (en tenant compte de l'origine)
+			arr := a[1].Arr
+			idx := k - arr.Origin
+			if idx < 0 || idx >= len(arr.Items) {
+				return Value{}, fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR ITEM")
+			}
+			return arr.Items[idx], nil
 		}
 		r := []rune(a[1].String()) // sinon : n-ieme caractere du mot
 		if k < 1 || k > len(r) {
@@ -248,17 +348,20 @@ func (i *Interp) registerOperations() {
 
 	// PIOCHE liste-ou-mot : un membre (ou caractere) tire au hasard (PICK FMSLogo)
 	op(1, func(in *Interp, a []Value) (Value, error) {
+		if a[0].Kind == KArray { // un tableau se pioche avec ITEM + HASARD
+			return Value{}, &badData{a[0].String()}
+		}
 		if a[0].Kind == KList {
 			if len(a[0].List) == 0 {
 				return Value{}, &badData{a[0].String()}
 			}
-			return datumToValue(a[0].List[rand.Intn(len(a[0].List))])
+			return datumToValue(a[0].List[in.randN(len(a[0].List))])
 		}
 		r := []rune(a[0].String())
 		if len(r) == 0 {
 			return Value{}, &badData{a[0].String()}
 		}
-		return WordValue(string(r[rand.Intn(len(r))])), nil
+		return WordValue(string(r[in.randN(len(r))])), nil
 	}, "PIOCHE")
 
 	// mots et listes : construire (variadique entre parentheses)
@@ -407,6 +510,9 @@ func (i *Interp) registerOperations() {
 	}), "RAZ")
 	// QUITTE : on plie bagage, la tortue rentre se coucher
 	i.register(&primitive{name: "QUITTE", arity: 0, fn: func(in *Interp, a []Value) (Value, error) {
+		if err := in.closeAllFiles(); err != nil { // on referme proprement avant de plier bagage
+			fmt.Fprintln(in.Out, "fermeture fichiers:", err)
+		}
 		return None, ErrQuitter
 	}}, "QUITTE", "QUITTER")
 	i.register(&primitive{name: "EXEC", arity: 1, reporter: true, fn: func(in *Interp, a []Value) (Value, error) {
@@ -451,6 +557,9 @@ func (i *Interp) registerOperations() {
 		return WordValue(strings.ToLower(w)), nil
 	}, "MINUSCULE")
 	op(1, func(in *Interp, a []Value) (Value, error) {
+		if b, ok := asIntOperand(a[0]); ok { // valeur absolue exacte d'un entier
+			return intResult(new(big.Int).Abs(b)), nil
+		}
 		x, err := toNumber(a[0])
 		if err != nil {
 			return Value{}, err
@@ -466,6 +575,16 @@ func (i *Interp) registerOperations() {
 	}, "ARCTAN", "ATAN")
 	// MODULO : reste de la division, du signe du diviseur (contrairement a RESTE)
 	op(2, func(in *Interp, a []Value) (Value, error) {
+		if bx, by, ok := twoInts(a); ok {
+			if by.Sign() == 0 {
+				return Value{}, fmt.Errorf("MODULO N'AIME PAS 0")
+			}
+			m := new(big.Int).Rem(bx, by)
+			if m.Sign() != 0 && (m.Sign() < 0) != (by.Sign() < 0) {
+				m.Add(m, by) // ramene au signe du diviseur
+			}
+			return intResult(m), nil
+		}
 		x, err := toNumber(a[0])
 		if err != nil {
 			return Value{}, err
@@ -535,6 +654,16 @@ func (i *Interp) registerOperations() {
 	}), "ATTENDS")
 }
 
+// randN rend un entier de [0,n) via le RNG local (in.rng) s'il est defini, sinon
+// le generateur global (auto-seede a chaque lancement). Le bac a sable de l'aide
+// fixe in.rng pour des exemples reproductibles.
+func (in *Interp) randN(n int) int {
+	if in.rng != nil {
+		return in.rng.Intn(n)
+	}
+	return rand.Intn(n)
+}
+
 // convertit une ligne tapee en liste Logo (LL/READLIST). si elle est mal formee
 // (crochet pas ferme), chaque mot devient un mot brut, sans erreur
 func lineToList(line string) Value {
@@ -575,12 +704,41 @@ func datumNum(d Datum) (float64, bool) {
 
 // ordonne deux elements pour TRIE : deux nombres par valeur, sinon par leur ecriture
 func datumLess(a, b Datum) bool {
+	av, ae := datumToValue(a)
+	bv, be := datumToValue(b)
+	if ae == nil && be == nil {
+		if c, ok := intCmp(av, bv); ok { // grands entiers : compare exact
+			return c < 0
+		}
+	}
 	if an, aok := datumNum(a); aok {
 		if bn, bok := datumNum(b); bok {
 			return an < bn
 		}
 	}
 	return a.String() < b.String()
+}
+
+// valide une base de numeration : un entier de 2 a 36 (sinon erreur)
+func baseArg(v Value) (int, error) {
+	n, err := toNumber(v)
+	if err != nil {
+		return 0, err
+	}
+	b := int(n)
+	if float64(b) != n || b < 2 || b > 36 {
+		return 0, &badData{v.String()}
+	}
+	return b, nil
+}
+
+// ecrit l'entier v dans la base donnee, en majuscules (FF plutot que ff)
+func toBaseWord(v Value, base int) (Value, error) {
+	b, ok := asIntOperand(v)
+	if !ok {
+		return Value{}, &badData{v.String()}
+	}
+	return WordValue(strings.ToUpper(b.Text(base))), nil
 }
 
 func twoNums(a []Value) (float64, float64, error) {
@@ -623,18 +781,33 @@ func reverse(v Value) (Value, error) {
 	return WordValue(string(r)), nil
 }
 
-// cumule les nombres de a avec f en partant de init (SOMME/PROD variadiques)
-// avec 2 arguments, revient a f(a0, a1)
-func reduceNums(a []Value, init float64, f func(x, y float64) float64) (Value, error) {
-	acc := init
+// cumule les nombres de a en partant de init (SOMME/PROD variadiques). tant que
+// les operandes sont entiers, on replie avec comb (chemin int64/big exact) ; des
+// qu'une operande est fractionnaire, on bascule en flottant avec f pour le reste.
+func reduceNums(a []Value, init float64, comb func(l, r Value) (Value, bool), f func(x, y float64) float64) (Value, error) {
+	acc := NumberValue(init)
+	facc := init
+	floatMode := false
 	for _, v := range a {
+		if !floatMode {
+			if r, ok := comb(acc, v); ok {
+				acc = r
+				continue
+			}
+			// v n'est pas un entier : on passe en flottant pour la suite
+			facc, _ = toNumber(acc) // acc est entier, conversion exacte
+			floatMode = true
+		}
 		n, err := toNumber(v)
 		if err != nil {
 			return Value{}, err
 		}
-		acc = f(acc, n)
+		facc = f(facc, n)
 	}
-	return numResult(acc), nil
+	if floatMode {
+		return numResult(facc), nil
+	}
+	return acc, nil
 }
 
 func num1(a []Value, f func(float64) float64) (Value, error) {
@@ -645,7 +818,12 @@ func num1(a []Value, f func(float64) float64) (Value, error) {
 	return numResult(f(x)), nil
 }
 
-func cmpOp(a []Value, f func(x, y float64) bool) (Value, error) {
+// op vaut "<" ou ">" : on compare en entier exact si les deux operandes en sont
+// (sinon en flottant). evite que PLP?/PLG? reperdent la precision au-dela de 2^53.
+func cmpOp(a []Value, op string, f func(x, y float64) bool) (Value, error) {
+	if c, ok := intCmp(a[0], a[1]); ok {
+		return BoolValue(cmpHolds(op, c)), nil
+	}
 	x, y, err := twoNums(a)
 	if err != nil {
 		return Value{}, err
@@ -665,6 +843,9 @@ func isEmpty(v Value) bool {
 
 // premier (first=true) ou dernier element/caractere
 func firstLast(v Value, first bool) (Value, error) {
+	if v.Kind == KArray { // un tableau s'indexe avec ITEM, pas avec PREM/DER
+		return Value{}, &badData{v.String()}
+	}
 	switch v.Kind {
 	case KList:
 		if len(v.List) == 0 {
@@ -688,6 +869,9 @@ func firstLast(v Value, first bool) (Value, error) {
 
 // la liste/mot sans le premier (first=true) ou sans le dernier element
 func butFirstLast(v Value, first bool) (Value, error) {
+	if v.Kind == KArray { // pas de "sauf le premier" sur un tableau
+		return Value{}, &badData{v.String()}
+	}
 	switch v.Kind {
 	case KList:
 		if len(v.List) == 0 {

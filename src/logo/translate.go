@@ -27,7 +27,7 @@ func (i *Interp) TranslateProgram(src string, toEN bool) string {
 				b.WriteByte(src[j])
 				j++
 			}
-		case c == '[' || c == ']' || c == '(' || c == ')': // delimiteur de liste
+		case c == '[' || c == ']' || c == '(' || c == ')' || c == '{' || c == '}': // delimiteurs liste/tableau
 			b.WriteByte(c)
 			j++
 		default:
@@ -42,10 +42,10 @@ func (i *Interp) TranslateProgram(src string, toEN bool) string {
 	return b.String()
 }
 
-// un token s'arrete sur une espace ou un [ ] ( ) (jamais inclus dans le mot)
+// un token s'arrete sur une espace ou un [ ] ( ) { } (jamais inclus dans le mot)
 func isTokenBreak(c byte) bool {
 	switch c {
-	case ' ', '\t', '\r', '\n', '[', ']', '(', ')':
+	case ' ', '\t', '\r', '\n', '[', ']', '(', ')', '{', '}':
 		return true
 	}
 	return false

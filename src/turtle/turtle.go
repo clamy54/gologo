@@ -426,7 +426,9 @@ func (t *Turtle) goToWrapped(tx, ty float64) {
 		}
 		cx, cy = ex, ey
 	}
-	t.cur().X, t.cur().Y = wrap(cx, cy)
+	// la position enroulee finale ne depend que de la cible nette : si le garde-fou
+	// a coupe le trace (deplacement enorme), cx,cy serait partiel, pas tx,ty
+	t.cur().X, t.cur().Y = wrap(tx, ty)
 }
 
 // AV. coupe une anim en cours sur la tortue active

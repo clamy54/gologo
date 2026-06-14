@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math/big"
+	"math/rand"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -45,6 +47,7 @@ func (e *procErr) Unwrap() error { return e.inner }
 type Interp struct {
 	Turtle              *turtle.Turtle
 	Out                 io.Writer
+	rng                 *rand.Rand // RNG de HASARD/PIOCHE ; nil = rand global (auto-seede par run)
 	prims               map[string]*primitive
 	procs               map[string]*userProc
 	vars                map[string]Value       // variables globales
@@ -53,6 +56,8 @@ type Interp struct {
 	repStack            []int                  // compteurs de boucle REPETE (COMPTEUR/REPCOUNT)
 	testResult, testSet bool                   // resultat du dernier TESTE (SIVRAI/SIFAUX)
 	brk                 atomic.Bool            // drapeau partage : interruption demandee (PAUSE)
+	runDepth            int                    // profondeur de RunString (CHARGE/ED imbriques)
+	evalDepth           int                    // imbrication de l'evaluateur (garde anti-debordement)
 	editor              Editor                 // ouvre l'editeur ED
 	edBuf               string                 // contenu garde pour un ED sans argument
 	help                Helper                 // navigateur d'aide AIDE
@@ -69,6 +74,9 @@ type Interp struct {
 	langMu                                   sync.Mutex       // protege lang (le worker ecrit, l'UI lit)
 	workDir                                  string           // dossier des .GLG (vide => ~/Logo)
 	examplesDir                              string           // dossier des exemples (vide => defaut plateforme) ; commandes ...EX
+	fio                                      *fileIO          // fichiers ouverts + flux lecture/ecriture courants (E/S fichier)
+	Quiet                                    bool             // tait le "VOUS VENEZ DE DEFINIR" (utile en batch/comparaison)
+	eolCRLF                                  bool             // ecriture fichier en CRLF (FIXEFINLIGNE) ; defaut LF
 }
 
 // bascule la langue (Ctrl+L dans le navigateur) ; rend les donnees regenerees et
@@ -259,9 +267,12 @@ func New(t *turtle.Turtle, out io.Writer) *Interp {
 	}
 	i.registerBuiltins()
 	i.registerOperations()
+	i.registerStrings() // MEMBRE / SOUSCHAINE? / DECOUPE / ROGNE / SUBSTITUE / TRANCHE...
+	i.registerArrays()  // TABLEAU / FIXEITEM / COPIETABLEAU / EMPILE / DEFILE...
 	i.registerWorkspace()
 	i.registerScreenExt()
 	i.registerFiles()          // SAUVE / RAMENE / CHARGE / SAUVED / CATALOGUE / DETRUIS
+	i.registerFileIO()         // OUVRELECTURE / FIXELECTURE / LISLIGNE / FINFICHIER? ... (flux fichier)
 	i.registerPrinter()        // COPIE (copie d'ecran PNG numerotee)
 	i.registerPlist()          // DONNEPROP / PROP / EFPROP / LISTEPROP (listes de proprietes)
 	i.registerDefine()         // DEFINIS / TEXTE (procedures comme donnees)
@@ -288,8 +299,25 @@ func (i *Interp) register(p *primitive, names ...string) {
 }
 
 // lit puis execute une source Logo complete
-func (i *Interp) RunString(src string) error {
-	i.brk.Store(false) // arme la detection d'interruption pour ce programme
+func (i *Interp) RunString(src string) (err error) {
+	// seul le programme racine arme la detection d'interruption : un CHARGE/ED imbrique
+	// ne doit pas effacer un Ctrl+C demande juste avant
+	if i.runDepth == 0 {
+		i.brk.Store(false)
+	}
+	i.runDepth++
+	// filet de securite : une primitive ne devrait jamais paniquer, mais si ca arrive
+	// (entree pathologique...) on transforme la panique en erreur Logo au lieu de tuer
+	// toute l'appli. au retour au niveau racine on remet aussi les piles a plat
+	defer func() {
+		i.runDepth--
+		if r := recover(); r != nil {
+			if i.runDepth == 0 {
+				i.frames, i.repStack, i.testSet = nil, nil, false
+			}
+			err = fmt.Errorf("ERREUR INTERNE : %v", r)
+		}
+	}()
 	data, err := Read(src)
 	if err != nil {
 		return err
@@ -302,9 +330,28 @@ func (i *Interp) RunString(src string) error {
 	return err
 }
 
+// plafond d'imbrication de l'evaluateur. les appels de procs sont deja bornes par
+// maxCallDepth, mais une liste qui s'execute elle-meme (DONNE "L [ EXEC :L ]
+// EXEC :L) recurse en Go sans empiler de contexte : sans ce garde-fou, la pile
+// Go finirait par deborder et emporter tout le programme, sans rattrapage possible
+const maxEvalDepth = 40000
+
+// descend d'un cran dans l'evaluateur ; erreur PLUS DE PLACE au-dela du plafond
+func (i *Interp) enterEval() error {
+	if i.evalDepth >= maxEvalDepth {
+		return errPlusDePlace
+	}
+	i.evalDepth++
+	return nil
+}
+
 // execute une suite d'instructions sans recursion terminale (tout appel de proc
 // empile un contexte). cas general : programme, corps de boucle, EXEC...
 func (i *Interp) runSeq(data []Datum) error {
+	if err := i.enterEval(); err != nil {
+		return err
+	}
+	defer func() { i.evalDepth-- }()
 	return (&eval{i: i, data: data}).exec()
 }
 
@@ -312,6 +359,10 @@ func (i *Interp) runSeq(data []Datum) error {
 // resultat devient celui de la proc englobante). pour le corps des procs et les
 // branches terminales de SI, pour que callProc deroule la TCO
 func (i *Interp) runSeqTail(data []Datum, tail bool) error {
+	if err := i.enterEval(); err != nil {
+		return err
+	}
+	defer func() { i.evalDepth-- }()
 	return (&eval{i: i, data: data, tailOK: tail}).exec()
 }
 
@@ -361,6 +412,10 @@ type displayResetter interface {
 // RAZ : remet l'interpreteur et l'affichage a neuf. procedures et variables
 // effacees, parametres par defaut, ecran reinitialise
 func (i *Interp) resetAll() {
+	if err := i.closeAllFiles(); err != nil { // referme les fichiers ouverts
+		fmt.Fprintln(i.Out, "fermeture fichiers:", err)
+	}
+	i.eolCRLF = false // FIXEFINLIGNE revient a son defaut LF
 	i.procs = map[string]*userProc{}
 	i.vars = map[string]Value{}
 	i.plists = map[string][]propEntry{}
@@ -661,6 +716,9 @@ func (e *eval) primary() (Value, error) {
 	d := e.next()
 	switch d.Kind {
 	case DNumber:
+		if d.Big != nil {
+			return IntValue(d.Big), nil
+		}
 		return NumberValue(d.Num), nil
 	case DWord:
 		return WordValue(d.Text), nil
@@ -672,6 +730,9 @@ func (e *eval) primary() (Value, error) {
 		return v, nil
 	case DList:
 		return ListValue(d.List), nil
+	case DArray:
+		// tableau litteral { ... } : construit une valeur tableau (fraiche)
+		return datumToValue(d)
 	case DGroup:
 		// (prim-commande ...) en position de valeur : traite comme une liste ;
 		// sinon on evalue et on rend la valeur
@@ -684,6 +745,9 @@ func (e *eval) primary() (Value, error) {
 			v, err := e.primary()
 			if err != nil {
 				return Value{}, err
+			}
+			if b, ok := asIntOperand(v); ok { // -:A reste exact si A est entier
+				return intResult(new(big.Int).Neg(b)), nil
 			}
 			n, err := toNumber(v)
 			if err != nil {
@@ -759,9 +823,16 @@ func (i *Interp) evalCode(data []Datum, group bool) (Value, error) {
 	if len(data) == 0 {
 		return None, nil
 	}
+	if err := i.enterEval(); err != nil {
+		return Value{}, err
+	}
+	defer func() { i.evalDepth-- }()
 	ev := &eval{i: i, data: data, group: group}
 	if startsWithCommand(i, data) {
 		for !ev.atEnd() {
+			if i.brk.Load() { // meme point de controle que exec()
+				return Value{}, ErrInterrompu
+			}
 			if err := ev.statement(); err != nil {
 				return Value{}, err
 			}
@@ -773,6 +844,9 @@ func (i *Interp) evalCode(data []Datum, group bool) (Value, error) {
 		return Value{}, err
 	}
 	for !ev.atEnd() { // eventuelles commandes apres l'operation
+		if i.brk.Load() {
+			return Value{}, ErrInterrompu
+		}
 		if err := ev.statement(); err != nil {
 			return Value{}, err
 		}

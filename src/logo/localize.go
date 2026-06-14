@@ -44,6 +44,24 @@ var errExact = map[string]string{
 	"LECTURE IMPOSSIBLE":                            "CANNOT READ FILE",
 	"PAS DE DOSSIER D'EXEMPLES":                     "NO EXAMPLES DIRECTORY",
 	"PLUS DE PLACE":                                 "OUT OF SPACE",
+	"FICHIER INTROUVABLE":                           "FILE NOT FOUND",
+	"FICHIER DEJA OUVERT":                           "FILE ALREADY OPEN",
+	"FICHIER NON OUVERT":                            "FILE NOT OPEN",
+	"FICHIER OUVERT":                                "FILE IS OPEN",
+	"POSITION INVALIDE":                             "INVALID POSITION",
+	"NOM DE FICHIER INVALIDE":                       "INVALID FILE NAME",
+	"MAUVAIS MODE D'OUVERTURE":                      "WRONG OPEN MODE",
+	"FICHIER BINAIRE":                               "BINARY FILE",
+	"IMBRICATION TROP PROFONDE":                     "NESTING TOO DEEP",
+	"TABLEAU TROP GRAND":                            "ARRAY TOO LARGE",
+	"TABLEAUMD VEUT AU MOINS UNE DIMENSION":         "MDARRAY WANTS AT LEAST ONE DIMENSION",
+	"TABLEAUMD VEUT DES TAILLES POSITIVES":          "MDARRAY WANTS POSITIVE SIZES",
+	"FIXEITEMMD VEUT AU MOINS UN INDICE":            "MDSETITEM WANTS AT LEAST ONE INDEX",
+	"ITEMMD : PAS ASSEZ DE DIMENSIONS":              "MDITEM: NOT ENOUGH DIMENSIONS",
+	"FIXEITEMMD : PAS ASSEZ DE DIMENSIONS":          "MDSETITEM: NOT ENOUGH DIMENSIONS",
+	"LISTE D'INDICES ATTENDUE":                      "INDEX LIST EXPECTED",
+	"DECOUPE VEUT UN SEPARATEUR NON VIDE":           "SPLIT WANTS A NON-EMPTY SEPARATOR",
+	`FIXEFINLIGNE VEUT "LF OU "CRLF`:                `SETEOL WANTS "LF OR "CRLF`,
 }
 
 // traduit un message FR en EN : table exacte, puis prefixe/suffixe reconnus,
@@ -54,6 +72,21 @@ func localizeErr(msg string) string {
 	}
 	if rest, ok := strings.CutPrefix(msg, "PAS ASSEZ DE DONNEES POUR "); ok {
 		return "NOT ENOUGH INPUTS TO " + primNameEN(rest)
+	}
+	if rest, ok := strings.CutPrefix(msg, "PAS ASSEZ D'ELEMENTS POUR "); ok {
+		return "NOT ENOUGH ITEMS FOR " + primNameEN(rest)
+	}
+	if rest, ok := strings.CutPrefix(msg, "ERREUR INTERNE : "); ok {
+		return "INTERNAL ERROR: " + rest
+	}
+	if rest, ok := strings.CutPrefix(msg, "ORIGINE DE TABLEAU INVALIDE : "); ok {
+		return "INVALID ARRAY ORIGIN: " + rest
+	}
+	if rest, ok := strings.CutPrefix(msg, "INDICE INVALIDE : "); ok {
+		return "INVALID INDEX: " + rest
+	}
+	if rest, ok := strings.CutPrefix(msg, "POSITION INVALIDE POUR "); ok {
+		return "INVALID POSITION FOR " + primNameEN(rest)
 	}
 	if rest, ok := strings.CutPrefix(msg, "PAS DE CHOSE DONNEE A "); ok {
 		return rest + " HAS NO VALUE" // nom de variable : pas de traduction
@@ -85,6 +118,17 @@ func localizeErr(msg string) string {
 	}
 	if rest, ok := strings.CutSuffix(msg, " inattendu"); ok {
 		return rest + " unexpected"
+	}
+	if rest, ok := strings.CutSuffix(msg, " REFUSE UN TABLEAU CIRCULAIRE"); ok {
+		return primNameEN(rest) + " REFUSES A CIRCULAR ARRAY"
+	}
+	// "<primitive> N'AIME PAS LA LISTE/LE MOT VIDE" : avant le cas general, sinon la
+	// fin "LA LISTE VIDE" resterait en francais
+	if rest, ok := strings.CutSuffix(msg, " N'AIME PAS LA LISTE VIDE"); ok {
+		return primNameEN(rest) + " DOESN'T LIKE THE EMPTY LIST"
+	}
+	if rest, ok := strings.CutSuffix(msg, " N'AIME PAS LE MOT VIDE"); ok {
+		return primNameEN(rest) + " DOESN'T LIKE THE EMPTY WORD"
 	}
 	// cas general "<primitive> N'AIME PAS <objet>" : on traduit le nom, on garde l'objet
 	if i := strings.Index(msg, " N'AIME PAS "); i >= 0 {

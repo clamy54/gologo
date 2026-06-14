@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// DEFINIS / TEXTE : manipuler des procedures comme des donnees (Logo adulte)
+// DEFINIS / TEXTE : manipuler des procedures comme des donnees (Logo etendu)
 // DEFINIS (alias DEF, anglais DEFINE) a deux signatures, devinees sur la 1re liste :
 //   imbriquee UCBLogo : DEFINIS "nom [ [params] [ligne1] [ligne2]... ]
 //   plate XLogo       : DEFINIS "nom [params] [corps]   (le corps est l'arg suivant)

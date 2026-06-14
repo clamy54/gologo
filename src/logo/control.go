@@ -32,10 +32,12 @@ func formePour(e *eval) (Value, error) {
 		return Value{}, fmt.Errorf("%s EXISTE DEJA", name)
 	}
 	e.i.procs[name] = &userProc{name: name, params: params, body: body}
-	if e.i.Lang() == "EN" {
-		fmt.Fprintf(e.i.Out, "%s DEFINED\n", name)
-	} else {
-		fmt.Fprintf(e.i.Out, "VOUS VENEZ DE DEFINIR %s\n", name)
+	if !e.i.Quiet {
+		if e.i.Lang() == "EN" {
+			fmt.Fprintf(e.i.Out, "%s DEFINED\n", name)
+		} else {
+			fmt.Fprintf(e.i.Out, "VOUS VENEZ DE DEFINIR %s\n", name)
+		}
 	}
 	return None, nil
 }
@@ -93,10 +95,23 @@ func (i *Interp) procsText(names []string) string {
 // eventuelles autres lignes du texte
 func (i *Interp) defineFromEditor(text string) error {
 	blocks := scanProcBlocks(text)
+	old := make(map[string]*userProc, len(blocks))
 	for name := range blocks {
+		if p := i.procs[name]; p != nil {
+			old[name] = p // garde l'ancienne def pour la restaurer si l'edition est fautive
+		}
 		delete(i.procs, name) // autorise la redefinition (sinon "... EXISTE DEJA")
 	}
 	if err := i.RunString(text); err != nil {
+		// edition invalide : on annule TOUT (meme les procs deja redefinies avant
+		// l'erreur), pour remettre l'atelier exactement dans son etat d'avant
+		for name := range blocks {
+			if p := old[name]; p != nil {
+				i.procs[name] = p
+			} else {
+				delete(i.procs, name)
+			}
+		}
 		return err
 	}
 	for name, raw := range blocks {

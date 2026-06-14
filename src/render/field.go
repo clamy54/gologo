@@ -80,6 +80,8 @@ func (s *Screen) SaveFieldPNG(path string) error {
 // serait jamais atteint, et la COPIE attendrait une frame qui ne viendra jamais : fige
 func (s *Screen) captureFrame(schedule func()) *image.RGBA {
 	resp := make(chan *image.RGBA, 1)
+	s.captureWaiting.Add(1) // leve la mise en sommeil d'invalidate pendant un SCENE gele
+	defer s.captureWaiting.Add(-1)
 	s.captureCh <- resp // bufferise : non bloquant
 	schedule()          // programme une frame qui servira la capture
 	return <-resp

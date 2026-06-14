@@ -1,4 +1,4 @@
-; VORAX - le serpent vorace facon NIBBLES (QBasic / MS-DOS).
+; VORAX - le serpent vorace. Librement inspiré par Nibbles
 ; Fleches pour diriger, mange les pommes, evite les murs et ta queue.
 ; Terrain en grille COLS x ROWS ; chaque case porte un numero unique
 ; N = ligne * COLS + colonne. Le corps est une liste de numeros (tete
@@ -86,13 +86,13 @@ FCC :TETE CASE PREMIER :BODY
 FIN
 
 ; ---- le score, au-dessus de la muraille ----
-POUR TABLEAU
+POUR TAB
 FCC :TXT LC FXY -740 485 ETIQUETTE ( PHRASE [ SCORE ] :SCORE )
 FIN
 
 ; ---- une image complete (double tampon : pas de clignotement) ----
 POUR IMAGE
-SCENE [ NETTOIE MURS POMME CORPS TABLEAU ]
+SCENE [ NETTOIE MURS POMME CORPS TAB ]
 FIN
 
 ; ---- ecran titre : attend une touche ----

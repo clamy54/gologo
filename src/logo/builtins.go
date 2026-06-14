@@ -3,6 +3,7 @@ package logo
 import (
 	"fmt"
 	"math"
+	"math/big"
 	"strconv"
 	"strings"
 
@@ -246,13 +247,13 @@ func (i *Interp) registerBuiltins() {
 	// sortie texte
 	// forme variable entre parentheses : (ECRIS a b c) imprime les objets separes
 	// par une espace, comme PRINT/TYPE en Logo standard
+	// ECRIS/TAPE/MONTRE ecrivent sur le flux d'ecriture courant (FIXEECRITURE) s'il
+	// y en a un, sinon sur la console (cf in.writeText)
 	i.register(vcmd(1, func(in *Interp, a []Value) error {
-		fmt.Fprintln(in.Out, joinValues(a))
-		return nil
+		return in.writeText(joinValues(a) + "\n")
 	}), "ECRIS", "EC")
 	i.register(vcmd(1, func(in *Interp, a []Value) error {
-		fmt.Fprint(in.Out, joinValues(a))
-		return nil
+		return in.writeText(joinValues(a))
 	}), "TAPE")
 
 	// MONTRE : comme ECRIS mais garde les crochets autour des listes (SHOW standard)
@@ -261,8 +262,7 @@ func (i *Interp) registerBuiltins() {
 		for i, v := range a {
 			parts[i] = showValue(v)
 		}
-		fmt.Fprintln(in.Out, strings.Join(parts, " "))
-		return nil
+		return in.writeText(strings.Join(parts, " ") + "\n")
 	}), "MONTRE")
 }
 
@@ -353,7 +353,9 @@ func (i *Interp) drawArc(r, cap1, cap2 float64) error {
 
 // REPETE n [ ... ]
 func primRepete(in *Interp, a []Value) (Value, error) {
-	n, err := toNumber(a[0])
+	// entier exact (comme ITEM/HASARD) : refuse 3.6, l'infini et les compteurs
+	// gigantesques (qui partiraient en boucle quasi sans fin) plutot que de tronquer
+	n, err := intArg(a[0])
 	if err != nil {
 		return Value{}, err
 	}
@@ -363,7 +365,10 @@ func primRepete(in *Interp, a []Value) (Value, error) {
 	// compteur d'iteration empile pour COMPTEUR/REPCOUNT (depile meme si ca plante)
 	in.repStack = append(in.repStack, 0)
 	defer func() { in.repStack = in.repStack[:len(in.repStack)-1] }()
-	for k := 0; k < int(n); k++ {
+	for k := 0; k < n; k++ {
+		if in.brk.Load() { // interruptible meme avec un corps vide (REPETE 1e18 [])
+			return Value{}, ErrInterrompu
+		}
 		in.repStack[len(in.repStack)-1] = k + 1
 		if err := in.runSeq(a[1].List); err != nil {
 			return Value{}, err
@@ -378,6 +383,11 @@ func toNumber(v Value) (float64, error) {
 	switch v.Kind {
 	case KNumber:
 		return v.Num, nil
+	case KInt:
+		// approche float64 de l'entier exact (perd de la precision au-dela de
+		// 2^53, mais c'est le contrat de toNumber : trigo, indices, couleurs...)
+		f, _ := new(big.Float).SetInt(v.Int).Float64()
+		return f, nil
 	case KWord:
 		if n, err := strconv.ParseFloat(strings.Replace(v.Word, ",", ".", 1), 64); err == nil {
 			return n, nil
@@ -392,6 +402,8 @@ func toWord(v Value) (string, error) {
 		return v.Word, nil
 	case KNumber:
 		return formatNumber(v.Num), nil
+	case KInt:
+		return v.Int.String(), nil
 	}
 	return "", &badData{v.String()}
 }
@@ -493,6 +505,32 @@ func applyOp(op string, l, r Value) (Value, error) {
 		}
 		return BoolValue(eq), nil
 	}
+	// chemin entier exact : + - * sur deux entiers restent exacts (au-dela de 2^53),
+	// les comparaisons aussi. petits entiers -> int64 sans allocation ; tout le
+	// reste (fractions) retombe sur le float64.
+	switch op {
+	case "+":
+		if v, ok := addInt(l, r); ok {
+			return v, nil
+		}
+	case "-":
+		if v, ok := subInt(l, r); ok {
+			return v, nil
+		}
+	case "*":
+		if v, ok := mulInt(l, r); ok {
+			return v, nil
+		}
+	case "<", ">", "<=", ">=":
+		if x, ok := asSmallInt(l); ok {
+			if y, ok2 := asSmallInt(r); ok2 {
+				return BoolValue(cmpHolds(op, cmpInt64(x, y))), nil
+			}
+		}
+		if c, ok := intCmp(l, r); ok {
+			return BoolValue(cmpHolds(op, c)), nil
+		}
+	}
 	ln, err := toNumber(l)
 	if err != nil {
 		return Value{}, err
@@ -526,8 +564,21 @@ func applyOp(op string, l, r Value) (Value, error) {
 }
 
 func valuesEqual(l, r Value) bool {
+	// au moins un entier exact : compare les valeurs entieres si l'autre en est
+	// un aussi (sinon on laisse filer vers la comparaison de chaines plus bas,
+	// pour ne pas changer le sens de "007 = "7 entre deux mots)
+	if l.Kind == KInt || r.Kind == KInt {
+		if c, ok := intCmp(l, r); ok {
+			return c == 0
+		}
+	}
 	if l.Kind == KNumber && r.Kind == KNumber {
 		return l.Num == r.Num
+	}
+	// tableaux : egalite par identite (le MEME tableau), pas par contenu - deux
+	// tableaux distincts au contenu identique ne sont pas egaux (facon FMSLogo)
+	if l.Kind == KArray || r.Kind == KArray {
+		return l.Kind == KArray && r.Kind == KArray && l.Arr == r.Arr
 	}
 	return strings.EqualFold(l.String(), r.String())
 }

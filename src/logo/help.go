@@ -2,8 +2,13 @@ package logo
 
 import (
 	"fmt"
+	"math/rand"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+
+	"beroot.com/logo/turtle"
 )
 
 // decrit une primitive pour AIDE, bilingue. cle helpData = nom FR,
@@ -112,7 +117,7 @@ var helpData = map[string]helpEntry{
 	"ETIQUETTE":        {en: "LABEL", params: "obj", kind: "C", exemples: []string{"ETIQUETTE \"BONJOUR"}, descFr: "Écrit obj dans le champ graphique, à la position de la tortue (couleur du crayon).", descEn: "Writes obj in the graphics field at the turtle's position (pen color)."},
 
 	// mots et listes : examiner
-	"EGAL?":   {en: "EQUAL?", enAliases: []string{"EQUALP"}, params: "obj1 obj2", kind: "P", exemples: []string{"ECRIS EGAL? 2 2"}, descFr: "Retourne VRAI si obj1 et obj2 sont égaux. Opérateur infixe : =.", descEn: "Outputs TRUE if obj1 and obj2 are equal. Infix operator: =."},
+	"EGAL?":   {en: "EQUAL?", enAliases: []string{"EQUALP"}, params: "obj1 obj2", kind: "P", exemples: []string{"ECRIS EGAL? 2 2"}, descFr: "Retourne VRAI si obj1 et obj2 sont égaux. Opérateur infixe : =. La comparaison de mots ignore la casse (EGAL? \"a \"A rend VRAI) ; quand la casse compte, comparer les codes : EGAL? ASCII :c1 ASCII :c2.", descEn: "Outputs TRUE if obj1 and obj2 are equal. Infix operator: =. Word comparison ignores letter case (EQUAL? \"a \"A is TRUE); when case matters, compare codes: EQUAL? ASCII :c1 ASCII :c2."},
 	"VIDE?":   {en: "EMPTY?", enAliases: []string{"EMPTYP"}, params: "obj", kind: "P", exemples: []string{"ECRIS VIDE? [ ]"}, descFr: "Retourne VRAI si obj est le mot vide ou la liste vide.", descEn: "Outputs TRUE if obj is the empty word or empty list."},
 	"LISTE?":  {en: "LIST?", enAliases: []string{"LISTP"}, params: "obj", kind: "P", exemples: []string{"ECRIS LISTE? [ A B ]"}, descFr: "Retourne VRAI si obj est une liste.", descEn: "Outputs TRUE if obj is a list."},
 	"MOT?":    {en: "WORD?", enAliases: []string{"WORDP"}, params: "obj", kind: "P", exemples: []string{"ECRIS MOT? \"BONJOUR"}, descFr: "Retourne VRAI si obj est un mot.", descEn: "Outputs TRUE if obj is a word."},
@@ -120,14 +125,14 @@ var helpData = map[string]helpEntry{
 	"NOMBRE?": {en: "NUMBER?", enAliases: []string{"NUMBERP"}, params: "obj", kind: "P", exemples: []string{"ECRIS NOMBRE? 42"}, descFr: "Retourne VRAI si obj est un nombre.", descEn: "Outputs TRUE if obj is a number."},
 	"ASCII":   {en: "ASCII", params: "mot", kind: "O", exemples: []string{"ECRIS ASCII \"A"}, descFr: "Retourne le code ASCII du 1er caractère de mot (mot vide -> 0).", descEn: "Outputs the ASCII code of the first character of word (empty word -> 0)."},
 	"CAR":     {en: "CHAR", params: "n", kind: "O", exemples: []string{"ECRIS CAR 65"}, descFr: "Retourne le caractère de code n (modulo 256 ; 0 -> mot vide).", descEn: "Outputs the character of code n (modulo 256; 0 -> empty word)."},
-	"COMPTE":  {en: "COUNT", params: "liste", kind: "O", exemples: []string{"ECRIS COMPTE [ A B C ]"}, descFr: "Retourne le nombre de membres d'une liste (ou de caractères d'un mot).", descEn: "Outputs the number of members of a list (or characters of a word)."},
+	"COMPTE":  {en: "COUNT", params: "chose", kind: "O", exemples: []string{"ECRIS COMPTE [ A B C ]"}, descFr: "Retourne le nombre de membres d'une liste, de caractères d'un mot, ou de cases d'un tableau.", descEn: "Outputs the number of members of a list, characters of a word, or cells of an array."},
 
 	// mots et listes : demonter
 	"PREM":   {en: "FIRST", frAliases: []string{"PREMIER"}, params: "obj", kind: "O", exemples: []string{"ECRIS PREM [ A B C ]"}, descFr: "Retourne le 1er membre d'une liste (ou le 1er caractère d'un mot).", descEn: "Outputs the first member of a list (or first character of a word)."},
 	"SP":     {en: "BUTFIRST", frAliases: []string{"SAUFPREMIER"}, enAliases: []string{"BF"}, params: "obj", kind: "O", exemples: []string{"ECRIS SP [ A B C ]"}, descFr: "Retourne obj sauf son premier élément.", descEn: "Outputs obj without its first element."},
 	"DER":    {en: "LAST", frAliases: []string{"DERNIER"}, params: "obj", kind: "O", exemples: []string{"ECRIS DER [ A B C ]"}, descFr: "Retourne le dernier membre d'une liste (ou le dernier caractère d'un mot).", descEn: "Outputs the last member of a list (or last character of a word)."},
 	"SD":     {en: "BUTLAST", frAliases: []string{"SAUFDERNIER"}, enAliases: []string{"BL"}, params: "obj", kind: "O", exemples: []string{"ECRIS SD [ A B C ]"}, descFr: "Retourne obj sauf son dernier élément.", descEn: "Outputs obj without its last element."},
-	"ITEM":   {en: "ITEM", params: "n liste ou mot", kind: "O", exemples: []string{"ECRIS ITEM 2 [ A B C ]", "ECRIS ITEM 2 \"CHAT"}, descFr: "Retourne le n-ième membre d'une liste, ou le n-ième caractère d'un mot (n entier >= 1).", descEn: "Outputs the nth member of a list, or the nth character of a word (n integer >= 1)."},
+	"ITEM":   {en: "ITEM", params: "n chose", kind: "O", exemples: []string{"ECRIS ITEM 2 [ A B C ]", "ECRIS ITEM 2 \"CHAT"}, descFr: "Retourne le n-ième membre d'une liste, le n-ième caractère d'un mot, ou la case n d'un tableau (n entier ; pour un tableau on tient compte de l'origine).", descEn: "Outputs the nth member of a list, the nth character of a word, or cell n of an array (n integer; for an array the origin is taken into account)."},
 	"PIOCHE": {en: "PICK", params: "liste ou mot", kind: "O", exemples: []string{"ECRIS PIOCHE [ PILE FACE ]"}, descFr: "Retourne un membre d'une liste (ou un caractère d'un mot) tiré au hasard. (Compat FMSLogo.)", descEn: "Outputs a randomly chosen member of a list (or character of a word). (FMSLogo compatibility.)"},
 
 	// mots et listes : construire
@@ -138,6 +143,40 @@ var helpData = map[string]helpEntry{
 	"LISTE":     {en: "LIST", params: "obj1 obj2", kind: "O", exemples: []string{"ECRIS LISTE \"A \"B"}, descFr: "Construit la liste [obj1 obj2].", descEn: "Builds the list [obj1 obj2]."},
 	"MP":        {en: "FPUT", frAliases: []string{"METSPREMIER"}, params: "obj liste", kind: "O", exemples: []string{"ECRIS MP \"A [ B C ]"}, descFr: "Ajoute obj en tête de liste.", descEn: "Adds obj at the front of list."},
 	"MD":        {en: "LPUT", frAliases: []string{"METSDERNIER"}, params: "obj liste", kind: "O", exemples: []string{"ECRIS MD \"C [ A B ]"}, descFr: "Ajoute obj en queue de liste.", descEn: "Adds obj at the end of list."},
+
+	// chaines : recherche, decoupe, nettoyage (v2.0)
+	"MEMBRE":       {en: "MEMBER", params: "chose1 chose2", kind: "O", exemples: []string{"ECRIS MEMBRE \"C \"ABCDE", "ECRIS MEMBRE \"B [ A B C ]"}, descFr: "Retourne la portion de chose2 (mot ou liste) depuis la première occurrence de chose1 jusqu'à la fin, ou le vide si chose1 est absent. Sur un mot, chose1 est un seul caractère.", descEn: "Outputs the portion of thing2 (word or list) from the first occurrence of thing1 to the end, or empty if thing1 is absent. On a word, thing1 is a single character."},
+	"SOUSCHAINE?":  {en: "SUBSTRING?", enAliases: []string{"SUBSTRINGP"}, params: "chose1 chose2", kind: "P", exemples: []string{"ECRIS SOUSCHAINE? \"bc \"abc"}, descFr: "Retourne VRAI si chose1 est une sous-chaîne du mot chose2 (casse ignorée). FAUX si l'un des deux est une liste.", descEn: "Outputs TRUE if thing1 is a substring of the word thing2 (case-insensitive). FALSE if either one is a list."},
+	"AVANT?":       {en: "BEFORE?", enAliases: []string{"BEFOREP"}, params: "mot1 mot2", kind: "P", exemples: []string{"ECRIS AVANT? \"abc \"abd"}, descFr: "Retourne VRAI si mot1 vient avant mot2 dans l'ordre alphabétique (casse ignorée).", descEn: "Outputs TRUE if word1 comes before word2 in alphabetical order (case-insensitive)."},
+	"DECOUPE":      {en: "SPLIT", params: "mot separateur", kind: "O", exemples: []string{"ECRIS DECOUPE \"1-2-3 \"-", "ECRIS DECOUPE \"a::b::c \"::"}, descFr: "Découpe mot sur le separateur et retourne la liste des morceaux (les morceaux vides sont gardés). Le separateur peut être un seul caractère ou une chaîne entière. Extension gologo.", descEn: "Splits word on the separator and outputs the list of pieces (empty pieces are kept). The separator may be a single character or a whole string. gologo extension."},
+	"ROGNE":        {en: "TRIM", params: "mot", kind: "O", exemples: []string{"ECRIS ROGNE \"bonjour"}, descFr: "Retourne mot sans les blancs (espaces, tabulations) de début et de fin. Utile sur une ligne lue au clavier. Extension gologo.", descEn: "Outputs word without leading and trailing blanks (spaces, tabs). Useful on a line read from input. gologo extension."},
+	"ROGNEDEBUT":   {en: "LTRIM", params: "mot", kind: "O", exemples: []string{"ECRIS ROGNEDEBUT \"bonjour"}, descFr: "Retourne mot sans les blancs de début. Extension gologo.", descEn: "Outputs word without leading blanks. gologo extension."},
+	"ROGNEFIN":     {en: "RTRIM", params: "mot", kind: "O", exemples: []string{"ECRIS ROGNEFIN \"bonjour"}, descFr: "Retourne mot sans les blancs de fin. Extension gologo.", descEn: "Outputs word without trailing blanks. gologo extension."},
+	"SUBSTITUE":    {en: "SUBSTITUTE", params: "ancien nouveau chaine", kind: "O", exemples: []string{"ECRIS SUBSTITUE \"an \"AN \"banane", "ECRIS ( SUBSTITUE \"a \"o \"ananas 1 )"}, descFr: "Retourne chaine où toutes les occurrences de la sous-chaîne ancien sont remplacées par nouveau. Entre parenthèses, (SUBSTITUE ancien nouveau chaine n) en remplace au plus n. ancien vide est une erreur. Extension gologo.", descEn: "Outputs string with every occurrence of the substring old replaced by new. In parentheses, (SUBSTITUTE old new string n) replaces at most n. An empty old is an error. gologo extension."},
+	"OTETOUT":      {en: "REMOVE", params: "chose elements", kind: "O", exemples: []string{"ECRIS OTETOUT \"A [ A B A C ]"}, descFr: "Retourne elements (liste ou mot) privé de tous les membres égaux à chose. Sur un mot, chose est un seul caractère.", descEn: "Outputs elements (list or word) without all members equal to thing. On a word, thing is a single character."},
+	"SANSDOUBLONS": {en: "REMDUP", params: "elements", kind: "O", exemples: []string{"ECRIS SANSDOUBLONS [ A B C C B ]"}, descFr: "Retourne une copie de elements sans doublons : si un membre apparaît plusieurs fois, on garde celui le plus à droite.", descEn: "Outputs a copy of elements with duplicates removed: if a member appears several times, the rightmost one is kept."},
+	"TRANCHE":      {en: "SLICE", params: "sequence debut fin", kind: "O", exemples: []string{"ECRIS TRANCHE \"bonjour 2 4", "ECRIS ( TRANCHE \"bonjour 4 )", "ECRIS TRANCHE [ A B C D ] 2 3"}, descFr: "Retourne la sous-séquence de debut à fin inclus (indices à partir de 1, comme ITEM) ; le type suit l'entrée (mot ou liste). (TRANCHE sequence debut) va jusqu'au bout. Bornes hors limites ramenées proprement. Extension gologo.", descEn: "Outputs the subsequence from start to end inclusive (1-based, like ITEM); the type follows the input (word or list). (SLICE sequence start) goes to the end. Out-of-range bounds are clamped. gologo extension."},
+	"REMPLACE":     {en: "REPLACE", params: "sequence n arg", kind: "O", exemples: []string{"ECRIS REMPLACE [ A B C ] 2 8", "ECRIS REMPLACE \"chat 1 \"r"}, descFr: "Retourne sequence (mot ou liste) où l'élément n° n est remplacé par arg (n à partir de 1). Version non destructive (rend une nouvelle valeur). Repris de XLogo.", descEn: "Outputs sequence (word or list) with item number n replaced by arg (1-based). Non-destructive (outputs a new value). From XLogo."},
+	"AJOUTE":       {en: "INSERTITEM", params: "sequence n arg", kind: "O", exemples: []string{"ECRIS AJOUTE [ A B C ] 2 8", "ECRIS AJOUTE \"cat 2 \"h"}, descFr: "Retourne sequence (mot ou liste) avec arg inséré en position n (n de 1 à longueur+1). Repris de XLogo.", descEn: "Outputs sequence (word or list) with arg inserted at position n (n from 1 to length+1). From XLogo."},
+	"OTE":          {en: "DELETE", params: "sequence debut longueur", kind: "O", exemples: []string{"ECRIS OTE \"bonjour 2 3", "ECRIS OTE [ A B C D ] 2 2"}, descFr: "Retourne sequence (mot ou liste) privée de longueur éléments à partir de debut (indices à partir de 1). Retire par position (≠ OTETOUT qui retire par valeur). Extension gologo.", descEn: "Outputs sequence (word or list) without length elements starting at start (1-based). Removes by position (unlike REMOVE, which removes by value). gologo extension."},
+	"POSITION":     {en: "POSITION", params: "chose chaine", kind: "O", exemples: []string{"ECRIS POSITION \"n \"bonjour", "ECRIS POSITION \"B [ A B C ]"}, descFr: "Retourne le rang (à partir de 1) de la première occurrence de chose dans chaine, ou 0 si absent. Dans un mot, chose peut être une sous-chaîne ; dans une liste, un élément. Casse ignorée. Extension gologo.", descEn: "Outputs the rank (1-based) of the first occurrence of thing in chaine, or 0 if absent. In a word, thing can be a substring; in a list, an element. Case-insensitive. gologo extension."},
+
+	// tableaux (acces direct, mutables, passes par reference) - v2.0
+	"TABLEAU":          {en: "ARRAY", params: "taille", kind: "O", exemples: []string{"MONTRE TABLEAU 3", "DONNE \"T ( TABLEAU 3 0 )"}, descFr: "Retourne un tableau de taille cases, chacune initialisée à la liste vide (et non 0 : pensez à initialiser les cases avant de vous en servir comme compteurs ou drapeaux). (TABLEAU taille origine) fixe l'indice de la 1re case (1 par défaut). Un tableau est mutable et partagé par référence. Repris de FMSLogo.", descEn: "Outputs an array of size cells, each initially the empty list (not 0: initialise the cells before using them as counters or flags). (ARRAY size origin) sets the first cell's index (1 by default). An array is mutable and shared by reference. From FMSLogo."},
+	"TABLEAUMD":        {en: "MDARRAY", params: "listetailles", kind: "O", exemples: []string{"MONTRE TABLEAUMD [ 2 2 ]"}, descFr: "Retourne un tableau multi-dimensionnel : une dimension par taille de la liste (tailles positives). (TABLEAUMD listetailles origine) fixe l'origine. Repris de FMSLogo.", descEn: "Outputs a multi-dimensional array: one dimension per size in the list (positive sizes). (MDARRAY sizelist origin) sets the origin. From FMSLogo."},
+	"LISTEVERSTABLEAU": {en: "LISTTOARRAY", params: "liste", kind: "O", exemples: []string{"MONTRE LISTEVERSTABLEAU [ 1 2 3 ]"}, descFr: "Retourne un tableau ayant les mêmes éléments que liste. (LISTEVERSTABLEAU liste origine) fixe l'origine. Repris de FMSLogo.", descEn: "Outputs an array with the same elements as the list. (LISTTOARRAY list origin) sets the origin. From FMSLogo."},
+	"TABLEAUVERSLISTE": {en: "ARRAYTOLIST", params: "tableau", kind: "O", exemples: []string{"MONTRE TABLEAUVERSLISTE LISTEVERSTABLEAU [ 1 2 3 ]"}, descFr: "Retourne la liste des cases du tableau (1re case en tête, quelle que soit l'origine). Pratique pour traiter un tableau avec APPLIQUE/FILTRE. Repris de FMSLogo.", descEn: "Outputs the list of the array's cells (first cell first, whatever the origin). Handy to process an array with MAP/FILTER. From FMSLogo."},
+	"ITEMMD":           {en: "MDITEM", params: "listeindices tableaumd", kind: "O", exemples: []string{"ECRIS ITEMMD [ 1 ] LISTEVERSTABLEAU [ 7 8 9 ]"}, descFr: "Retourne la case d'un tableau multi-dimensionnel, repérée par une liste d'indices. Repris de FMSLogo.", descEn: "Outputs the cell of a multi-dimensional array, selected by a list of indices. From FMSLogo."},
+	"FIXEITEM":         {en: "SETITEM", params: "indice tableau valeur", kind: "C", exemples: []string{"DONNE \"T TABLEAU 3 FIXEITEM 2 :T 9 ECRIS ITEM 2 :T"}, descFr: "Remplace la case indice du tableau par valeur (modifie le tableau en place). Refuse de créer un cycle (valeur ne doit pas contenir le tableau modifié). Repris de FMSLogo.", descEn: "Replaces cell index of the array with value (mutates the array in place). Refuses to create a cycle (value must not contain the array). From FMSLogo."},
+	"FIXEITEMMD":       {en: "MDSETITEM", params: "listeindices tableaumd valeur", kind: "C", exemples: []string{"DONNE \"T TABLEAUMD [ 2 2 ] FIXEITEMMD [ 1 2 ] :T 5 ECRIS ITEMMD [ 1 2 ] :T"}, descFr: "Remplace une case d'un tableau multi-dimensionnel (repérée par une liste d'indices) par valeur. Refuse les cycles. Repris de FMSLogo.", descEn: "Replaces a cell of a multi-dimensional array (selected by a list of indices) with value. Refuses cycles. From FMSLogo."},
+	"TABLEAU?":         {en: "ARRAY?", enAliases: []string{"ARRAYP"}, params: "chose", kind: "P", exemples: []string{"ECRIS TABLEAU? TABLEAU 3"}, descFr: "Retourne VRAI si chose est un tableau.", descEn: "Outputs TRUE if thing is an array."},
+	"COPIETABLEAU":     {en: "COPYARRAY", params: "tableau", kind: "O", exemples: []string{"DONNE \"T TABLEAU 3 DONNE \"C COPIETABLEAU :T ECRIS TABLEAU? :C"}, descFr: "Retourne une copie PROFONDE du tableau (récursive sur les sous-tableaux, partage préservé), pour modifier la copie sans toucher l'original. Extension gologo.", descEn: "Outputs a DEEP copy of the array (recursive on sub-arrays, sharing preserved), so the copy can be modified without touching the original. gologo extension."},
+
+	// piles et files (sur une variable-liste) - v2.0
+	"EMPILE": {en: "PUSH", params: "nomvar valeur", kind: "C", exemples: []string{"DONNE \"P [ ] EMPILE \"P 1 EMPILE \"P 2 MONTRE :P"}, descFr: "Ajoute valeur en tête de la liste nommée nomvar (pile). À dépiler avec DEPILE. Repris de FMSLogo.", descEn: "Adds value to the front of the list named nomvar (stack). Pop it with POP. From FMSLogo."},
+	"DEPILE": {en: "POP", params: "nomvar", kind: "O", exemples: []string{"DONNE \"P [ ] EMPILE \"P 1 EMPILE \"P 2 ECRIS DEPILE \"P"}, descFr: "Retire et retourne l'élément de tête de la liste nommée nomvar (pile, dernier entré premier sorti). Repris de FMSLogo.", descEn: "Removes and outputs the front element of the list named nomvar (stack, last in first out). From FMSLogo."},
+	"ENFILE": {en: "QUEUE", params: "nomvar valeur", kind: "C", exemples: []string{"DONNE \"F [ ] ENFILE \"F 1 ENFILE \"F 2 MONTRE :F"}, descFr: "Ajoute valeur en fin de la liste nommée nomvar (file). À défiler avec DEFILE. Repris de FMSLogo.", descEn: "Adds value to the back of the list named nomvar (queue). Dequeue it with DEQUEUE. From FMSLogo."},
+	"DEFILE": {en: "DEQUEUE", params: "nomvar", kind: "O", exemples: []string{"DONNE \"F [ ] ENFILE \"F 1 ENFILE \"F 2 ECRIS DEFILE \"F"}, descFr: "Retire et retourne le plus ancien élément (en tête) de la liste nommée nomvar (file, premier entré premier sorti). Repris de FMSLogo.", descEn: "Removes and outputs the oldest element (at the front) of the list named nomvar (queue, first in first out). From FMSLogo."},
 
 	// valeurs logiques
 	"ET":   {en: "AND", params: "pred1 pred2", kind: "P", exemples: []string{"ECRIS ET VRAI FAUX", "ECRIS ( ET VRAI VRAI VRAI )"}, descFr: "ET logique : VRAI si les deux prédicats sont VRAI. Entre parenthèses, accepte plusieurs prédicats : (ET a b c).", descEn: "Logical AND: TRUE if both predicates are TRUE. In parentheses, accepts several: (AND a b c)."},
@@ -163,9 +202,9 @@ var helpData = map[string]helpEntry{
 	"LOGO":         {en: "TOPLEVEL", frAliases: []string{"STOPTOUT"}, enAliases: []string{"STOPALL"}, params: "", kind: "C", exemples: []string{"LOGO"}, descFr: "Arrêt total : retour au niveau supérieur.", descEn: "Full stop: return to top level."},
 	"RAZ":          {en: "RESET", params: "", kind: "C", exemples: []string{"RAZ"}, descFr: "Après confirmation (O/N), remet tout à zéro comme au démarrage : efface procédures et variables, réinitialise la tortue et l'écran.", descEn: "After confirmation (Y/N), resets everything to the startup state: erases procedures and variables, resets the turtle and the screen."},
 	"EXEC":         {en: "RUN", params: "liste", kind: "C", exemples: []string{"EXEC [ AV 50 ]"}, descFr: "Exécute liste ; retourne son résultat si c'est une opération. Brique des structures de contrôle.", descEn: "Runs list; outputs its result if it is an operation. Building block for control structures."},
-	"DEFINIS":      {en: "DEFINE", frAliases: []string{"DEF"}, params: "nom texte", kind: "C", exemples: []string{"DEFINIS \"CARRE [ [ ] [ REPETE 4 [ AV 50 TD 90 ] ] ]", "DEFINIS \"POLY [ NB LG ] [ REPETE :NB [ AV :LG TD 360 / :NB ] ]"}, descFr: "Définit la procédure nom à partir de données (procédures vues comme données, façon Logo adulte). Deux formes acceptées : imbriquée façon UCBLogo, DEFINIS \"nom [ [paramètres] [corps] ] ; ou à 3 arguments façon XLogo, DEFINIS \"nom [paramètres] [corps]. Inverse de TEXTE.", descEn: "Defines procedure name from data (procedures as data, advanced Logo style). Two accepted forms: UCBLogo-style nested, DEFINE \"name [ [inputs] [body] ] ; or XLogo-style 3-argument, DEFINE \"name [inputs] [body]. Inverse of TEXT."},
+	"DEFINIS":      {en: "DEFINE", frAliases: []string{"DEF"}, params: "nom texte", kind: "C", exemples: []string{"DEFINIS \"CARRE [ [ ] [ REPETE 4 [ AV 50 TD 90 ] ] ]", "DEFINIS \"POLY [ NB LG ] [ REPETE :NB [ AV :LG TD 360 / :NB ] ]"}, descFr: "Définit la procédure nom à partir de données (procédures vues comme données, façon Logo étendu). Deux formes acceptées : imbriquée façon UCBLogo, DEFINIS \"nom [ [paramètres] [corps] ] ; ou à 3 arguments façon XLogo, DEFINIS \"nom [paramètres] [corps]. Inverse de TEXTE.", descEn: "Defines procedure name from data (procedures as data, advanced Logo style). Two accepted forms: UCBLogo-style nested, DEFINE \"name [ [inputs] [body] ] ; or XLogo-style 3-argument, DEFINE \"name [inputs] [body]. Inverse of TEXT."},
 	"TEXTE":        {en: "TEXT", params: "nom", kind: "O", exemples: []string{"POUR CARRE REPETE 4 [ AV 50 TD 90 ] FIN MONTRE TEXTE \"CARRE"}, descFr: "Rend la définition de la procédure nom sous forme de liste [ [paramètres] [corps] ]. Inverse de DEFINIS.", descEn: "Outputs the definition of procedure name as a list [ [inputs] [body] ]. Inverse of DEFINE."},
-	"DONNEPROP":    {en: "PPROP", params: "obj prop valeur", kind: "C", exemples: []string{"DONNEPROP \"TINTIN \"AGE 17"}, descFr: "Donne à l'objet obj la propriété prop = valeur (listes de propriétés, façon Logo adulte). Remplace si la propriété existe déjà.", descEn: "Gives object obj the property prop = value (property lists, advanced Logo style). Replaces it if the property already exists."},
+	"DONNEPROP":    {en: "PPROP", params: "obj prop valeur", kind: "C", exemples: []string{"DONNEPROP \"TINTIN \"AGE 17"}, descFr: "Donne à l'objet obj la propriété prop = valeur (listes de propriétés, façon Logo étendu). Remplace si la propriété existe déjà.", descEn: "Gives object obj the property prop = value (property lists, advanced Logo style). Replaces it if the property already exists."},
 	"PROP":         {en: "GPROP", params: "obj prop", kind: "O", exemples: []string{"DONNEPROP \"TINTIN \"AGE 17 ECRIS PROP \"TINTIN \"AGE"}, descFr: "Rend la valeur de la propriété prop de l'objet obj, ou la liste vide [ ] si elle n'existe pas.", descEn: "Outputs the value of property prop of object obj, or the empty list [ ] if it does not exist."},
 	"EFPROP":       {en: "REMPROP", params: "obj prop", kind: "C", exemples: []string{"EFPROP \"TINTIN \"AGE"}, descFr: "Efface la propriété prop de l'objet obj.", descEn: "Removes property prop from object obj."},
 	"LISTEPROP":    {en: "PLIST", params: "obj", kind: "O", exemples: []string{"DONNEPROP \"TINTIN \"AGE 17 MONTRE LISTEPROP \"TINTIN"}, descFr: "Rend la liste des propriétés de obj : [ prop1 valeur1 prop2 valeur2 ... ], ou [ ] si obj n'a aucune propriété.", descEn: "Outputs the property list of obj: [ prop1 value1 prop2 value2 ... ], or [ ] if obj has no property."},
@@ -250,7 +289,13 @@ var helpData = map[string]helpEntry{
 	"TANGENTE":   {en: "TAN", frAliases: []string{"TAN"}, params: "n", kind: "O", exemples: []string{"ECRIS TAN 45"}, descFr: "Tangente de n (n en degrés).", descEn: "Tangent of n (n in degrees)."},
 	"INVERSE":    {en: "REVERSE", params: "obj", kind: "O", exemples: []string{"ECRIS INVERSE [ A B C ]"}, descFr: "Retourne la liste (ou le mot) avec ses éléments en ordre inverse.", descEn: "Outputs the list (or word) with its elements in reverse order."},
 	"TRIE":       {en: "SORT", params: "liste", kind: "O", exemples: []string{"ECRIS TRIE [ 3 1 2 ]", "ECRIS TRIE [ POMME CERISE BANANE ]"}, descFr: "Retourne la liste triée : les nombres par valeur croissante, sinon par ordre alphabétique. Tri stable.", descEn: "Outputs the list sorted: numbers by increasing value, otherwise alphabetically. Stable sort."},
+	"ORDONNE":    {en: "SORTARRAY", params: "tableau", kind: "C", exemples: []string{"DONNE \"T LISTEVERSTABLEAU [ 3 1 2 ] ORDONNE :T MONTRE :T"}, descFr: "Trie les cases du tableau sur place (nombres par valeur croissante, sinon ordre alphabétique). Modifie le tableau, comme FIXEITEM ; tri stable. Plus rapide que TRIE sur de gros volumes.", descEn: "Sorts the array's slots in place (numbers by increasing value, otherwise alphabetically). Modifies the array, like SETITEM; stable sort. Faster than SORT on large data."},
 	"PI":         {en: "PI", params: "", kind: "O", exemples: []string{"ECRIS PI"}, descFr: "Retourne la constante pi (3.14159...).", descEn: "Outputs the constant pi (3.14159...)."},
+	"OUEX":       {en: "XOR", params: "n1 n2", kind: "O", exemples: []string{"ECRIS OUEX 6 3"}, descFr: "Ou exclusif bit à bit de deux entiers positifs (OUEX 6 3 = 5).", descEn: "Bitwise exclusive-or of two non-negative integers (XOR 6 3 = 5)."},
+	"VERSBASE":   {en: "TOBASE", params: "n base", kind: "O", exemples: []string{"ECRIS VERSBASE 255 16"}, descFr: "Écrit l'entier n dans la base donnée (2 à 36), en majuscules : VERSBASE 255 16 donne FF. Voir HEXA et BINAIRE pour les cas courants.", descEn: "Writes the integer n in the given base (2 to 36), in upper case: TOBASE 255 16 gives FF. See HEX and BIN for the common cases."},
+	"DEPUISBASE": {en: "FROMBASE", params: "mot base", kind: "O", exemples: []string{"ECRIS DEPUISBASE \"FF 16"}, descFr: "Lit le mot comme un nombre écrit dans la base donnée (2 à 36) et retourne sa valeur : DEPUISBASE \"FF 16 donne 255.", descEn: "Reads the word as a number written in the given base (2 to 36) and outputs its value: FROMBASE \"FF 16 gives 255."},
+	"HEXA":       {en: "HEX", params: "n", kind: "O", exemples: []string{"ECRIS HEXA 255"}, descFr: "Montre l'entier n en hexadécimal (base 16). Raccourci de VERSBASE n 16.", descEn: "Shows the integer n in hexadecimal (base 16). Shorthand for TOBASE n 16."},
+	"BINAIRE":    {en: "BIN", params: "n", kind: "O", exemples: []string{"ECRIS BINAIRE 10"}, descFr: "Montre l'entier n en binaire (base 2). Raccourci de VERSBASE n 2.", descEn: "Shows the integer n in binary (base 2). Shorthand for TOBASE n 2."},
 	"TANTQUE":    {en: "WHILE", params: "[cond] [instr]", kind: "C", exemples: []string{"TANTQUE [ :N > 0 ] [ AV 10 DONNE \"N :N - 1 ]"}, descFr: "Exécute instr tant que l'évaluation de cond rend VRAI (boucle while).", descEn: "Runs instr while cond evaluates to TRUE (while loop)."},
 	"REPETEPOUR": {en: "FOR", params: "[var debut fin pas] [instr]", kind: "C", exemples: []string{"REPETEPOUR [ I 1 4 ] [ AV 50 TD 90 ]"}, descFr: "Boucle pour : var va de debut a fin (par pas, defaut 1) ; instr execute a chaque tour.", descEn: "For loop: var goes from start to end (by step, default 1); runs instr each time."},
 	"SCENE":      {en: "SCENE", params: "[instr]", kind: "C", exemples: []string{"SCENE [ NETTOIE CARRE ]"}, exemplesEn: []string{"SCENE [ CLEAN SQUARE ]"}, descFr: "Dessine instr dans un tampon caché puis l'affiche d'un seul coup (double tampon). Évite le clignotement des animations qui font NETTOIE puis redessinent à chaque image. À utiliser autour du dessin d'une image dans une boucle.", descEn: "Draws instr in a hidden buffer, then shows it all at once (double buffering). Prevents flicker in animations that CLEAN then redraw every frame. Use it around the drawing of one frame inside a loop."},
@@ -272,7 +317,31 @@ var helpData = map[string]helpEntry{
 	"CHARGE":    {en: "EDLOAD", params: "mot", kind: "C", exemples: []string{"CHARGE \"DESSIN"}, descFr: "Charge le fichier mot DANS L'ÉDITEUR, SANS l'interpréter : son texte devient le contenu de l'éditeur (ED sans argument le rouvre). Il faut ouvrir ED puis valider par Ctrl+S pour qu'il soit exécuté. --- Différence avec RAMENE : CHARGE sert à RELIRE ou MODIFIER un programme avant de le valider, tandis que RAMENE définit directement son contenu dans l'espace de travail (utilisable tout de suite).", descEn: "Loads file word INTO THE EDITOR, WITHOUT running it: its text becomes the editor content (ED with no argument reopens it). You must open ED then validate with Ctrl+S to run it. --- Difference with LOAD: EDLOAD is to READ or EDIT a program before validating it, whereas LOAD defines its contents directly in the workspace (usable right away)."},
 	"SAUVED":    {en: "EDSAVE", params: "mot", kind: "C", exemples: []string{"SAUVED \"DESSIN"}, descFr: "Sauve le contenu courant de l'éditeur dans le fichier mot.", descEn: "Saves the current editor content to file word."},
 	"CATALOGUE": {en: "CATALOG", enAliases: []string{"CAT"}, params: "", kind: "C", exemples: []string{"CATALOGUE"}, descFr: "Liste les fichiers du dossier de travail (nom et taille).", descEn: "Lists the files in the working directory (name and size)."},
-	"DETRUIS":   {en: "ERASEFILE", params: "mot", kind: "C", exemples: []string{"DETRUIS \"DESSIN"}, descFr: "Supprime définitivement le fichier mot.", descEn: "Permanently deletes file word."},
+	"DETRUIS":   {en: "ERASEFILE", params: "mot", kind: "C", exemples: []string{"DETRUIS \"DESSIN"}, descFr: "Supprime définitivement le fichier mot. Refuse de supprimer un fichier ouvert.", descEn: "Permanently deletes file word. Refuses to delete an open file."},
+
+	// fichiers de donnees : modele "flux" FMSLogo (v2.0). on ouvre un fichier, on en
+	// fait le flux de lecture/ecriture courant, puis LISLIGNE/ECRIS lisent/ecrivent dedans
+	"OUVRELECTURE":       {en: "OPENREAD", params: "nomfichier", kind: "C", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FERME \"DESSIN.GLG"}, descFr: "Ouvre le fichier en lecture (position au début). Erreur si le fichier est introuvable ou déjà ouvert. Repris de FMSLogo.", descEn: "Opens the file for reading (position at the start). Error if the file is missing or already open. From FMSLogo."},
+	"OUVREECRITURE":      {en: "OPENWRITE", params: "nomfichier", kind: "C", exemples: []string{"OUVREECRITURE \"SORTIE.TXT FERME \"SORTIE.TXT"}, descFr: "Ouvre le fichier en écriture, en écrasant son contenu existant SANS demander confirmation (fidélité FMSLogo). Le crée s'il n'existe pas. Repris de FMSLogo.", descEn: "Opens the file for writing, overwriting any existing content WITHOUT asking (FMSLogo fidelity). Creates it if absent. From FMSLogo."},
+	"OUVREAJOUT":         {en: "OPENAPPEND", params: "nomfichier", kind: "C", exemples: []string{"OUVREAJOUT \"JOURNAL.TXT FERME \"JOURNAL.TXT"}, descFr: "Ouvre le fichier en écriture, position à la fin (ajout). Le crée s'il n'existe pas. Repris de FMSLogo.", descEn: "Opens the file for writing, position at the end (append). Creates it if absent. From FMSLogo."},
+	"OUVREMAJ":           {en: "OPENUPDATE", params: "nomfichier", kind: "C", exemples: []string{"OUVREMAJ \"DESSIN.GLG FERME \"DESSIN.GLG"}, descFr: "Ouvre le fichier en lecture ET écriture (une seule position, partagée). Le crée s'il n'existe pas. Repris de FMSLogo.", descEn: "Opens the file for reading AND writing (a single, shared position). Creates it if absent. From FMSLogo."},
+	"FERME":              {en: "CLOSE", params: "nomfichier", kind: "C", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FERME \"DESSIN.GLG"}, descFr: "Ferme le fichier. S'il était le flux de lecture/écriture courant, on repasse au clavier/à la console. Erreur si le fichier n'est pas ouvert. Repris de FMSLogo.", descEn: "Closes the file. If it was the current read/write stream, we revert to keyboard/console. Error if the file is not open. From FMSLogo."},
+	"FERMETOUT":          {en: "CLOSEALL", params: "", kind: "C", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FERMETOUT"}, descFr: "Ferme tous les fichiers ouverts. Repris de FMSLogo.", descEn: "Closes all open files. From FMSLogo."},
+	"TOUSOUVERTS":        {en: "ALLOPEN", params: "", kind: "O", exemples: []string{"MONTRE TOUSOUVERTS"}, descFr: "Retourne la liste des noms des fichiers actuellement ouverts. Repris de FMSLogo.", descEn: "Outputs the list of names of currently open files. From FMSLogo."},
+	"FIXELECTURE":        {en: "SETREAD", params: "nomfichier ou liste", kind: "C", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FIXELECTURE \"DESSIN.GLG FIXELECTURE [ ] FERME \"DESSIN.GLG"}, descFr: "Choisit le flux de lecture courant : LISCAR/LISMOT/LL/LISLIGNE liront dans ce fichier. Une liste vide [ ] revient au clavier. Erreur si le fichier n'est pas ouvert en lecture. Repris de FMSLogo.", descEn: "Sets the current read stream: READCHAR/READWORD/READLIST/READRAWLINE will read from this file. An empty list [ ] reverts to the keyboard. Error if the file is not open for reading. From FMSLogo."},
+	"FIXEECRITURE":       {en: "SETWRITE", params: "nomfichier ou liste", kind: "C", exemples: []string{"OUVREECRITURE \"SORTIE.TXT FIXEECRITURE \"SORTIE.TXT FIXEECRITURE [ ] FERME \"SORTIE.TXT"}, descFr: "Choisit le flux d'écriture courant : ECRIS/MONTRE/TAPE écriront dans ce fichier. Une liste vide [ ] revient à la console. Erreur si le fichier n'est pas ouvert en écriture. Repris de FMSLogo.", descEn: "Sets the current write stream: PRINT/SHOW/TYPE will write to this file. An empty list [ ] reverts to the console. Error if the file is not open for writing. From FMSLogo."},
+	"FIXEFINLIGNE":       {en: "SETEOL", params: "\"LF ou \"CRLF", kind: "C", exemples: []string{"FIXEFINLIGNE \"CRLF"}, descFr: "Choisit la fin de ligne écrite dans les fichiers : \"LF (défaut, façon Unix) ou \"CRLF (façon Windows). La lecture accepte toujours les deux. Extension gologo.", descEn: "Sets the line ending written to files: \"LF (default, Unix-style) or \"CRLF (Windows-style). Reading always accepts both. gologo extension."},
+	"FINLIGNE":           {en: "EOL", params: "", kind: "O", exemples: []string{"ECRIS FINLIGNE"}, descFr: "Retourne le réglage courant de fin de ligne : \"LF ou \"CRLF. Extension gologo.", descEn: "Outputs the current line-ending setting: \"LF or \"CRLF. gologo extension."},
+	"FLUXLECTURE":        {en: "READER", params: "", kind: "O", exemples: []string{"MONTRE FLUXLECTURE"}, descFr: "Retourne le nom du flux de lecture courant, ou [ ] si c'est le clavier. Repris de FMSLogo.", descEn: "Outputs the name of the current read stream, or [ ] if it is the keyboard. From FMSLogo."},
+	"FLUXECRITURE":       {en: "WRITER", params: "", kind: "O", exemples: []string{"MONTRE FLUXECRITURE"}, descFr: "Retourne le nom du flux d'écriture courant, ou [ ] si c'est la console. Repris de FMSLogo.", descEn: "Outputs the name of the current write stream, or [ ] if it is the console. From FMSLogo."},
+	"FINFICHIER?":        {en: "EOF?", enAliases: []string{"EOFP"}, params: "", kind: "P", exemples: []string{"ECRIS FINFICHIER?"}, descFr: "Retourne VRAI s'il n'y a plus rien à lire dans le flux de lecture courant. Au clavier, retourne toujours FAUX. Repris de FMSLogo.", descEn: "Outputs TRUE if there is nothing left to read in the current read stream. On the keyboard, always FALSE. From FMSLogo."},
+	"POSLECTURE":         {en: "READPOS", params: "", kind: "O", exemples: []string{"ECRIS POSLECTURE"}, descFr: "Retourne la position d'octet courante en lecture, ou -1 si le flux est le clavier. Repris de FMSLogo.", descEn: "Outputs the current read byte position, or -1 if the stream is the keyboard. From FMSLogo."},
+	"POSECRITURE":        {en: "WRITEPOS", params: "", kind: "O", exemples: []string{"ECRIS POSECRITURE"}, descFr: "Retourne la position d'octet courante en écriture, ou -1 si le flux est la console. Repris de FMSLogo.", descEn: "Outputs the current write byte position, or -1 if the stream is the console. From FMSLogo."},
+	"FIXEPOSLECTURE":     {en: "SETREADPOS", params: "octet", kind: "C", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FIXELECTURE \"DESSIN.GLG FIXEPOSLECTURE 0 FERME \"DESSIN.GLG"}, descFr: "Déplace le pointeur de lecture du flux courant à la position octet (à partir de 0). Erreur si la position est hors fichier ou au milieu d'un caractère. Repris de FMSLogo.", descEn: "Moves the current read pointer to byte position (0-based). Error if the position is out of file or in the middle of a character. From FMSLogo."},
+	"FIXEPOSECRITURE":    {en: "SETWRITEPOS", params: "octet", kind: "C", exemples: []string{"OUVREECRITURE \"SORTIE.TXT FIXEECRITURE \"SORTIE.TXT FIXEPOSECRITURE 0 FERME \"SORTIE.TXT"}, descFr: "Déplace le pointeur d'écriture du flux courant à la position octet (à partir de 0). Repris de FMSLogo.", descEn: "Moves the current write pointer to byte position (0-based). From FMSLogo."},
+	"LISLIGNE":           {en: "READRAWLINE", params: "", kind: "O", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FIXELECTURE \"DESSIN.GLG ECRIS LISLIGNE FIXELECTURE [ ] FERME \"DESSIN.GLG"}, descFr: "Lit une ligne brute du flux de lecture courant et la retourne comme un seul mot (aucune interprétation). C'est LE bon récepteur pour parcourir un fichier ligne par ligne. [ ] en fin de fichier. Repris de FMSLogo.", descEn: "Reads a raw line from the current read stream and outputs it as a single word (no interpretation). This is THE receiver to walk a file line by line. [ ] at end of file. From FMSLogo."},
+	"LISCARS":            {en: "READCHARS", enAliases: []string{"RCS"}, params: "n", kind: "O", exemples: []string{"OUVRELECTURE \"DESSIN.GLG FIXELECTURE \"DESSIN.GLG ECRIS LISCARS 4 FIXELECTURE [ ] FERME \"DESSIN.GLG"}, descFr: "Lit n caractères du flux de lecture courant et les retourne comme un mot. [ ] en fin de fichier. Repris de FMSLogo.", descEn: "Reads n characters from the current read stream and outputs them as a word. [ ] at end of file. From FMSLogo."},
+	"FICHIERVERSTABLEAU": {en: "FILETOARRAY", params: "nomfichier", kind: "O", exemples: []string{"MONTRE FICHIERVERSTABLEAU \"DESSIN.GLG", "DONNE \"L FICHIERVERSTABLEAU \"DESSIN.GLG ECRIS COMPTE :L"}, descFr: "Charge tout un fichier texte d'un coup et retourne un tableau dont chaque case est une ligne (1re ligne en case 1). COMPTE donne le nombre de lignes, pour itérer facilement. Ouvre, lit et ferme le fichier tout seul. Refuse un fichier binaire (FICHIER BINAIRE). Extension gologo.", descEn: "Loads a whole text file at once and outputs an array whose cells are its lines (first line in cell 1). COUNT gives the number of lines, for easy iteration. Opens, reads and closes the file on its own. Refuses a binary file (BINARY FILE). gologo extension."},
 
 	// exemples livres avec l'install (dossier examples, lecture seule)
 	"CATALOGUEEX": {en: "CATALOGEX", enAliases: []string{"CATEX"}, params: "", kind: "C", exemples: []string{"CATALOGUEEX"}, descFr: "Liste les fichiers d'exemples (nom et taille), comme CATALOGUE mais dans le dossier des exemples fourni avec GoLogo. Erreur s'il n'y a pas de dossier d'exemples.", descEn: "Lists the example files (name and size), like CATALOG but in the examples directory shipped with GoLogo. Error if there is no examples directory."},
@@ -520,27 +589,88 @@ func enExamples(e helpEntry) []string {
 }
 
 // formate les lignes "Exemple(s)" (deja dans la bonne langue) : un seul sur la meme
-// ligne, plusieurs en liste sous un titre
+// ligne, plusieurs en liste sous un titre. quand un exemple affiche un resultat
+// (ECRIS/MONTRE...), on montre ce resultat juste apres, precede d'une fleche
 func exampleLines(lang string, ex []string) []string {
 	if len(ex) == 0 {
 		return nil
 	}
+	res := exampleResults(ex)
 	if len(ex) == 1 {
 		label := "Exemple : "
 		if lang == "EN" {
 			label = "Example: "
 		}
-		return []string{"", label + ex[0]}
+		out := []string{"", label + ex[0]}
+		if res[0] != "" {
+			out = append(out, "  -> "+res[0])
+		}
+		return out
 	}
 	label := "Exemples :"
 	if lang == "EN" {
 		label = "Examples:"
 	}
 	out := []string{"", label}
-	for _, e := range ex {
+	for i, e := range ex {
 		out = append(out, "  "+e)
+		if res[i] != "" {
+			out = append(out, "    -> "+res[i])
+		}
 	}
 	return out
+}
+
+// commandes d'affichage : un exemple qui en contient une produit un resultat
+// visible qu'on peut montrer dans l'aide (FR et alias EN)
+var outputCmds = map[string]bool{
+	"ECRIS": true, "EC": true, "PRINT": true, "PR": true,
+	"MONTRE": true, "SHOW": true, "TAPE": true, "TYPE": true,
+}
+
+func containsOutputCmd(ex string) bool {
+	for _, tok := range strings.Fields(ex) {
+		if outputCmds[strings.ToUpper(tok)] {
+			return true
+		}
+	}
+	return false
+}
+
+// calcule, pour chaque exemple, ce qu'il afficherait (ou "" si l'exemple ne montre
+// rien ou se plante). on relance l'exemple dans un interpreteur jetable, sans ecran
+// ni clavier, en n'executant que ceux qui contiennent une commande d'affichage
+// (les autres ne produisent rien d'interessant, et ca evite ATTENDS et compagnie)
+func exampleResults(ex []string) []string {
+	res := make([]string, len(ex))
+	var sandbox *Interp
+	var buf *strings.Builder
+	for i, e := range ex {
+		if !containsOutputCmd(e) {
+			continue
+		}
+		if sandbox == nil {
+			buf = &strings.Builder{}
+			sandbox = New(turtle.New(turtle.NewRecorder()), buf)
+			sandbox.rng = rand.New(rand.NewSource(1))
+			// dossier jetable : un exemple fichier n'ecrit jamais dans ~/Logo
+			sandbox.SetWorkDir(filepath.Join(os.TempDir(), "gologo-aide"))
+		} else {
+			sandbox.vars = map[string]Value{} // oublie les variables de l'exemple precedent
+			sandbox.frames = nil
+			buf.Reset()
+		}
+		// RNG re-seede AVANT chaque exemple : la sortie d'un exemple avec HASARD
+		// ne depend que de lui-meme, pas de l'ordre ni des exemples voisins
+		// (sinon un simple reordonnancement ferait bouger des sorties figees).
+		sandbox.rng.Seed(1)
+		if err := sandbox.RunString(e); err != nil {
+			continue
+		}
+		// une seule ligne compacte (les sorties multi-lignes sont recollees)
+		res[i] = strings.Join(strings.Fields(strings.TrimSpace(buf.String())), " ")
+	}
+	return res
 }
 
 // traduit les noms de commandes d'un exemple FR vers l'EN : complet -> complet

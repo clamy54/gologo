@@ -5,11 +5,15 @@ import (
 	"strings"
 )
 
-// iterateurs de liste a gabarit (Logo "adulte"). le gabarit est du code ou
+// iterateurs de liste a gabarit (Logo "etendu"). le gabarit est du code ou
 // l'element courant se lit via :? (et :?1 / :?2 pour REDUIS)
 
 // evalue une suite de Datum comme expression et rend sa valeur (ex. [ :? * 2 ])
 func (i *Interp) evalExpr(data []Datum) (Value, error) {
+	if err := i.enterEval(); err != nil {
+		return Value{}, err
+	}
+	defer func() { i.evalDepth-- }()
 	ev := &eval{i: i, data: data}
 	return ev.expr(0)
 }
@@ -42,7 +46,13 @@ func iterDatums(v Value) []Datum {
 	switch v.Kind {
 	case KList:
 		return v.List
-	case KWord, KNumber:
+	case KArray: // les cases du tableau (sinon POURCHAQUE bouclait sur rien en silence)
+		out := make([]Datum, len(v.Arr.Items))
+		for k, it := range v.Arr.Items {
+			out[k] = valueToDatum(it)
+		}
+		return out
+	case KWord, KNumber, KInt:
 		rs := []rune(v.String())
 		out := make([]Datum, len(rs))
 		for k, r := range rs {
@@ -54,8 +64,9 @@ func iterDatums(v Value) []Datum {
 }
 
 // POURCHAQUE a deux formes, devinees au type du 1er argument :
-//   liste en tete -> notre forme : POURCHAQUE liste [ gabarit avec :? ]
-//   mot en tete   -> forme XLogo : POURCHAQUE "var liste_ou_mot [ commande avec :var ]
+//
+//	liste en tete -> notre forme : POURCHAQUE liste [ gabarit avec :? ]
+//	mot en tete   -> forme XLogo : POURCHAQUE "var liste_ou_mot [ commande avec :var ]
 func formePourchaque(e *eval) (Value, error) {
 	first, err := e.expr(0)
 	if err != nil {
@@ -117,6 +128,9 @@ func (i *Interp) registerIterators() {
 	oplist("APPLIQUE", func(in *Interp, list, tmpl []Datum) (Value, error) {
 		out := make([]Datum, 0, len(list))
 		for _, d := range list {
+			if in.brk.Load() { // interruptible sur une grande liste
+				return Value{}, ErrInterrompu
+			}
 			v, err := datumToValue(d)
 			if err != nil {
 				return Value{}, err
@@ -136,6 +150,9 @@ func (i *Interp) registerIterators() {
 	oplist("FILTRE", func(in *Interp, list, tmpl []Datum) (Value, error) {
 		out := []Datum{}
 		for _, d := range list {
+			if in.brk.Load() {
+				return Value{}, ErrInterrompu
+			}
 			v, err := datumToValue(d)
 			if err != nil {
 				return Value{}, err
@@ -163,6 +180,9 @@ func (i *Interp) registerIterators() {
 			return Value{}, err
 		}
 		for _, d := range list[1:] {
+			if in.brk.Load() {
+				return Value{}, ErrInterrompu
+			}
 			v, err := datumToValue(d)
 			if err != nil {
 				return Value{}, err

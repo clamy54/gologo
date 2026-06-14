@@ -1,5 +1,6 @@
 // commande gologo : l'interpreteur Logo dans une fenetre Gio.
-// gologo seul = plein ecran (Ctrl+Q pour sortir), -w pour une fenetre (dev)
+// gologo seul = plein ecran (Ctrl+Q pour sortir), -w pour une fenetre (dev),
+// -x pour forcer le dossier des exemples
 package main
 
 import (
@@ -20,6 +21,7 @@ import (
 func main() {
 	fenetre := flag.Bool("w", false, "lance en fenêtré (windowed) au lieu du plein écran")
 	exec := flag.String("exec", "", "ligne Logo exécutée au démarrage (démo/cours)")
+	exDir := flag.String("x", "", "dossier des exemples (force son emplacement)")
 	flag.Parse()
 
 	// les 4 briques, puis on les relie
@@ -44,6 +46,9 @@ func main() {
 	screen.SetErrorText(interp.ErrorText)
 	interp.SetPager(screen.Page) // sortie longue facon "more"
 	screen.SetStartup(*exec)
+	if *exDir != "" {
+		interp.SetExamplesDir(*exDir) // -x force le dossier des exemples
+	}
 
 	// moteur d'anim (ANIME) : le goroutine dort sur wake et ne tourne que
 	// pendant une animation, donc cpu quasi nul au repos
@@ -68,14 +73,18 @@ func main() {
 
 	go func() {
 		w := new(app.Window)
-		w.Option(app.Title("GoLogo v1.0"))
+		w.Option(app.Title("GoLogo v" + logo.Version))
 		if *fenetre {
 			// demarrer maximise : evite le clignotement de la barre de titre sous KWin
 			w.Option(app.Size(unit.Dp(render.ScreenW), unit.Dp(render.ScreenH)), app.Maximized.Option())
 		} else {
 			w.Option(app.Fullscreen.Option())
 		}
-		if err := screen.Run(w); err != nil {
+		err := screen.Run(w)
+		if cerr := interp.CloseFiles(); cerr != nil { // referme les fichiers de donnees
+			log.Println("fermeture fichiers:", cerr)
+		}
+		if err != nil {
 			log.Fatal(err)
 		}
 		os.Exit(0) // la fenetre est morte, la tortue avec : RIP

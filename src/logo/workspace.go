@@ -168,10 +168,29 @@ func procTitle(p *userProc) string {
 	return t
 }
 
-// une valeur sous forme relisible (listes entre crochets)
+// une valeur sous forme relisible (DONNE re-executable) : listes entre crochets,
+// mots prefixes de " (sinon BONJOUR serait relu comme un appel de procedure)
 func valueSource(v Value) string {
-	if v.Kind == KList {
+	switch v.Kind {
+	case KList:
 		return "[" + v.String() + "]"
+	case KWord:
+		return quoteWord(v.Word)
 	}
 	return v.String()
+}
+
+// un mot sous forme de litteral relisible : "mot, avec \ devant les caracteres
+// que le lecteur prend pour des delimiteurs (espaces, crochets, ;, etc.)
+func quoteWord(w string) string {
+	var b strings.Builder
+	b.WriteByte('"')
+	for _, r := range w {
+		switch r {
+		case ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', ';', '\\', '$':
+			b.WriteByte('\\')
+		}
+		b.WriteRune(r)
+	}
+	return b.String()
 }

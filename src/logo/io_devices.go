@@ -29,8 +29,20 @@ func (i *Interp) registerIODevices() {
 		i.register(&primitive{arity: arity, reporter: true, fn: fn}, names...)
 	}
 
-	// clavier (manuel p.72-73)
+	// clavier (manuel p.72-73). si un flux de lecture courant est en place
+	// (FIXELECTURE), ces recepteurs lisent dedans au lieu du clavier ; [ ] en
+	// fin de fichier
 	op(0, func(in *Interp, a []Value) (Value, error) {
+		if of := in.curReadStream(); of != nil {
+			r, eof, err := of.readRune()
+			if err != nil {
+				return Value{}, errLectureImpossible
+			}
+			if eof {
+				return ListValue(nil), nil
+			}
+			return WordValue(string(r)), nil
+		}
 		if in.keyb == nil {
 			// pas de clavier, pas de dialogue : la machine reste muette
 			return Value{}, fmt.Errorf("CLAVIER INDISPONIBLE")
@@ -42,6 +54,16 @@ func (i *Interp) registerIODevices() {
 		return WordValue(string(r)), nil
 	}, "LISCAR")
 	op(0, func(in *Interp, a []Value) (Value, error) {
+		if of := in.curReadStream(); of != nil {
+			line, eof, err := of.readLine()
+			if err != nil {
+				return Value{}, errLectureImpossible
+			}
+			if eof {
+				return ListValue(nil), nil
+			}
+			return lineToList(line), nil
+		}
 		if in.keyb == nil {
 			return Value{}, fmt.Errorf("CLAVIER INDISPONIBLE")
 		}
@@ -52,6 +74,16 @@ func (i *Interp) registerIODevices() {
 		return lineToList(line), nil
 	}, "LL")
 	op(0, func(in *Interp, a []Value) (Value, error) {
+		if of := in.curReadStream(); of != nil {
+			line, eof, err := of.readLine()
+			if err != nil {
+				return Value{}, errLectureImpossible
+			}
+			if eof {
+				return ListValue(nil), nil
+			}
+			return WordValue(line), nil
+		}
 		if in.keyb == nil {
 			return Value{}, fmt.Errorf("CLAVIER INDISPONIBLE")
 		}

@@ -45,7 +45,7 @@ const (
 
 // ecran d'accueil, au demarrage et apres RAZ (bilingue), suivi d'une ligne vide
 // avant l'invite du REPL
-const banner = "GoLogo v1.0\n" +
+const banner = "GoLogo v" + logo.Version + "\n" +
 	"(C)2024-2026 Cyril LAMY\n" +
 	"Press F1 for HELP or type BYE to quit\n" +
 	"F1 pour l'aide, QUITTE pour sortir.\n\n"
@@ -305,7 +305,8 @@ type Screen struct {
 	// capture plein ecran (COPIE) : la tache de fond depose un canal de reponse ; la
 	// boucle d'evenements, juste apres compose(), y renvoie une copie de frame
 	// (s.frame appartient au thread UI). voir SaveScreenPNG / draw
-	captureCh chan chan *image.RGBA
+	captureCh      chan chan *image.RGBA
+	captureWaiting atomic.Int32 // COPIE en attente : force une frame meme pendant un SCENE gele
 
 	// composition cote processeur
 	frame       *image.RGBA // image plein ecran recopiee a l'ecran a chaque frame
@@ -371,7 +372,9 @@ func (s *Screen) SetErrorText(f func(error) string) { s.errText = f }
 // on s'abstient : l'ecran garde la derniere image complete jusqu'au bout du bloc
 // (cf BeginFrame/EndFrame)
 func (s *Screen) invalidate() {
-	if s.frozen.Load() > 0 {
+	// pendant un SCENE on s'abstient, SAUF si une COPIE attend une frame : sans ca
+	// le thread Logo resterait bloque sur captureCh (interblocage SCENE [ ... COPIE ... ])
+	if s.frozen.Load() > 0 && s.captureWaiting.Load() == 0 {
 		return
 	}
 	if s.win != nil {
@@ -671,8 +674,20 @@ func floodFill(img *image.RGBA, sx, sy int, col color.RGBA) {
 			continue
 		}
 		img.SetRGBA(p.X, p.Y, col)
-		stack = append(stack, image.Point{X: p.X + 1, Y: p.Y}, image.Point{X: p.X - 1, Y: p.Y},
-			image.Point{X: p.X, Y: p.Y + 1}, image.Point{X: p.X, Y: p.Y - 1})
+		// on n'empile un voisin que s'il est encore de la couleur cible : evite
+		// d'empiler chaque pixel jusqu'a 4 fois (pile bien plus petite)
+		if p.X+1 < b.Max.X && img.RGBAAt(p.X+1, p.Y) == target {
+			stack = append(stack, image.Point{X: p.X + 1, Y: p.Y})
+		}
+		if p.X-1 >= b.Min.X && img.RGBAAt(p.X-1, p.Y) == target {
+			stack = append(stack, image.Point{X: p.X - 1, Y: p.Y})
+		}
+		if p.Y+1 < b.Max.Y && img.RGBAAt(p.X, p.Y+1) == target {
+			stack = append(stack, image.Point{X: p.X, Y: p.Y + 1})
+		}
+		if p.Y-1 >= b.Min.Y && img.RGBAAt(p.X, p.Y-1) == target {
+			stack = append(stack, image.Point{X: p.X, Y: p.Y - 1})
+		}
 	}
 }
 
@@ -772,14 +787,14 @@ func (s *Screen) compose() {
 	s.baked = gfxCount
 
 	// Frame : fond noir.
-	draw.Draw(s.frame, s.frame.Bounds(), image.NewUniform(color.Black), image.Point{}, draw.Src)
+	draw.Draw(s.frame, s.frame.Bounds(), uniBlack, image.Point{}, draw.Src)
 	textTop := margin
 	if graphics {
 		const bw = 6 // epaisseur du bord
 		bord := image.Rect(fieldX-bw, fieldY-bw, fieldX+fieldW+bw, fieldY+fieldH+bw)
-		draw.Draw(s.frame, bord, image.NewUniform(rgba(border)), image.Point{}, draw.Src) // bord FCB
+		draw.Draw(s.frame, bord, uniform(rgba(border)), image.Point{}, draw.Src) // bord FCB
 		fr := image.Rect(fieldX, fieldY, fieldX+fieldW, fieldY+fieldH)
-		draw.Draw(s.frame, fr, image.NewUniform(rgba(bg)), image.Point{}, draw.Src) // fond champ
+		draw.Draw(s.frame, fr, uniform(rgba(bg)), image.Point{}, draw.Src) // fond champ
 		draw.Draw(s.frame, fr, s.fieldImg, image.Point{}, draw.Over)                // traits
 		for _, tst := range tsts {
 			if tst.Visible {
@@ -806,9 +821,31 @@ const (
 	edCols    = (ScreenW - 2*edTextX) / charW // largeur de l'editeur en colonnes
 )
 
+// cache d'uniformes de couleur : un *image.Uniform est immuable une fois cree, donc
+// partageable entre threads sans risque. evite d'en allouer un a chaque trait, fond
+// ou etiquette (appeles en boucle a chaque frame, grosse pression GC sinon)
+var (
+	uniMu    sync.Mutex
+	uniCache = map[color.RGBA]*image.Uniform{}
+	uniBlack = image.NewUniform(color.RGBA{0, 0, 0, 255})
+)
+
+func uniform(c color.RGBA) *image.Uniform {
+	uniMu.Lock()
+	defer uniMu.Unlock()
+	if u := uniCache[c]; u != nil {
+		return u
+	}
+	u := image.NewUniform(c)
+	if len(uniCache) < 4096 { // borne le cache : au-dela on alloue sans memoriser
+		uniCache[c] = u
+	}
+	return u
+}
+
 // remplit le rectangle (x,y,w,h) avec col dans img
 func fillRect(img *image.RGBA, x, y, w, h int, col color.RGBA) {
-	draw.Draw(img, image.Rect(x, y, x+w, y+h), image.NewUniform(col), image.Point{}, draw.Src)
+	draw.Draw(img, image.Rect(x, y, x+w, y+h), uniform(col), image.Point{}, draw.Src)
 }
 
 // dessine la tortue dans frame (petits carres pivotes selon le cap), selon sa forme
@@ -992,7 +1029,7 @@ func drawText2x(dst *image.RGBA, x, y int, s string, col color.RGBA) {
 	s = deaccent(s) // basicfont = ASCII seul : convertit les accents
 	w := len([]rune(s)) * 7
 	tmp := image.NewRGBA(image.Rect(0, 0, w, 13))
-	d := &font.Drawer{Dst: tmp, Src: image.NewUniform(col), Face: basicfont.Face7x13, Dot: fixed.P(0, 10)}
+	d := &font.Drawer{Dst: tmp, Src: uniform(col), Face: basicfont.Face7x13, Dot: fixed.P(0, 10)}
 	d.DrawString(s)
 	for ty := 0; ty < 13; ty++ {
 		for tx := 0; tx < w; tx++ {

@@ -6,13 +6,30 @@ import "strings"
 // d'insertion pour que PLIST soit deterministe
 type propEntry struct {
 	name string // nom de propriete, casse preservee (affichee par LISTEPROP)
+	key  string // meme nom replie en MAJ (upperKey), pour comparer sans allouer
 	val  Value
 }
 
-// index de la propriete prop dans la liste de obj, ou -1. objKey est deja en MAJ
-func (i *Interp) findProp(objKey, prop string) int {
+// upperKey rend la cle d'objet en MAJUSCULES, mais sans allouer quand c'est
+// inutile : un nom deja sans minuscule ASCII (chiffres, "75-70-1", "ABC"...) est
+// rendu tel quel. ToUpper n'est appele que s'il y a une minuscule ou du non-ASCII.
+// dans les boucles serrees qui s'en servent comme d'un dictionnaire, ca evite
+// une allocation a chaque PROP/DONNEPROP.
+func upperKey(s string) string {
+	for k := 0; k < len(s); k++ {
+		c := s[k]
+		if (c >= 'a' && c <= 'z') || c >= 0x80 {
+			return strings.ToUpper(s)
+		}
+	}
+	return s
+}
+
+// index de la propriete propKey dans la liste de obj, ou -1. objKey et propKey
+// sont deja replies en MAJ (upperKey), donc simple comparaison, sans allocation
+func (i *Interp) findProp(objKey, propKey string) int {
 	for k, e := range i.plists[objKey] {
-		if strings.EqualFold(e.name, prop) {
+		if e.key == propKey {
 			return k
 		}
 	}
@@ -31,11 +48,12 @@ func (i *Interp) registerPlist() {
 		if err != nil {
 			return err
 		}
-		key := strings.ToUpper(obj)
-		if idx := in.findProp(key, prop); idx >= 0 {
+		key := upperKey(obj)
+		pk := upperKey(prop)
+		if idx := in.findProp(key, pk); idx >= 0 {
 			in.plists[key][idx].val = a[2]
 		} else {
-			in.plists[key] = append(in.plists[key], propEntry{name: prop, val: a[2]})
+			in.plists[key] = append(in.plists[key], propEntry{name: prop, key: pk, val: a[2]})
 		}
 		return nil
 	}), "DONNEPROP")
@@ -50,8 +68,8 @@ func (i *Interp) registerPlist() {
 		if err != nil {
 			return Value{}, err
 		}
-		key := strings.ToUpper(obj)
-		if idx := in.findProp(key, prop); idx >= 0 {
+		key := upperKey(obj)
+		if idx := in.findProp(key, upperKey(prop)); idx >= 0 {
 			return in.plists[key][idx].val, nil
 		}
 		return ListValue(nil), nil
@@ -67,8 +85,8 @@ func (i *Interp) registerPlist() {
 		if err != nil {
 			return err
 		}
-		key := strings.ToUpper(obj)
-		idx := in.findProp(key, prop)
+		key := upperKey(obj)
+		idx := in.findProp(key, upperKey(prop))
 		if idx < 0 {
 			return nil
 		}
@@ -86,7 +104,7 @@ func (i *Interp) registerPlist() {
 		if err != nil {
 			return Value{}, err
 		}
-		entries := in.plists[strings.ToUpper(obj)]
+		entries := in.plists[upperKey(obj)]
 		items := make([]Datum, 0, len(entries)*2)
 		for _, e := range entries {
 			items = append(items, valueToDatum(WordValue(e.name)), valueToDatum(e.val))

@@ -1,0 +1,1176 @@
+; A TABLE ! - Librement inspiré du jeu "Chez Maxime" (Videopac / Jopac).
+; Un restaurant sur 4 niveaux. Au sous-sol le chef prepare des plats
+; et les charge sur le monte-plat . Le serveur
+; monte et descend les escaliers pour récuperer les plats et servir les
+; clients.
+; Au menu : clients qui s'impatientent,  difficulte
+; qui monte avec le score et un chien chapardeur qui rode dans le restaurant.
+
+
+; ---- les formes, recopiees pixel pour pixel sur les sprites d'origine ----
+; (toutes calees sur 15 lignes, pieds en bas, pour un seul reglage FEET)
+POUR FORMES
+; serveur tourne a droite (3) et a gauche (4), bras tendu pour le plateau
+DEFSPRITE 3 [
+XXXXXXXXXX.
+XXXXXXXXXX.
+.XXXXXXXX..
+..XXXXXX...
+..XXXXXX...
+..XXXXXX...
+....XXXX...
+XXXXXXXX...
+XXXXXXXX...
+....XXXX...
+....XXXX...
+....XXXX...
+....XXXX...
+..XXXXXX...
+..XXXXXX...
+]
+DEFSPRITE 13 [
+XXXXXXXXXX.
+XXXXXXXXXX.
+.XXXXXXXX..
+..XXXXXX...
+..XXXXXX...
+..XXXXXX...
+....XXXX...
+XXXXXXXX...
+XXXXXXXX...
+....XXXX...
+....XXXX...
+....XXXX...
+....XXXX...
+..XX...XXXX
+XXXX.....XX
+]
+DEFSPRITE 14 [
+.XXXXXXXXXX
+.XXXXXXXXXX
+..XXXXXXXX.
+...XXXXXX..
+...XXXXXX..
+...XXXXXX..
+...XXXX....
+...XXXXXXXX
+...XXXXXXXX
+...XXXX....
+...XXXX....
+...XXXX....
+...XXXX....
+XXXX...XX..
+XX.....XXXX
+]
+DEFSPRITE 4 [
+.XXXXXXXXXX
+.XXXXXXXXXX
+..XXXXXXXX.
+...XXXXXX..
+...XXXXXX..
+...XXXXXX..
+...XXXX....
+...XXXXXXX.
+...XXXXXXXX
+...XXXXXXX.
+...XXXX....
+...XXXX....
+...XXXX....
+...XXXXXX..
+...XXXXXX..
+]
+; le chef, coiffe d'une toque : tourne a gauche (5) et a droite (6)
+DEFSPRITE 5 [
+.........
+.........
+.XXXXXX..
+.XXXXXX..
+.XXXXXX..
+.XXXXXX..
+.XXXX....
+.XXXXXXX.
+.XXXXXXXX
+.XXXXXXXX
+.XXXX....
+.XXXX....
+.XXXX....
+.XXXXXX..
+.XXXXXX..
+]
+DEFSPRITE 15 [
+.........
+.........
+.XXXXXX..
+.XXXXXX..
+.XXXXXX..
+.XXXXXX..
+.XXXX....
+.XXXXXXX.
+.XXXXXXXX
+.XXXXXXXX
+.XXXX....
+.XXXX....
+.XXXX....
+XXX..XXX.
+XX....XXX
+]
+
+DEFSPRITE 6 [
+.........
+.........
+..XXXXXX.
+..XXXXXX.
+..XXXXXX.
+..XXXXXX.
+....XXXX.
+.XXXXXXX.
+XXXXXXXX.
+XXXXXXXX.
+....XXXX.
+....XXXX.
+....XXXX.
+..XXXXXX.
+..XXXXXX.
+]
+
+DEFSPRITE 16 [
+.........
+.........
+..XXXXXX.
+..XXXXXX.
+..XXXXXX.
+..XXXXXX.
+....XXXX.
+.XXXXXXX.
+XXXXXXXX.
+XXXXXXXX.
+....XXXX.
+....XXXX.
+....XXXX.
+.XXX..XXX
+XXX....XX
+]
+
+; le client : tourne a droite (7) et a gauche (10)
+DEFSPRITE 7 [
+..........
+..........
+...XXXXX..
+..XXXXXX..
+..XXXXXX..
+...XXXXX..
+....XXXX..
+.XXXXXXX..
+.XXXXXXX..
+.XXXXXXX..
+....XXXX..
+....XXXX..
+....XXXX..
+...XXXXX..
+..XXXXXXX.
+]
+DEFSPRITE 17 [
+..........
+..........
+...XXXXX..
+..XXXXXX..
+..XXXXXX..
+...XXXXX..
+....XXXX..
+.XXXXXXX..
+.XXXXXXX..
+.XXXXXXX..
+....XXXX..
+....XXXX..
+....XXXX..
+..XX...XX.
+.XXX....XX
+]
+
+DEFSPRITE 10 [
+..........
+..........
+..XXXXX...
+..XXXXXX..
+..XXXXXX..
+..XXXXX...
+..XXXX....
+..XXXXXXX.
+..XXXXXXX.
+..XXXXXXX.
+..XXXX....
+..XXXX....
+..XXXX....
+..XXXXX...
+.XXXXXXX..
+]
+
+DEFSPRITE 20 [
+..........
+..........
+..XXXXX...
+..XXXXXX..
+..XXXXXX..
+..XXXXX...
+..XXXX....
+..XXXXXXX.
+..XXXXXXX.
+..XXXXXXX.
+..XXXX....
+..XXXX....
+..XXXX....
+.XX...XX..
+XX....XXX.
+]
+
+; un plat, et le plateau du monte-plat
+DEFSPRITE 8 [
+.XXX....XXX.
+.XXX....XXX.
+..XXXXXXXX..
+...XXXXXX...
+....XXXX....
+]
+DEFSPRITE 9 [
+............
+XXXXXXXXXXXX
+XXXXXXXXXXXX
+XXXXXXXXXXXX
+]
+; la table : plateau 14x2 sur deux pieds (gauche 4 cases, droit 5 cases)
+DEFSPRITE 11 [
+XXXXXXXXXXXXXX
+XXXXXXXXXXXXXX
+XXX........XXX
+XXX........XXX
+XXX........XXX
+XXX........XXX
+XXX........XXX
+XXX........XXX
+]
+; le chien : recopie pixel pour pixel de chien.png (16x12), cale en bas comme
+; les autres (pieds sur la derniere ligne, pour le meme reglage FEET)
+DEFSPRITE 21 [
+....XXX......XX.
+....XXX......XXX
+..XXXXX......XXX
+.XXXXXXX....XX..
+.XXXXXXX....XX..
+.XXXXXXXXXXXXX..
+....XXXXXXXXX...
+....XXXXXXXXX...
+...XXX....XX....
+...XXX....XXX...
+....XXX..XX.....
+....XXX..XX.....
+]
+DEFSPRITE 22 [
+....XXX......XX.
+....XXX......XXX
+..XXXXX......XXX
+.XXXXXXX....XX..
+.XXXXXXX....XX..
+.XXXXXXXXXXXXX..
+....XXXXXXXXX...
+....XXXXXXXXX...
+...XXX....XX....
+...XXX....XXX...
+.XX.........XX..
+XX..........XX..
+]
+; le chien dans l'autre sens : miroir vertical (gauche-droite) de 21 et 22
+DEFSPRITE 23 [
+.XX......XXX....
+XXX......XXX....
+XXX......XXXXX..
+..XX....XXXXXXX.
+..XX....XXXXXXX.
+..XXXXXXXXXXXXX.
+...XXXXXXXXX....
+...XXXXXXXXX....
+....XX....XXX...
+...XXX....XXX...
+.....XX..XXX....
+.....XX..XXX....
+]
+DEFSPRITE 24 [
+.XX......XXX....
+XXX......XXX....
+XXX......XXXXX..
+..XX....XXXXXXX.
+..XX....XXXXXXX.
+..XXXXXXXXXXXXX.
+...XXXXXXXXX....
+...XXXXXXXXX....
+....XX....XXX...
+...XXX....XXX...
+..XX.........XX.
+..XX..........XX
+]
+FIN
+
+; ---- rectangle plein a coins droits : on empile des traits horizontaux ----
+POUR RECTPLEIN :XC :YBAS :W :H :COUL
+FCC :COUL FIXETAILLECRAYON 7
+DONNE "YY ( :YBAS + 3 )
+TANTQUE [ :YY < ( :YBAS + :H ) ] [
+LC FXY ( :XC - :W / 2 + 3 ) :YY BC FXY ( :XC + :W / 2 - 3 ) :YY LC
+DONNE "YY :YY + 5
+]
+FIN
+
+; ---- un trait horizontal sur toute la largeur ----
+POUR TRAITH :Y
+LC FXY -800 :Y BC FXY 800 :Y LC
+FIN
+
+; ---- une porte : rectangle noir bien carre, pose sur le plancher ----
+POUR PORTE :XC :Y
+RECTPLEIN :XC :Y :DOORW :DOORH :CNOIR
+FIN
+
+; ---- une table-tortue posee a (XC, etage FL), et ses donnees memorisees ----
+POUR TABLETORTUE :XC :FL
+FIXEITEM :NT :TABLEX :XC
+FIXEITEM :NT :TABLEFL :FL
+FIXEITEM :NT :TABLEST 0
+FIXETORTUE ( :TBLBASE + :NT ) FCC :CBLANC SPRITE 11 LC FXY :XC ( ( PLANCHER :FL ) + :TABFEET ) MT
+DONNE "NT :NT + 1
+FIN
+
+; ---- un escalier en diagonale (du bas-gauche vers le haut-droite) ----
+POUR ESCALIER :XB :YB :XT :YT
+FCC :CBLANC FIXETAILLECRAYON 8
+LC FXY :XB :YB BC FXY :XT :YT LC
+FIN
+
+; ---- portes et tables, etage par etage (positions stockees en listes) ----
+POUR POSEPORTES
+DONNE "YE :FY3 POURCHAQUE :PORTES3 [ PORTE :? :YE ]
+DONNE "YE :FY2 POURCHAQUE :PORTES2 [ PORTE :? :YE ]
+DONNE "YE :FY1 POURCHAQUE :PORTES1 [ PORTE :? :YE ]
+FIN
+
+; les tables : tortues, et leurs coordonnees rangees dans des tableaux
+POUR POSETABLES
+DONNE "NT 1
+POSEFLOOR :TABLES3 3
+POSEFLOOR :TABLES2 2
+POSEFLOOR :TABLES1 1
+FIN
+
+POUR POSEFLOOR :LISTE :FL
+POURCHAQUE :LISTE [ TABLETORTUE :? :FL ]
+FIN
+
+; ---- tout le decor, trace une seule fois (le champ reste "cuit") ----
+POUR DECOR
+FIXETORTUE 0 CT NETTOIE
+; les portes (avant les planchers : le trait du sol cache leur bas)
+POSEPORTES
+; les planchers, du plafond au sol du chef
+FCC :CSOL FIXETAILLECRAYON 12
+TRAITH :CEIL
+TRAITH :FY3
+TRAITH :FY2
+TRAITH :FY1
+TRAITH :FYG
+; sous le sol du chef il n'y a pas d'etage : tout en noir jusqu'en bas
+RECTPLEIN 0 ( :BASEY - 110 ) 1620 ( :FYG - :BASEY + 110 ) :CNOIR
+; on repasse le trait du sol du chef bien net par-dessus le noir
+FCC :CSOL FIXETAILLECRAYON 12 TRAITH :FYG
+; la cage du monte-plat : colonne noire etroite, plaquee tout a droite
+RECTPLEIN 777 :BASEY 53 ( :CEIL - :BASEY ) :CNOIR
+; les deux escaliers, decales (1->2 a droite, 2->3 a gauche)
+ESCALIER :XBA :FY2 :XTA :FY3
+ESCALIER :XBB :FY1 :XTB :FY2
+; le bandeau du haut, par-dessus tout : fond, enseigne, score et vies
+BANDEAU
+FIN
+
+; ---- cree les tortues-sprites. ordre des numeros = ordre d'affichage :
+; clients (derriere) < tables < plats poses < personnages (devant) ----
+POUR SETSPRITES
+DONNE "NTABLES ( ( COMPTE :TABLES3 ) + ( COMPTE :TABLES2 ) + ( COMPTE :TABLES1 ) )
+DONNE "TBLBASE :NTABLES
+DONNE "TDBASE ( 2 * :NTABLES )
+DONNE "WTURT ( 3 * :NTABLES + 1 )
+DONNE "CTURT ( 3 * :NTABLES + 2 )
+DONNE "PTURT ( 3 * :NTABLES + 3 )
+DONNE "DTURT ( 3 * :NTABLES + 4 )
+DONNE "WDTURT ( 3 * :NTABLES + 5 )
+DONNE "CDTURT ( 3 * :NTABLES + 6 )
+DONNE "DOGTURT ( 3 * :NTABLES + 7 )
+DONNE "DOGDTURT ( 3 * :NTABLES + 8 )
+POSETABLES
+BUILDDOORS
+; les clients et les plats poses : caches au depart
+REPETEPOUR [ I 1 :NTABLES ] [
+FIXETORTUE ( CLITURT :I ) FCC :CCLIENT SPRITE 7 LC CT
+FIXETORTUE ( TDTURT :I ) FCC :CVIOLET SPRITE 8 LC CT
+]
+FIXETORTUE :WTURT FCC :CSERVEUR SPRITE 3 LC FXY :WX ( ( PLANCHER :WFL ) + :FEET ) MT
+FIXETORTUE :CTURT FCC :CMAUVE SPRITE 6 LC FXY :CHEFX ( :FYG + :FEET ) MT
+FIXETORTUE :PTURT FCC :CRAIL SPRITE 9 LC FXY 778 :MPY MT
+FIXETORTUE :DTURT FCC :CVIOLET SPRITE 8 LC FXY 778 ( :MPY + 13 ) CT
+FIXETORTUE :WDTURT FCC :CVIOLET SPRITE 8 LC CT
+FIXETORTUE :CDTURT FCC :CVIOLET SPRITE 8 LC CT
+; le chien et le plat qu'il peut chaparder : caches au depart
+FIXETORTUE :DOGTURT FCC :CCHIEN SPRITE 21 LC CT
+FIXETORTUE :DOGDTURT FCC :CVIOLET SPRITE 8 LC CT
+FIN
+
+; ---- ordonnee du plancher d'un etage (0 = sous-sol, le chef y reste) ----
+POUR PLANCHER :FL
+SI :FL = 1 [ RENDS :FY1 ]
+SI :FL = 2 [ RENDS :FY2 ]
+SI :FL = 3 [ RENDS :FY3 ]
+RENDS :FYG
+FIN
+
+; ---- position courante du serveur (sur un etage ou sur un escalier) ----
+POUR SERVEURXY
+SI :WONSTAIR = 1 [
+DONNE "WPX ( :XBA + :WT * ( :XTA - :XBA ) )
+DONNE "WPY ( :FY2 + :WT * ( :FY3 - :FY2 ) )
+STOP
+]
+SI :WONSTAIR = 2 [
+DONNE "WPX ( :XBB + :WT * ( :XTB - :XBB ) )
+DONNE "WPY ( :FY1 + :WT * ( :FY2 - :FY1 ) )
+STOP
+]
+DONNE "WPX :WX
+DONNE "WPY ( PLANCHER :WFL )
+FIN
+
+; ---- forme animee : immobile = la forme de repos ; quand BOUGE on alterne
+; repos et pas toutes les 6 images, pour donner la demarche ----
+POUR FORMEMARCHE :BOUGE :REPOS :PAS
+SI NON :BOUGE [ RENDS :REPOS ]
+SI ( RESTE :FRAME 12 ) < 6 [ RENDS :REPOS ]
+RENDS :PAS
+FIN
+
+; ---- replace le serveur et le tourne dans son sens de marche (ou a terre) ----
+POUR MAJSERVEUR
+SERVEURXY
+FIXETORTUE :WTURT
+SI :WSTUN > 0 [ SERVEURKO STOP ]
+FCAP 0
+FCC :CSERVEUR
+SI :WDIR < 0 [ SPRITE ( FORMEMARCHE :WMOVE 3 13 ) ] [ SPRITE ( FORMEMARCHE :WMOVE 4 14 ) ]
+FXY :WPX ( :WPY + :FEET )
+FIN
+
+; ---- le serveur a terre : sprite pivote de 90 deg, clignote blanc-rouge ----
+POUR SERVEURKO
+FCAP :WDOWNCAP
+SI ( ( RESTE :FRAME 12 ) < 6 ) [ FCC :CBLANC ] [ FCC :CROUGE ]
+; couche au ras du sol ; l'abaissement differe selon le sens (sprite cale a gauche)
+SI :WDIR < 0 [ SPRITE 3 FXY :WPX ( :WPY + :WKOFEETG ) ] [ SPRITE 4 FXY :WPX ( :WPY + :WKOFEETD ) ]
+FIN
+
+; ---- entrer dans un escalier en montant (haut-droite) ----
+POUR MONTE
+SI ET ( :WFL = 2 ) ( ( VALABS ( :WX - :XBA ) ) < 48 ) [ DONNE "WONSTAIR 1 DONNE "WT 0 STOP ]
+SI ET ( :WFL = 1 ) ( ( VALABS ( :WX - :XBB ) ) < 48 ) [ DONNE "WONSTAIR 2 DONNE "WT 0 STOP ]
+FIN
+
+; ---- entrer dans un escalier en descendant (bas-gauche) ----
+POUR DESCEND
+SI ET ( :WFL = 3 ) ( ( VALABS ( :WX - :XTA ) ) < 48 ) [ DONNE "WONSTAIR 1 DONNE "WT 1 STOP ]
+SI ET ( :WFL = 2 ) ( ( VALABS ( :WX - :XTB ) ) < 48 ) [ DONNE "WONSTAIR 2 DONNE "WT 1 STOP ]
+FIN
+
+; ---- on pose le serveur sur l'etage d'arrivee ----
+POUR FINESCALIER :HAUT
+DONNE "S :WONSTAIR
+DONNE "WONSTAIR 0
+SI :HAUT = 1 [
+SI :S = 1 [ DONNE "WFL 3 DONNE "WX :XTA ]
+SI :S = 2 [ DONNE "WFL 2 DONNE "WX :XTB ]
+STOP
+]
+SI :S = 1 [ DONNE "WFL 2 DONNE "WX :XBA ]
+SI :S = 2 [ DONNE "WFL 1 DONNE "WX :XBB ]
+FIN
+
+; ---- monter / descendre le long d'un escalier ----
+POUR DANSESCALIER
+; l'escalier monte vers la droite : on monte en regardant a droite, on descend a gauche
+SI ( OU ( :J = 2 ) ( :J = 1 ) ) [ DONNE "WT :WT + :PASESC DONNE "WDIR 1 DONNE "WMOVE VRAI ]
+SI ( OU ( :J = 6 ) ( :J = 5 ) ) [ DONNE "WT :WT - :PASESC DONNE "WDIR -1 DONNE "WMOVE VRAI ]
+SI :WT >= 1 [ FINESCALIER 1 ]
+SI :WT <= 0 [ FINESCALIER 0 ]
+FIN
+
+; ---- marche gauche/droite sur un etage, et tentatives d'escalier ----
+POUR SURETAGE
+SI :J = 7 [ DONNE "WX :WX - :PAS DONNE "WDIR -1 DONNE "WMOVE VRAI ]
+SI :J = 3 [ DONNE "WX :WX + :PAS DONNE "WDIR 1 DONNE "WMOVE VRAI ]
+SI :WX < :WXMIN [ DONNE "WX :WXMIN ]
+SI :WX > :WXMAX [ DONNE "WX :WXMAX ]
+SI :J = 2 [ MONTE ]
+SI :J = 6 [ DESCEND ]
+FIN
+
+; ---- la manette, a chaque image ----
+POUR CONTROLE
+DONNE "FRAME :FRAME + 1
+DONNE "J MANETTE 0
+DONNE "WMOVE FAUX
+; a terre : on decompte, le serveur ne bouge pas, mais le jeu continue autour
+SI :WSTUN > 0 [ DONNE "WSTUN ( :WSTUN - 1 ) MAJSERVEUR DONNE "LASTBTN BOUTON? 0 STOP ]
+SI :WONSTAIR > 0 [ DANSESCALIER ] [ SURETAGE ]
+MAJSERVEUR
+; bouton (detection de front) : poser un plat sur la table devant soi
+DONNE "BT BOUTON? 0
+SI ET :BT ( NON :LASTBTN ) [ TENTESERVICE ]
+DONNE "LASTBTN :BT
+FIN
+
+; ---- altitude du plateau pour un etage donne (cale sur le trait du sol) ----
+POUR MPYAT :F
+RENDS ( PLANCHER :F ) - 12
+FIN
+
+; ---- le serveur est-il en train d'attendre a la cage, sur l'etage du plateau ? ----
+POUR ALACAGE
+SI :WONSTAIR > 0 [ RENDS FAUX ]
+SI NON ( :WFL = :MPFLOOR ) [ RENDS FAUX ]
+RENDS ( :WX > 690 )
+FIN
+
+; ---- le chef charge un plat : le monte-plat s'elance vers le 1er etage ----
+POUR CHARGEMP
+DONNE "MPDISH VRAI
+DONNE "MPDIR 1
+DONNE "MPFLOORT 1
+DONNE "MPTARGET ( MPYAT 1 )
+DONNE "MPSTATE 1
+FIN
+
+; ---- le plateau glisse vers sa cible ; arrive, il attend 2 s ----
+POUR MPENMOUVEMENT
+SI :MPY < :MPTARGET [ DONNE "MPY ( :MPY + :MPSPEED ) ]
+SI :MPY > :MPTARGET [ DONNE "MPY ( :MPY - :MPSPEED ) ]
+SI ( VALABS ( :MPY - :MPTARGET ) ) <= :MPSPEED [
+DONNE "MPY :MPTARGET DONNE "MPFLOOR :MPFLOORT
+DONNE "MPSTATE 2 DONNE "MPWAIT :WAIT2S
+]
+FIN
+
+; ---- choix de l'etage suivant : on oscille 1->2->3->2->1... ----
+POUR MPPROCHAIN
+SI :MPFLOOR = 3 [ DONNE "MPDIR -1 ]
+SI :MPFLOOR = 1 [ DONNE "MPDIR 1 ]
+DONNE "MPFLOORT ( :MPFLOOR + :MPDIR )
+DONNE "MPTARGET ( MPYAT :MPFLOORT )
+DONNE "MPSTATE 1
+FIN
+
+; ---- attente de 2 s a un etage ----
+POUR MPATTENTE
+DONNE "MPWAIT :MPWAIT - 1
+SI :MPWAIT <= 0 [ MPPROCHAIN ]
+FIN
+
+; ---- le plateau vide redescend au sol attendre le chef ----
+POUR MPRETOUR
+DONNE "MPTARGET ( MPYAT 0 )
+SI :MPY > :MPTARGET [ DONNE "MPY ( :MPY - :MPSPEED ) ]
+SI ( VALABS ( :MPY - :MPTARGET ) ) <= :MPSPEED [
+DONNE "MPY :MPTARGET DONNE "MPFLOOR 0 DONNE "MPSTATE 0
+]
+FIN
+
+; ---- le serveur (mains vides) cueille le plat present a son etage ----
+POUR TENTEPRISE
+SI :WAITERDISH [ STOP ]
+SI ALACAGE [
+DONNE "WAITERDISH VRAI
+DONNE "MPDISH FAUX
+DONNE "MPSTATE 3
+]
+FIN
+
+; ---- replace le plateau et le plat pose dessus ----
+POUR MAJPLATEAU
+FIXETORTUE :PTURT FXY 778 :MPY
+FIXETORTUE :DTURT FXY 778 ( :MPY + 13 )
+SI :MPDISH [ MT ] [ CT ]
+FIN
+
+; ---- un pas du monte-plat ----
+POUR MAJMONTEPLAT
+SI :MPSTATE = 1 [ MPENMOUVEMENT ]
+SI :MPSTATE = 2 [ MPATTENTE ]
+SI :MPSTATE = 3 [ MPRETOUR ]
+SI :MPDISH [ SI :MPSTATE = 2 [ TENTEPRISE ] ]
+MAJPLATEAU
+FIN
+
+; ---- le plat porte par le serveur (dans sa main, du cote ou il regarde) ----
+POUR MAJPLATSERVEUR
+FIXETORTUE :WDTURT
+SI :WAITERDISH [ FXY ( :WPX + :WDIR * :DISHDX ) ( :WPY + :DISHDY ) MT ] [ CT ]
+FIN
+
+; ---- le chef prepare un plat, puis attend le plateau ----
+POUR CHEFPREPARE
+DONNE "CHEFTIMER :CHEFTIMER - 1
+SI :CHEFTIMER <= 0 [ DONNE "CHEFSTATE 3 ]
+FIN
+
+; ---- plat pret en main : il patiente tant que le plateau n'est pas au sol ----
+POUR CHEFATTEND
+SI ET ( :MPSTATE = 0 ) ( NON :MPDISH ) [ DONNE "CHEFSTATE 1 ]
+FIN
+
+; ---- le chef marche vers la cage ; arrive, il charge si le plateau est la ----
+POUR CHEFVADROITE
+SI :CHEFX < :CHEFXCAGE [ DONNE "CHEFX ( :CHEFX + :CHEFSPEED ) DONNE "CHEFMOVE VRAI ]
+SI :CHEFX >= :CHEFXCAGE [
+DONNE "CHEFX :CHEFXCAGE
+SI ET ( :MPSTATE = 0 ) ( NON :MPDISH ) [ CHARGEMP DONNE "CHEFSTATE 2 ]
+]
+FIN
+
+; ---- le chef retourne preparer le plat suivant ----
+POUR CHEFVAGAUCHE
+SI :CHEFX > :CHEFXPREP [ DONNE "CHEFX ( :CHEFX - :CHEFSPEED ) DONNE "CHEFMOVE VRAI ]
+SI :CHEFX <= :CHEFXPREP [
+DONNE "CHEFX :CHEFXPREP DONNE "CHEFSTATE 0 DONNE "CHEFTIMER :CHEFPREP
+]
+FIN
+
+; ---- replace et oriente le sprite du chef ----
+POUR MAJCHEFSPRITE
+FIXETORTUE :CTURT
+SI ( OU ( :CHEFSTATE = 1 ) ( :CHEFSTATE = 3 ) ) [ SPRITE ( FORMEMARCHE :CHEFMOVE 5 15 ) ] [ SPRITE ( FORMEMARCHE :CHEFMOVE 6 16 ) ]
+FXY :CHEFX ( :FYG + :FEET )
+; le plat dans ses mains : quand il attend pret (3) et quand il porte (1)
+FIXETORTUE :CDTURT
+SI ( OU ( :CHEFSTATE = 1 ) ( :CHEFSTATE = 3 ) ) [ FXY ( :CHEFX + :DISHDX ) ( :FYG + :DISHDY ) MT ] [ CT ]
+FIN
+
+; ---- un pas du chef ----
+POUR MAJCHEF
+DONNE "CHEFMOVE FAUX
+SI :CHEFSTATE = 0 [ CHEFPREPARE ]
+SI :CHEFSTATE = 3 [ CHEFATTEND ]
+SI :CHEFSTATE = 1 [ CHEFVADROITE ]
+SI :CHEFSTATE = 2 [ CHEFVAGAUCHE ]
+MAJCHEFSPRITE
+FIN
+
+; ---- numero de tortue d'un client / d'un plat pose sur sa table ----
+POUR CLITURT :I
+RENDS :I
+FIN
+POUR TDTURT :I
+RENDS ( :TDBASE + :I )
+FIN
+
+; ---- liste des portes d'un etage ----
+POUR PORTESDE :FL
+SI :FL = 1 [ RENDS :PORTES1 ]
+SI :FL = 2 [ RENDS :PORTES2 ]
+RENDS :PORTES3
+FIN
+
+; ---- petit tremblement vertical (client qui s'impatiente) ----
+POUR TREMBLE
+SI ( RESTE :FRAME 6 ) < 3 [ RENDS 4 ] [ RENDS -4 ]
+FIN
+
+; ---- couleur d'un client : vert, ou rouge s'il attend depuis trop longtemps ----
+POUR COULEURCLIENT :I
+SI ( ITEM :I :TABLEST ) = 2 [
+SI ( ITEM :I :TABLETMR ) >= :PWARN [ RENDS :CROUGE ]
+]
+RENDS :CCLIENT
+FIN
+
+; ---- le client se deplace-t-il ? (1 = il arrive, 4 = il repart) ----
+POUR CLIENTBOUGE :I
+RENDS ( OU ( ( ITEM :I :TABLEST ) = 1 ) ( ( ITEM :I :TABLEST ) = 4 ) )
+FIN
+
+; ---- place le sprite d'un client (decale verticalement de SHAKE si agite,
+; et anime la marche quand il va vers sa table ou vers la porte) ----
+POUR AFFICHECLIENT :I :CX :COUL :SHAKE
+DONNE "FYY PLANCHER ( ITEM :I :TABLEFL )
+FIXETORTUE ( CLITURT :I )
+FCC :COUL
+SI ( ITEM :I :TABLEDIR ) < 0 [ SPRITE ( FORMEMARCHE ( CLIENTBOUGE :I ) 7 17 ) ] [ SPRITE ( FORMEMARCHE ( CLIENTBOUGE :I ) 10 20 ) ]
+FXY :CX ( :FYY + :FEET + :SHAKE )
+MT
+FIN
+
+; ---- place le plat pose sur une table ----
+; le +5 recentre le plat : sa forme (11 de large) et la table (14) sont calees a
+; gauche dans la grille 16, leurs centres ne tombent donc pas au meme endroit
+POUR AFFICHEPLAT :I
+FIXETORTUE ( TDTURT :I )
+FXY ( ( ITEM :I :TABLEX ) + 5 ) ( ( PLANCHER ( ITEM :I :TABLEFL ) ) + 23 )
+MT
+FIN
+
+; ---- un client arrive d'une porte et marche vers sa table ----
+POUR CLIENTENTRE :I
+DONNE "CX ( ( ITEM :I :TABLECX ) + ( ITEM :I :TABLEDIR ) * :CLISPEED )
+; il s'arrete a cote de la table, du cote de son arrivee (jamais au centre)
+DONNE "TX ( ( ITEM :I :TABLEX ) - ( ITEM :I :TABLEDIR ) * :SEATDX )
+; cote droit : on decale un peu (table et client cales a gauche dans la grille)
+SI ( ITEM :I :TABLEDIR ) < 0 [ DONNE "TX ( :TX + :SEATFIX ) ]
+SI ( ( ( :TX - :CX ) * ( ITEM :I :TABLEDIR ) ) <= 0 ) [
+DONNE "CX :TX FIXEITEM :I :TABLEST 2 FIXEITEM :I :TABLETMR 0
+]
+FIXEITEM :I :TABLECX :CX
+AFFICHECLIENT :I :CX :CCLIENT 0
+FIN
+
+; ---- client attable qui attend son plat ; il s'enerve avec le temps ----
+POUR CLIENTATTEND :I
+DONNE "T ( ( ITEM :I :TABLETMR ) + 1 )
+FIXEITEM :I :TABLETMR :T
+SI :T >= :PLEAVE [ CLIENTFACHE :I STOP ]
+DONNE "SH 0
+SI :T >= :PSHAKE [ DONNE "SH TREMBLE ]
+AFFICHECLIENT :I ( ITEM :I :TABLECX ) ( COULEURCLIENT :I ) :SH
+FIN
+
+; ---- client servi : il mange 5 s, puis s'en va ----
+POUR CLIENTMANGE :I
+DONNE "T ( ( ITEM :I :TABLETMR ) - 1 )
+FIXEITEM :I :TABLETMR :T
+SI :T <= 0 [ FIXETORTUE ( TDTURT :I ) CT PARTIR :I STOP ]
+AFFICHECLIENT :I ( ITEM :I :TABLECX ) :CCLIENT 0
+AFFICHEPLAT :I
+FIN
+
+; ---- prepare le depart : le client repart vers sa porte ----
+POUR PARTIR :I
+FIXEITEM :I :TABLEST 4
+SI ( ITEM :I :TABLEDOOR ) < ( ITEM :I :TABLECX ) [ FIXEITEM :I :TABLEDIR -1 ] [ FIXEITEM :I :TABLEDIR 1 ]
+FIN
+
+; ---- client pas servi a temps : il part fache, on perd une vie ----
+; si c'etait la derniere vie, on retient ce client : la partie ne s'arretera
+; que lorsqu'il aura atteint sa porte (voir CLIENTSORT)
+POUR CLIENTFACHE :I
+DONNE "VIES :VIES - 1
+MAJHUD
+SI :VIES <= 0 [ DONNE "DERNIER :I ]
+PARTIR :I
+FIN
+
+; ---- client qui repart vers sa porte ; arrive, il disparait et libere la table ----
+POUR CLIENTSORT :I
+DONNE "CX ( ( ITEM :I :TABLECX ) + ( ITEM :I :TABLEDIR ) * :CLISPEED )
+DONNE "DOOR ITEM :I :TABLEDOOR
+SI ( ( ( :DOOR - :CX ) * ( ITEM :I :TABLEDIR ) ) <= 0 ) [
+FIXEITEM :I :TABLEST 0
+FIXETORTUE ( CLITURT :I ) CT
+SI ET ( :VIES <= 0 ) ( :I = :DERNIER ) [ DONNE "GAMEOVER VRAI ]
+STOP
+]
+FIXEITEM :I :TABLECX :CX
+AFFICHECLIENT :I :CX :CCLIENT 0
+FIN
+
+; ---- un pas pour le client de la table I ----
+POUR MAJCLIENT :I
+DONNE "ST ITEM :I :TABLEST
+SI :ST = 1 [ CLIENTENTRE :I ]
+SI :ST = 2 [ CLIENTATTEND :I ]
+SI :ST = 3 [ CLIENTMANGE :I ]
+SI :ST = 4 [ CLIENTSORT :I ]
+FIN
+
+POUR MAJCLIENTS
+REPETEPOUR [ I 1 :NTABLES ] [ MAJCLIENT :I ]
+FIN
+
+; ---- table la plus proche d'une porte, sur le meme etage (0 si aucune) ----
+POUR NEARESTTABLE :DX :FL
+DONNE "BEST 0 DONNE "BESTD 99999
+REPETEPOUR [ I 1 :NTABLES ] [
+SI ( ITEM :I :TABLEFL ) = :FL [
+DONNE "DD VALABS ( ( ITEM :I :TABLEX ) - :DX )
+SI :DD < :BESTD [ DONNE "BESTD :DD DONNE "BEST :I ]
+]
+]
+RENDS :BEST
+FIN
+
+; ---- fait apparaitre un client a la table K, depuis la porte DR ----
+POUR SPAWNCLIENT :K :DR
+FIXEITEM :K :TABLEDOOR :DR
+FIXEITEM :K :TABLECX :DR
+FIXEITEM :K :TABLETMR 0
+FIXEITEM :K :TABLEST 1
+SI ( ITEM :K :TABLEX ) < :DR [ FIXEITEM :K :TABLEDIR -1 ] [ FIXEITEM :K :TABLEDIR 1 ]
+FIN
+
+; ---- une tentative : une porte au hasard, et son client si la table la plus
+; proche de cette porte est libre ----
+POUR SPAWNUN
+DONNE "D ( 1 + HASARD :NDOORS )
+DONNE "DRX ITEM :D :DOORX
+DONNE "K NEARESTTABLE :DRX ( ITEM :D :DOORFL )
+SI :K > 0 [ SI ( ITEM :K :TABLEST ) = 0 [ SPAWNCLIENT :K :DRX ] ]
+FIN
+
+; ---- combien de clients d'un coup : 1, puis 2 passe 100 pts, 3 passe 200 ----
+POUR NBSPAWN
+SI :SCORE > 200 [ RENDS 3 ]
+SI :SCORE > 100 [ RENDS 2 ]
+RENDS 1
+FIN
+
+; ---- a intervalle (de plus en plus court) : on lance autant de tentatives que
+; le score l'autorise (chacune sur une porte au hasard) ----
+POUR MAJSPAWN
+DONNE "SPAWNTIMER :SPAWNTIMER - 1
+SI :SPAWNTIMER > 0 [ STOP ]
+DONNE "SPAWNTIMER :SPAWNINT
+DONNE "SPAWNINT ( :SPAWNINT - :SPAWNDEC )
+SI :SPAWNINT < :SPAWNMIN [ DONNE "SPAWNINT :SPAWNMIN ]
+REPETE NBSPAWN [ SPAWNUN ]
+FIN
+
+; ---- enregistre les portes (x et etage) pour le choix a l'apparition ----
+POUR ADDDOOR :XC :FL
+FIXEITEM :ND :DOORX :XC
+FIXEITEM :ND :DOORFL :FL
+DONNE "ND :ND + 1
+FIN
+
+POUR DOORFLOOR :LISTE :FL
+POURCHAQUE :LISTE [ ADDDOOR :? :FL ]
+FIN
+
+POUR BUILDDOORS
+DONNE "ND 1
+DOORFLOOR :PORTES3 3
+DOORFLOOR :PORTES2 2
+DOORFLOOR :PORTES1 1
+DONNE "NDOORS ( :ND - 1 )
+FIN
+
+; ============================ LE CHIEN ============================
+; il rode a partir de 200 pts. Normalement : un aller-retour porte<->table de
+; son etage, puis il repart par la porte. Mais si le serveur est sur son etage :
+; - sans plat : si le serveur le croise, coup de pied et le chien file ;
+; - avec un plat : le chien fonce sur le serveur, le renverse, lui vole le plat
+;   et s'enfuit (le serveur reste a terre 3 s, le jeu continue autour de lui).
+
+; ---- porte la plus proche d'une position, sur un etage donne ----
+POUR NEARESTDOOR :DX :FL
+DONNE "BESTX :DX DONNE "BESTD 99999
+REPETEPOUR [ I 1 :NDOORS ] [
+SI ( ITEM :I :DOORFL ) = :FL [
+DONNE "DD VALABS ( ( ITEM :I :DOORX ) - :DX )
+SI :DD < :BESTD [ DONNE "BESTD :DD DONNE "BESTX ( ITEM :I :DOORX ) ]
+]
+]
+RENDS :BESTX
+FIN
+
+; ---- delai avant le prochain chien : 20 s a partir de 200 pts, -100 images a
+; chaque palier de 200 pts, plancher de 5 s atteint a 2000 pts ----
+POUR DOGNEXTTIMER
+DONNE "TIER ENT ( ( :SCORE - 200 ) / 200 )
+SI :TIER < 0 [ DONNE "TIER 0 ]
+DONNE "DOGTIMER ( :DOGINTMAX - ( :TIER * :DOGINTDEC ) )
+SI :DOGTIMER < :DOGINTMINI [ DONNE "DOGTIMER :DOGINTMINI ]
+FIN
+
+; ---- de temps en temps (apres 200 pts), un chien sort d'une porte au hasard ----
+POUR DOGSPAWN
+SI NON ( :SCORE > 200 ) [ STOP ]
+DONNE "DOGTIMER ( :DOGTIMER - 1 )
+SI :DOGTIMER > 0 [ STOP ]
+DOGNEXTTIMER
+DONNE "D ( 1 + HASARD :NDOORS )
+DONNE "DOGFL ( ITEM :D :DOORFL )
+DONNE "DOGDOOR ( ITEM :D :DOORX )
+DONNE "DOGK NEARESTTABLE :DOGDOOR :DOGFL
+SI :DOGK = 0 [ STOP ]
+DONNE "DOGTABLEX ( ITEM :DOGK :TABLEX )
+DONNE "DOGX :DOGDOOR
+DONNE "DOGDISH FAUX
+DONNE "DOGBOND 0
+DONNE "DOGSTATE 1
+FIN
+
+; ---- avance le chien de PASCHIEN vers CIBLE, en reglant son sens de marche ----
+POUR DOGVERS :CIBLE :PASCHIEN
+SI ( :CIBLE > :DOGX ) [ DONNE "DOGDIR 1 ] [ DONNE "DOGDIR -1 ]
+DONNE "DOGX ( :DOGX + :DOGDIR * :PASCHIEN )
+FIN
+
+; ---- reaction au serveur present sur le meme etage (peut changer l'etat) ----
+POUR DOGVSSERVEUR
+SI :DOGSTATE = 3 [ STOP ]
+SI NON ( ET ( :WONSTAIR = 0 ) ( :WFL = :DOGFL ) ) [ SI :DOGSTATE = 4 [ DONNE "DOGSTATE 1 ] STOP ]
+SI :WAITERDISH [
+SI ( ( VALABS ( :WX - :DOGX ) ) < :DOGHIT ) [ DOGVOLE STOP ]
+DONNE "DOGSTATE 4 STOP
+]
+SI :DOGSTATE = 4 [ DONNE "DOGSTATE 1 ]
+SI ( ( VALABS ( :WX - :DOGX ) ) < :DOGHIT ) [ DOGCOUPDEPIED ]
+FIN
+
+; ---- le serveur botte le chien : il decolle vers la porte la plus proche,
+; avec un petit bond (poussee + arc) pour bien voir le coup de pied ----
+POUR DOGCOUPDEPIED
+DONNE "DOGSTATE 3
+DONNE "DOGFLEEX NEARESTDOOR :DOGX :DOGFL
+DONNE "DOGBOND :DOGBONDT
+FIN
+
+; ---- le chien renverse le serveur et lui vole son plat, puis s'enfuit ----
+POUR DOGVOLE
+DONNE "WAITERDISH FAUX
+DONNE "DOGDISH VRAI
+DONNE "WSTUN ( 3 * :IMGPARSEC )
+SI :WDIR < 0 [ DONNE "WDOWNCAP 90 ] [ DONNE "WDOWNCAP -90 ]
+DONNE "DOGSTATE 3
+DONNE "DOGFLEEX NEARESTDOOR :DOGX :DOGFL
+FIN
+
+; ---- aller vers la table ; arrive, on fait demi-tour vers la porte ----
+POUR DOGALLER
+DOGVERS :DOGTABLEX :DOGSPEED
+SI ( ( VALABS ( :DOGX - :DOGTABLEX ) ) <= :DOGSPEED ) [ DONNE "DOGX :DOGTABLEX DONNE "DOGSTATE 2 ]
+FIN
+
+; ---- retour vers la porte ; arrive, le chien disparait ----
+POUR DOGRETOUR
+DOGVERS :DOGDOOR :DOGSPEED
+SI ( ( VALABS ( :DOGX - :DOGDOOR ) ) <= :DOGSPEED ) [ DOGPARTI ]
+FIN
+
+; ---- fuite a toute vitesse vers la porte ; arrive, il disparait ----
+; pendant le bond du coup de pied, il file plus vite (puis reprend sa vitesse)
+POUR DOGFUITE
+DONNE "VF :DOGSPEEDF
+SI :DOGBOND > 0 [ DONNE "VF :DOGSPEEDBOND DONNE "DOGBOND ( :DOGBOND - 1 ) ]
+DOGVERS :DOGFLEEX :VF
+SI ( ( VALABS ( :DOGX - :DOGFLEEX ) ) <= :VF ) [ DOGPARTI ]
+FIN
+
+; ---- le chien quitte la scene et on arme le prochain passage ----
+POUR DOGPARTI
+DONNE "DOGSTATE 0
+DONNE "DOGDISH FAUX
+FIXETORTUE :DOGTURT CT
+FIXETORTUE :DOGDTURT CT
+DOGNEXTTIMER
+FIN
+
+; ---- dessine le chien (gauche : 21/22, droite : 23/24) et le plat vole ----
+POUR DOGSPRITE
+; arc du bond : B va de 1 a 0, 4*B*(1-B) culmine au milieu du saut
+DONNE "DOGYOFF 0
+SI :DOGBOND > 0 [ DONNE "B ( :DOGBOND / :DOGBONDT ) DONNE "DOGYOFF ( :DOGBONDH * 4 * :B * ( 1 - :B ) ) ]
+FIXETORTUE :DOGTURT
+FCC :CCHIEN
+SI :DOGDIR < 0 [ SPRITE ( FORMEMARCHE VRAI 21 22 ) ] [ SPRITE ( FORMEMARCHE VRAI 23 24 ) ]
+FXY :DOGX ( ( PLANCHER :DOGFL ) + :DOGFEET + :DOGYOFF ) MT
+FIXETORTUE :DOGDTURT
+SI :DOGDISH [ FCC :CVIOLET SPRITE 8 FXY ( :DOGX + :DOGDIR * :DOGDISHDX ) ( ( PLANCHER :DOGFL ) + :DOGDISHDY ) MT ] [ CT ]
+FIN
+
+; ---- un pas du chien selon son etat (0 absent, 1 aller, 2 retour, 3 fuite, 4 charge) ----
+POUR MAJDOG
+SI :DOGSTATE = 0 [ DOGSPAWN STOP ]
+DOGVSSERVEUR
+SI :DOGSTATE = 1 [ DOGALLER ]
+SI :DOGSTATE = 2 [ DOGRETOUR ]
+SI :DOGSTATE = 4 [ DOGVERS :WX :DOGSPEEDC ]
+SI :DOGSTATE = 3 [ DOGFUITE ]
+SI :DOGSTATE > 0 [ DOGSPRITE ]
+FIN
+
+; ---- le serveur pose son plat sur une table devant lui (au bouton) ----
+POUR TENTESERVICE
+SI NON :WAITERDISH [ STOP ]
+SI :WONSTAIR > 0 [ STOP ]
+DONNE "DISHX ( :WX + :WDIR * :DISHDX )
+REPETEPOUR [ I 1 :NTABLES ] [
+SI ET ( ( ITEM :I :TABLEST ) = 2 ) ( ( ITEM :I :TABLEFL ) = :WFL ) [
+SI ET ( ( VALABS ( :DISHX - ( ITEM :I :TABLEX ) ) ) < 30 ) ( ( :WDIR * ( ITEM :I :TABLEDIR ) ) < 0 ) [ SERVIR :I STOP ]
+]
+]
+FIN
+
+; ---- service reussi : plat sur la table, le client mange, on marque des points ----
+POUR SERVIR :I
+DONNE "WAITERDISH FAUX
+FIXEITEM :I :TABLEST 3
+FIXEITEM :I :TABLETMR :EATTIME
+DONNE "SCORE :SCORE + :SCOREVAL
+MAJPATIENCE
+MAJHUD
+AFFICHEPLAT :I
+FIN
+
+; ---- la patience se resserre avec le score : passe 400 pts, PWARN perd 1 image
+; tous les 50 pts (jamais sous 10). tremblement 10 s apres le rouge, depart 15 s ----
+POUR MAJPATIENCE
+DONNE "PWARN :PWARNBASE
+SI :SCORE > 400 [ DONNE "PWARN ( :PWARNBASE - ENT ( ( :SCORE - 400 ) / 50 ) ) ]
+SI :PWARN < 10 [ DONNE "PWARN 10 ]
+DONNE "PSHAKE ( :PWARN + ( 10 * :IMGPARSEC ) )
+DONNE "PLEAVE ( :PWARN + ( 15 * :IMGPARSEC ) )
+FIN
+
+; ---- l'enseigne "RESTAURANT" : un panneau pose au centre du bandeau,
+; cadre bois autour d'un fond creme, lettres rouge fonce ----
+POUR ENSEIGNE
+RECTPLEIN 0 ( :ENSY - 8 ) ( :ENSW + 16 ) ( :ENSH + 16 ) :CENSCADRE
+RECTPLEIN 0 :ENSY :ENSW :ENSH :CENSEIGNE
+FCC :CENSTXT
+LC FXY :ENSTX :ENSTY ETIQUETTE [ RESTAURANT ]
+FIN
+
+; ---- le bandeau du haut : fond colore, enseigne au centre, score et vies ----
+POUR BANDEAU
+FCC :CBANDEAU FIXETAILLECRAYON 120
+LC FXY -800 430 BC FXY 800 430 LC
+ENSEIGNE
+FCC :CBLANC
+LC FXY -770 400 ETIQUETTE ( PHRASE :SCORE )
+LC FXY 430 400 ETIQUETTE ( PHRASE [ VIES ] :VIES )
+FIN
+
+; ---- redessine le bandeau du haut (score et vies changent) ----
+POUR MAJHUD
+FIXETORTUE 0 CT
+BANDEAU
+FIN
+
+; ---- ecran de fin : on cache tout, fond noir, et le score final au centre ----
+; (texte ~23 unites par lettre ; "PARTIE TERMINEE" = 15 lettres -> debut a -175)
+POUR ECRANFIN
+REPETEPOUR [ I 1 :DOGDTURT ] [ FIXETORTUE :I CT ]
+FIXETORTUE 0 CT
+FCFG :CNOIR NETTOIE
+FCC :CBANDEAU
+LC FXY -175 120 ETIQUETTE [ PARTIE TERMINEE ]
+FCC :CBLANC
+LC FXY -190 -20 ETIQUETTE ( PHRASE [ SCORE FINAL ] :SCORE )
+FIN
+
+; ---- valeurs de depart ----
+POUR REGLAGES
+; couleurs
+DONNE "CSOL [ 25 25 25 ]
+DONNE "CNOIR [ 0 0 0 ]
+DONNE "CBLANC [ 240 240 240 ]
+DONNE "CMAUVE [ 170 70 200 ]
+DONNE "CSERVEUR [ 80 230 230 ]
+DONNE "CVIOLET [ 160 60 220 ]
+DONNE "CCLIENT [ 120 230 120 ]
+DONNE "CROUGE [ 230 60 60 ]
+DONNE "CBANDEAU [ 35 200 155 ]
+DONNE "CRAIL [ 180 180 180 ]
+; l'enseigne RESTAURANT au centre du bandeau : fond creme, cadre bois, lettres rouge fonce
+DONNE "CENSEIGNE [ 245 235 210 ] DONNE "CENSCADRE [ 80 50 20 ] DONNE "CENSTXT [ 150 30 30 ]
+; panneau centre en x : largeur, hauteur, bas du fond, et coin du texte (10 lettres ~233 de large)
+DONNE "ENSW 280 DONNE "ENSH 80 DONNE "ENSY 380 DONNE "ENSTX -117 DONNE "ENSTY 442
+; les quatre niveaux : trois etages, et le sous-sol du chef (assez haut)
+DONNE "CEIL 365
+DONNE "FY3 170
+DONNE "FY2 -25
+DONNE "FY1 -220
+DONNE "FYG -335
+DONNE "BASEY -405
+; decalage vertical pour poser les pieds des sprites juste au-dessus du trait du sol
+DONNE "FEET 33
+DONNE "TABFEET 10
+; position du plat tenu en main : ecart lateral, et hauteur pour qu'il pose sur
+; la main tendue et non sur l'avant-bras
+DONNE "DISHDX 24 DONNE "DISHDY 20
+; portes et tables, par etage (asymetrique, comme l'original)
+DONNE "DOORW 110 DONNE "DOORH 90
+DONNE "PORTES3 [ -669 495 ]
+DONNE "PORTES2 [ -179 ]
+DONNE "PORTES1 [ -179 ]
+DONNE "TABLES3 [ -411 74 ]
+DONNE "TABLES2 [ 179 ]
+DONNE "TABLES1 [ 168 ]
+; les escaliers, decales : haut (2->3) a gauche, bas (1->2) a droite
+DONNE "XBA -400 DONNE "XTA -195
+DONNE "XBB -370 DONNE "XTB -165
+; vitesses
+DONNE "PAS 6
+DONNE "PASESC 0.02
+; limites de deplacement du serveur (a droite : bord gauche du monte-plat)
+DONNE "WXMIN -760 DONNE "WXMAX 745
+; le monte-plat : il commence au sol, vide, en attente du chef
+DONNE "MPFLOOR 0 DONNE "MPSTATE 0 DONNE "MPDIR 1 DONNE "MPDISH FAUX
+DONNE "MPY ( MPYAT 0 ) DONNE "MPTARGET :MPY DONNE "MPFLOORT 0 DONNE "MPWAIT 0
+DONNE "MPSPEED 4 DONNE "WAIT2S 120
+; le chef : prepare a gauche, charge a droite (pres de la cage)
+DONNE "CHEFSTATE 0 DONNE "CHEFPREP 120 DONNE "CHEFMOVE FAUX
+DONNE "CHEFTIMER :CHEFPREP
+DONNE "CHEFXPREP -560 DONNE "CHEFXCAGE 700 DONNE "CHEFSPEED 8
+DONNE "CHEFX :CHEFXPREP
+; le serveur : il demarre en haut a droite, mains vides
+DONNE "WX 690 DONNE "WFL 3 DONNE "WDIR -1
+DONNE "WONSTAIR 0 DONNE "WT 0 DONNE "WSTEP 0
+DONNE "WAITERDISH FAUX
+; donnees des tables (index 1..NTABLES)
+DONNE "TABLEX TABLEAU 8 DONNE "TABLEFL TABLEAU 8 DONNE "TABLEST TABLEAU 8
+DONNE "TABLETMR TABLEAU 8 DONNE "TABLECX TABLEAU 8
+DONNE "TABLEDIR TABLEAU 8 DONNE "TABLEDOOR TABLEAU 8
+; portes (x et etage) pour le choix a l'apparition
+DONNE "DOORX TABLEAU 8 DONNE "DOORFL TABLEAU 8
+; le client s'assoit a cote de la table, a cette distance du centre
+; (SEATFIX : decalage en plus du cote droit, formes calees a gauche dans la grille)
+DONNE "SEATDX 34 DONNE "SEATFIX 13
+; clients : apparition (intervalle qui se reduit) et seuils de patience
+DONNE "SPAWNINT 900 DONNE "SPAWNMIN 210 DONNE "SPAWNDEC 60 DONNE "SPAWNTIMER 300
+DONNE "IMGPARSEC 60 DONNE "PWARNBASE 1200 DONNE "EATTIME 300
+DONNE "CLISPEED 4 DONNE "SCOREVAL 30
+DONNE "FRAME 0 DONNE "LASTBTN FAUX
+; le chien : apparait apres 200 pts, aller-retour porte<->table, et chapardeur
+DONNE "DOGSTATE 0 DONNE "DOGDISH FAUX DONNE "DOGDIR -1
+DONNE "DOGSPEED 1.33 DONNE "DOGSPEEDC 7 DONNE "DOGSPEEDF 5.5
+DONNE "DOGHIT 30 DONNE "DOGFEET 23
+DONNE "DOGDISHDX 16 DONNE "DOGDISHDY 20
+; le coup de pied : petit bond vers la porte (DOGBONDT images, hauteur DOGBONDH, vitesse DOGSPEEDBOND)
+DONNE "DOGBOND 0 DONNE "DOGBONDT 14 DONNE "DOGBONDH 45 DONNE "DOGSPEEDBOND 13
+DONNE "DOGINTMAX 1200 DONNE "DOGINTDEC 100 DONNE "DOGINTMINI 300 DONNE "DOGTIMER 1200
+DONNE "CCHIEN [ 235 235 235 ]
+; le serveur reste a terre 3 s quand le chien lui vole son plat (couche au sol :
+; abaissement different a gauche / a droite a cause du sprite cale a gauche)
+DONNE "WSTUN 0 DONNE "WDOWNCAP 0 DONNE "WKOFEETG 18 DONNE "WKOFEETD 34
+; compteurs
+DONNE "SCORE 0
+DONNE "VIES 3
+; fin de partie : VRAI quand le dernier client fache a regagne sa porte
+DONNE "GAMEOVER FAUX DONNE "DERNIER 0
+; seuils de patience derives du score (PWARN/PSHAKE/PLEAVE)
+MAJPATIENCE
+FIN
+
+POUR START
+VE CT FEN
+FCFG [ 150 150 20 ]
+REGLAGES
+FORMES
+DECOR
+SETSPRITES
+TANTQUE [ NON :GAMEOVER ] [
+SCENE [ CONTROLE MAJMONTEPLAT MAJCHEF MAJPLATSERVEUR MAJSPAWN MAJCLIENTS MAJDOG ]
+ATTENDS 1
+]
+ECRANFIN
+FIN

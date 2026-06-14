@@ -176,7 +176,7 @@ func (s *Screen) pagerKey(ev event.Event) {
 // dessine le pager texte plein ecran : fond noir, lignes defilables, pied de page
 // avec la position et les touches
 func (s *Screen) composePager() {
-	draw.Draw(s.frame, s.frame.Bounds(), image.NewUniform(color.Black), image.Point{}, draw.Src)
+	draw.Draw(s.frame, s.frame.Bounds(), uniBlack, image.Point{}, draw.Src)
 	last := s.txtScroll
 	for i := 0; i < pgRows; i++ {
 		row := s.txtScroll + i
@@ -662,7 +662,7 @@ func (s *Screen) helpDetailKey(ev event.Event) {
 
 // dessine le navigateur d'aide (liste ou detail) dans s.frame
 func (s *Screen) composeHelp() {
-	draw.Draw(s.frame, s.frame.Bounds(), image.NewUniform(color.Black), image.Point{}, draw.Src)
+	draw.Draw(s.frame, s.frame.Bounds(), uniBlack, image.Point{}, draw.Src)
 	if s.pgDetail == "" {
 		s.composeHelpList()
 	} else {
