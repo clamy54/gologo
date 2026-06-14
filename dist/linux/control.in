@@ -4,7 +4,7 @@ Section: education
 Priority: optional
 Architecture: @ARCH@
 Maintainer: Cyril Lamy <cyril.lamy@gmail.com>
-Depends: libc6, libx11-6, libxkbcommon0, libgl1, libegl1, libwayland-client0, libwayland-egl1, libxcursor1
+Depends: libc6, libx11-6, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libgl1, libegl1, libgles2, libvulkan1, libwayland-client0, libwayland-cursor0, libwayland-egl1, libxcursor1, libxfixes3, libasound2t64 | libasound2
 Description: GoLogo - bilingual Logo interpreter
  A modern, cross-platform re-creation of the French Logo from the 1984
  Thomson MO5 (SOLI) cartridge: turtle graphics, built-in bilingual help,

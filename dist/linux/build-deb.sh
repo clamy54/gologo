@@ -5,7 +5,7 @@
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$(cd "$here/../.." && pwd)" # github/
-ver="${1:-1.0}"
+ver="${1:-2.0}"
 arch="$(dpkg --print-architecture)"
 bin="$root/tools/build/bin/linux/gologo"
 

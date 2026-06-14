@@ -10,7 +10,7 @@ Inno Setup installer.
 
 1. `tools\build\build-windows.ps1` (produces `bin\windows\gologo.exe`).
 2. Compile the installer: `ISCC.exe windows\gologo.iss` (or open it in the Inno
-   Setup IDE). Output: `windows\output\GoLogo-Setup-1.0.exe`.
+   Setup IDE). Output: `windows\output\GoLogo-Setup-2.0.exe`.
 
 The installer puts `gologo.exe` and the `examples\` folder in the install
 directory, and creates Start Menu (and optional desktop) shortcuts.

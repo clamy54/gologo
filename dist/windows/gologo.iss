@@ -4,7 +4,7 @@
 ; Compilation de l'installeur : ISCC.exe gologo.iss  (ou via l'IDE Inno Setup).
 
 #define AppName "GoLogo"
-#define AppVersion "1.0"
+#define AppVersion "2.0"
 #define AppPublisher "Cyril Lamy"
 #define AppExe "gologo.exe"
 
