@@ -8,7 +8,7 @@ package logo
 
 // ajouts hors manuel SOLI (Logo moderne)
 var categExtension = map[string]bool{
-	"AIDE": true, "ANGLAIS": true, "FRANCAIS": true, "QUITTE": true, "RAZ": true,
+	"AIDE": true, "ANGLAIS": true, "FRANCAIS": true, "LANGUE": true, "QUITTE": true, "RAZ": true,
 	"APPLIQUE": true, "FILTRE": true, "REDUIS": true, "POURCHAQUE": true,
 	"PIEGE": true, "LANCE": true, "TESTE": true, "SIVRAI": true, "SIFAUX": true,
 	"ARC": true, "CERCLE": true, "REMPLIS": true, "ETIQUETTE": true,
@@ -18,6 +18,7 @@ var categExtension = map[string]bool{
 	"VALABS": true, "ARRONDI": true, "TRONQUE": true, "MOINS": true,
 	"PUISSANCE": true, "INVERSE": true, "PI": true, "TANGENTE": true, "OUEX": true,
 	"VERSBASE": true, "DEPUISBASE": true, "HEXA": true, "BINAIRE": true,
+	"DEVELOPPE": true, "FACTORISE": true, "RESOUS": true, "EVALUE": true,
 	"MAJUSCULE": true, "MINUSCULE": true, "TRIE": true, "MONTRE": true,
 	"LISMOT": true, "LOCAL": true, "COMPTEUR": true, "ATTENDS": true,
 	"TANTQUE": true, "REPETEPOUR": true, "SCENE": true, "EXECRESULTAT": true, "COPIE": true,
@@ -48,6 +49,8 @@ var categExtension = map[string]bool{
 // dans l'aide F1. leur vraie categorie (extension) ne change pas dans la fiche
 var categDebutant = map[string]bool{
 	"QUITTE": true, // au cas ou il voudrait fuir : annonce dans la banniere
+	// gestion des exemples : un debutant en a besoin pour decouvrir et charger les .GLG
+	"CATALOGUEEX": true, "RAMENEEX": true, "CHARGEEX": true,
 }
 
 // force le nom affiche dans l'aide debutant FR quand le nom long auto ne convient pas

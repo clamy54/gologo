@@ -66,17 +66,17 @@ type Interp struct {
 	sound               Sound                  // son JOUE
 	joy                 Joystick               // manettes MANETTE/BOUTON?
 
-	// reglages musicaux (OCTAVE/DUREE/TEMPO/TIMBRE)
-	musOctave, musDuree, musTempo, musTimbre int
-	spriteDefs                               map[int][]string // formes 16x16 de DEFSPRITE (numero >= turtle.SpriteCount)
-	pager                                    Pager            // pagination de la sortie texte (CATALOGUE...)
-	lang                                     string           // langue courante : "FR" (defaut) ou "EN"
-	langMu                                   sync.Mutex       // protege lang (le worker ecrit, l'UI lit)
-	workDir                                  string           // dossier des .GLG (vide => ~/Logo)
-	examplesDir                              string           // dossier des exemples (vide => defaut plateforme) ; commandes ...EX
-	fio                                      *fileIO          // fichiers ouverts + flux lecture/ecriture courants (E/S fichier)
-	Quiet                                    bool             // tait le "VOUS VENEZ DE DEFINIR" (utile en batch/comparaison)
-	eolCRLF                                  bool             // ecriture fichier en CRLF (FIXEFINLIGNE) ; defaut LF
+	// reglages musicaux (OCTAVE/DUREE/TEMPO/TIMBRE/VOLUME)
+	musOctave, musDuree, musTempo, musTimbre, musVolume int
+	spriteDefs                                          map[int][]string // formes 16x16 de DEFSPRITE (numero >= turtle.SpriteCount)
+	pager                                               Pager            // pagination de la sortie texte (CATALOGUE...)
+	lang                                                string           // langue courante : "FR" (defaut) ou "EN"
+	langMu                                              sync.Mutex       // protege lang (le worker ecrit, l'UI lit)
+	workDir                                             string           // dossier des .GLG (vide => ~/Logo)
+	examplesDir                                         string           // dossier des exemples (vide => defaut plateforme) ; commandes ...EX
+	fio                                                 *fileIO          // fichiers ouverts + flux lecture/ecriture courants (E/S fichier)
+	Quiet                                               bool             // tait le "VOUS VENEZ DE DEFINIR" (utile en batch/comparaison)
+	eolCRLF                                             bool             // ecriture fichier en CRLF (FIXEFINLIGNE) ; defaut LF
 }
 
 // bascule la langue (Ctrl+L dans le navigateur) ; rend les donnees regenerees et
@@ -121,6 +121,9 @@ func (i *Interp) setLang(l string) {
 	i.langMu.Unlock()
 }
 
+// SetLang fixe la langue de demarrage ("FR" par defaut, "EN"), pour l'option -e de la CLI.
+func (i *Interp) SetLang(l string) { i.setLang(l) }
+
 // ouvre l'editeur plein ecran. valider=false = on a annule (Ctrl+C). nil en headless
 type Editor func(initial string) (texte string, valider bool)
 
@@ -146,9 +149,10 @@ type Mouse interface {
 func (i *Interp) SetMouse(m Mouse) { i.mouse = m }
 
 // joue une note (backend audio) pour JOUE. Tone bloque le temps de la note ;
-// freq <= 0 = silence ; timbre 0-255 choisit la forme d'onde. nil = pas de son
+// freq <= 0 = silence ; timbre 0-255 choisit la forme d'onde, volume 0-100 le niveau.
+// nil = pas de son
 type Sound interface {
-	Tone(freqHz float64, ms int, timbre int)
+	Tone(freqHz float64, ms int, timbre int, volume int)
 }
 
 func (i *Interp) SetSound(s Sound) { i.sound = s }
@@ -263,7 +267,7 @@ func New(t *turtle.Turtle, out io.Writer) *Interp {
 		plists: map[string][]propEntry{},
 		lang:   "FR",
 		// workDir vide => ~/Logo par defaut, resolu paresseusement (voir files.go)
-		musOctave: octaveDefaut, musDuree: dureeDefaut, musTempo: tempoDefaut, musTimbre: timbreDefaut,
+		musOctave: octaveDefaut, musDuree: dureeDefaut, musTempo: tempoDefaut, musTimbre: timbreDefaut, musVolume: volumeDefaut,
 	}
 	i.registerBuiltins()
 	i.registerOperations()
@@ -285,6 +289,7 @@ func New(t *turtle.Turtle, out io.Writer) *Interp {
 	i.registerMultiTurtle()    // FIXETORTUE / TORTUE / NBTORTUES / DEMANDE / DISTORTUE
 	i.registerSprites()        // DEFSPRITE (formes 16x16 redefinissables)
 	i.registerAnimate()        // ANIME / STOPANIME / CADENCE (animation automatique)
+	i.registerCalcul()         // DEVELOPPE / FACTORISE / RESOUS (calcul litteral)
 	i.registerEnglishAliases() // alias anglais (lus depuis helpData)
 	i.registerXLogoAliases()   // alias XLogo (noms longs francophones) ; n'ecrase rien
 	i.registerFMSLogoAliases() // alias FMSLogo (noms anglais Windows) ; n'ecrase rien
@@ -423,7 +428,7 @@ func (i *Interp) resetAll() {
 	i.frames = nil
 	i.repStack = nil
 	i.edBuf = ""
-	i.musOctave, i.musDuree, i.musTempo, i.musTimbre = octaveDefaut, dureeDefaut, tempoDefaut, timbreDefaut
+	i.musOctave, i.musDuree, i.musTempo, i.musTimbre, i.musVolume = octaveDefaut, dureeDefaut, tempoDefaut, timbreDefaut, volumeDefaut
 	i.setLang("FR")
 	i.Turtle.Reset() // tortue recentree + graphique efface + fond bleu
 	if r, ok := i.Out.(displayResetter); ok {

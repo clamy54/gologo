@@ -15,9 +15,9 @@ func (s *Screen) replKey(ev event.Event) {
 			return
 		}
 		if !s.running.Load() {
-			s.replInsert(strings.ToUpper(e.Text)) // tout en majuscules
+			s.replInsert(typedText(e.Text)) // majuscules + exposants reecrits
 		} else {
-			s.kbPush([]rune(strings.ToUpper(e.Text))...) // tampon clavier (TOUCHE?/LISCAR)
+			s.kbPush([]rune(typedText(e.Text))...) // tampon clavier (TOUCHE?/LISCAR)
 		}
 	case key.Event:
 		if e.State != key.Press {
@@ -92,6 +92,16 @@ func (s *Screen) replKey(ev event.Event) {
 			}
 		}
 	}
+}
+
+// sur AZERTY, le 2 en exposant est une touche directe que notre fonte ne sait pas
+// dessiner. on en fait la touche puissance : elle insere "^", a toi de taper
+// l'exposant (x puis ^ puis 7). le 3 en exposant, plus rare, reste "^3"
+var exposantClavier = strings.NewReplacer("²", "^", "³", "^3")
+
+// texte tape, pret a etre insere : majuscules + exposants clavier reecrits
+func typedText(t string) string {
+	return exposantClavier.Replace(strings.ToUpper(t))
 }
 
 // insere du texte a la position du curseur de l'invite

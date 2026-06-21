@@ -1,4 +1,4 @@
-# Artefacts de compilation et de packaging
+# Artefacts de compilation et de packaging (regeneres par les scripts).
 tools/build/bin/
 src/cmd/gologo/*.syso
 dist/windows/output/

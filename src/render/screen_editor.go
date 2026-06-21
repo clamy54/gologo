@@ -92,7 +92,7 @@ func (s *Screen) editorKey(ev event.Event) {
 		} else {
 			s.edBeginEdit(true) // serie de frappes = un seul undo regroupe
 		}
-		s.edInsert(strings.ToUpper(e.Text)) // tout en majuscules
+		s.edInsert(typedText(e.Text)) // majuscules + exposants reecrits
 	case key.Event:
 		if e.State != key.Press {
 			return

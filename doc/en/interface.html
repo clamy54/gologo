@@ -135,8 +135,8 @@
     <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Interrupts the running program</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Opens the editor (when the line is empty)</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td>Quits GoLogo</td></tr>
-    <tr><td><kbd>F1</kbd></td><td>Opens the beginner help (original SOLI Logo commands, full names)</td></tr>
-    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Opens the full help (every command)</td></tr>
+    <tr><td><kbd>F1</kbd></td><td>Opens the help in the current mode (beginner help to start with)</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Toggles between beginner and full help (the choice is remembered for next time)</td></tr>
   </table>
 
   <h3>Autocompletion</h3>
@@ -175,8 +175,8 @@
     <tr><th>Key</th><th>Action</th></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Saves the content and interprets it (back to the REPL, procedures defined)</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>X</kbd></td><td>Quits without saving (the content is lost)</td></tr>
-    <tr><td><kbd>F1</kbd></td><td>Context help: opens the page for the word under the cursor if it exists, otherwise the beginner help</td></tr>
-    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Opens the full help (every command)</td></tr>
+    <tr><td><kbd>F1</kbd></td><td>Context help: opens the page for the word under the cursor if it exists, otherwise the help in the current mode</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Toggles between beginner and full help (the choice is remembered)</td></tr>
     <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Moves the cursor</td></tr>
     <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Start / end of the current line</td></tr>
     <tr><td><kbd>Page Up</kbd> / <kbd>Page Down</kbd></td><td>Moves the cursor up / down by one page</td></tr>
@@ -213,8 +213,8 @@
   <p>GoLogo has a built-in help browser, available&nbsp;:</p>
   <ul>
     <li>through the <code>HELP</code> or <code>HELP NAME</code> command at the REPL.</li>
-    <li>through <kbd>F1</kbd> (beginner help) or <kbd>Shift</kbd>+<kbd>F1</kbd>
-    (full help) from the REPL or the editor.</li>
+    <li>through <kbd>F1</kbd> from the REPL or the editor&nbsp;;
+    <kbd>Shift</kbd>+<kbd>F1</kbd> toggles between beginner and full help.</li>
   </ul>
 
   <p>The browser fills the screen, with the grid of commands and the detail of the
@@ -222,16 +222,17 @@
 
   <h3>Beginner help and full help</h3>
 
-  <p><kbd>F1</kbd> opens the <strong>beginner help</strong>&nbsp;: it lists only the
+  <p>The <strong>beginner help</strong> lists only the
   original commands of SOLI Logo, under their full name (for example
   <code>HIDETURTLE</code> rather than <code>HT</code>, or <code>SQRT</code> rather
-  than <code>RC</code>), so as not to overwhelm the beginner.</p>
+  than <code>RC</code>), so as not to overwhelm the beginner. It is the starting mode.</p>
 
-  <p><kbd>Shift</kbd>+<kbd>F1</kbd> opens the <strong>full help</strong>&nbsp;: every
-  primitive, including the modern extensions (the <code>HELP</code> command also opens
-  the full help). You can switch from one to the other at any time, without leaving the
-  help, with <kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd>&nbsp;; the footer recalls the
-  key for the other view.</p>
+  <p>The <strong>full help</strong> adds every
+  primitive, including the modern extensions (the <code>HELP</code> command opens
+  the full help directly). <kbd>Shift</kbd>+<kbd>F1</kbd> switches from one to the other
+  at any time, even without leaving the help&nbsp;; the chosen mode is
+  <strong>remembered</strong>, so <kbd>F1</kbd> then reopens the help in that mode. The
+  footer recalls the toggle key.</p>
 
   <h3>Help browser shortcuts</h3>
 
@@ -244,7 +245,7 @@
     <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd> or <kbd>/</kbd></td><td>Opens the search field</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Next / previous search result</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Switches between English and French</td></tr>
-    <tr><td><kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Switches between the beginner help and the full help</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Switches between the beginner help and the full help</td></tr>
     <tr><td>A letter (<kbd>A</kbd>…<kbd>Z</kbd>)</td><td>Jumps to the first command starting with that letter</td></tr>
     <tr><td><kbd>Q</kbd> or <kbd>Esc</kbd></td><td>Closes the help</td></tr>
   </table>
@@ -290,11 +291,11 @@
     </tr>
     <tr>
       <td><kbd>F1</kbd></td>
-      <td>Opens the beginner help (context-aware in the editor)</td>
+      <td>Opens the help in the current mode (context-aware in the editor)</td>
     </tr>
     <tr>
       <td><kbd>Shift</kbd>+<kbd>F1</kbd></td>
-      <td>Opens the full help (every command)</td>
+      <td>Toggles beginner / full help (the choice is remembered)</td>
     </tr>
     <tr>
       <td><kbd>Ctrl</kbd>+<kbd>L</kbd></td>
@@ -344,7 +345,7 @@
     </tr>
     <tr>
       <td rowspan="5">Help</td>
-      <td><kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd></td>
+      <td><kbd>Shift</kbd>+<kbd>F1</kbd></td>
       <td>Toggle beginner help / full help</td>
     </tr>
     <tr>

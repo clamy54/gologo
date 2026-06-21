@@ -3,6 +3,12 @@ package logo
 // pour chaque primitive (cle = nom FR), les quelques "voir aussi" de l'aide
 // on vise le contraire (BC/LC) ou le plus courant, pas tout le voisinage
 var voirAussi = map[string][]string{
+	// calcul litteral
+	"DEVELOPPE": {"FACTORISE", "RESOUS", "EVALUE"},
+	"FACTORISE": {"DEVELOPPE", "RESOUS"},
+	"RESOUS":    {"DEVELOPPE", "FACTORISE"},
+	"EVALUE":    {"DEVELOPPE", "RESOUS"},
+
 	// deplacements et tortue
 	"AVANCE":           {"RECULE"},
 	"RECULE":           {"AVANCE"},
@@ -229,9 +235,10 @@ var voirAussi = map[string][]string{
 	"CHARGEEX":    {"CHARGE", "CATALOGUEEX", "RAMENEEX"},
 
 	// son
-	"JOUE":   {"OCTAVE", "DUREE", "TEMPO", "TIMBRE"},
+	"JOUE":   {"OCTAVE", "DUREE", "TEMPO", "TIMBRE", "VOLUME"},
 	"OCTAVE": {"JOUE", "DUREE", "TEMPO"},
 	"DUREE":  {"JOUE", "TEMPO", "OCTAVE"},
 	"TEMPO":  {"JOUE", "DUREE"},
-	"TIMBRE": {"JOUE"},
+	"TIMBRE": {"JOUE", "VOLUME"},
+	"VOLUME": {"JOUE", "TIMBRE"},
 }

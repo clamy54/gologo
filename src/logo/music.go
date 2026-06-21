@@ -12,6 +12,7 @@ const (
 	dureeDefaut  = 24
 	tempoDefaut  = 5
 	timbreDefaut = 0
+	volumeDefaut = 100 // a fond : on garde l'ancien niveau
 )
 
 // demi-tons de chaque note a partir de DO
@@ -89,6 +90,7 @@ func (i *Interp) registerMusic() {
 	param("DUREE", 1, 96, func(in *Interp, n int) { in.musDuree = n })
 	param("TEMPO", 1, 255, func(in *Interp, n int) { in.musTempo = n })
 	param("TIMBRE", 0, 255, func(in *Interp, n int) { in.musTimbre = n })
+	param("VOLUME", 0, 100, func(in *Interp, n int) { in.musVolume = n })
 
 	i.register(cmd(1, func(in *Interp, a []Value) error {
 		for _, w := range joueNotes(a[0]) { // une note seule ou une liste de notes
@@ -100,7 +102,7 @@ func (i *Interp) registerMusic() {
 				return fmt.Errorf("JOUE N'AIME PAS %s", w)
 			}
 			if in.sound != nil {
-				in.sound.Tone(freq, noteDurationMs(in.musDuree, in.musTempo), in.musTimbre)
+				in.sound.Tone(freq, noteDurationMs(in.musDuree, in.musTempo), in.musTimbre, in.musVolume)
 			}
 		}
 		return nil

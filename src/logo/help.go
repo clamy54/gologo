@@ -140,6 +140,10 @@ var helpData = map[string]helpEntry{
 	"PHRASE":    {en: "SENTENCE", frAliases: []string{"PH"}, enAliases: []string{"SE"}, params: "obj1 obj2", kind: "O", exemples: []string{"ECRIS PHRASE \"A \"B"}, descFr: "Construit une liste à partir de obj1 et obj2 (aplatit les listes).", descEn: "Builds a list from obj1 and obj2 (flattens lists)."},
 	"MAJUSCULE": {en: "UPPERCASE", params: "mot", kind: "O", exemples: []string{"ECRIS MAJUSCULE \"bonjour"}, descFr: "Retourne le mot tout en majuscules.", descEn: "Outputs the word in upper case."},
 	"MINUSCULE": {en: "LOWERCASE", params: "mot", kind: "O", exemples: []string{"ECRIS MINUSCULE \"BONJOUR"}, descFr: "Retourne le mot tout en minuscules.", descEn: "Outputs the word in lower case."},
+	"DEVELOPPE": {en: "EXPAND", params: "expr", kind: "O", exemples: []string{"ECRIS DEVELOPPE [ (3x+5y)(3x-5y) ]", "ECRIS DEVELOPPE [ (x+2)^2 ]"}, descFr: "Développe et réduit une expression littérale (à variables), donnée entre crochets. La multiplication peut rester implicite (3x, 2(x+1)) et la casse est libre. La division par une expression simplifie la fraction quand elle tombe juste, sinon elle donne le quotient et le reste (ex. (x^2+1)/(x-1) rend x + 1 + 2/(x-1)). À une variable, on peut aussi additionner et simplifier des fractions. Exemple : DEVELOPPE [ (3x+5y)(3x-5y) ] rend 9x^2 - 25y^2. Extension gologo.", descEn: "Expands and simplifies a literal expression (with variables), given between brackets. Multiplication may stay implicit (3x, 2(x+1)) and case is ignored. Division by an expression simplifies the fraction when it comes out even, otherwise it gives the quotient and remainder (e.g. (x^2+1)/(x-1) gives x + 1 + 2/(x-1)). With a single variable you can also add and simplify fractions. Example: EXPAND [ (3x+5y)(3x-5y) ] outputs 9x^2 - 25y^2. gologo extension."},
+	"FACTORISE": {en: "FACTOR", params: "expr", kind: "O", exemples: []string{"ECRIS FACTORISE [ 9x^2 - 25y^2 ]", "ECRIS FACTORISE [ x^2 + 4x + 4 ]"}, descFr: "Factorise une expression entre crochets : facteur commun et identités remarquables (a^2-b^2, a^2±2ab+b^2) ; à une variable, factorisation par toutes les racines rationnelles, quel que soit le degré. Exemples : FACTORISE [ 9x^2 - 25y^2 ] rend (3x + 5y)(3x - 5y), FACTORISE [ x^3 - 6x^2 + 11x - 6 ] rend (x - 1)(x - 2)(x - 3). Ce qui ne se factorise pas avec ces règles est rendu tel quel. Extension gologo.", descEn: "Factors an expression given between brackets: common factor and remarkable identities (a^2-b^2, a^2±2ab+b^2); with a single variable, factoring by all rational roots, whatever the degree. Examples: FACTOR [ 9x^2 - 25y^2 ] outputs (3x + 5y)(3x - 5y), FACTOR [ x^3 - 6x^2 + 11x - 6 ] outputs (x - 1)(x - 2)(x - 3). What does not factor with these rules is returned unchanged. gologo extension."},
+	"RESOUS":    {en: "SOLVE", frAliases: []string{"RESOUDS"}, params: "equation", kind: "O", exemples: []string{"ECRIS RESOUS [ 2x + 3 = 7 ]", "ECRIS RESOUS [ x^2 - 5x + 6 = 0 ]"}, descFr: "Résout une équation à une inconnue, du premier ou du second degré, donnée entre crochets avec un signe =. Rend la ou les solutions (ou \"pas de solution reelle\"). Exemple : RESOUS [ x^2 - 5x + 6 = 0 ] rend x = 2 ou x = 3. Extension gologo.", descEn: "Solves a one-unknown equation, of the first or second degree, given between brackets with an = sign. Outputs the solution(s) (or \"no real solution\"). Example: SOLVE [ x^2 - 5x + 6 = 0 ] outputs x = 2 or x = 3. gologo extension."},
+	"EVALUE":    {en: "EVALUATE", params: "expr valeurs", kind: "O", exemples: []string{"ECRIS EVALUE [ x^2 + 1 ] [ x 3 ]", "ECRIS EVALUE [ x^2 + y ] [ x 2 y 5 ]"}, descFr: "Remplace les variables par des valeurs dans une expression (entre crochets). Les valeurs se donnent en couples variable/nombre, eux aussi entre crochets. L'évaluation peut être partielle (les variables non données restent). Exemple : EVALUE [ x^2 + 1 ] [ x 3 ] rend 10. Extension gologo.", descEn: "Replaces variables with values in an expression (between brackets). The values are given as variable/number pairs, also between brackets. Evaluation may be partial (unset variables remain). Example: EVALUATE [ x^2 + 1 ] [ x 3 ] outputs 10. gologo extension."},
 	"LISTE":     {en: "LIST", params: "obj1 obj2", kind: "O", exemples: []string{"ECRIS LISTE \"A \"B"}, descFr: "Construit la liste [obj1 obj2].", descEn: "Builds the list [obj1 obj2]."},
 	"MP":        {en: "FPUT", frAliases: []string{"METSPREMIER"}, params: "obj liste", kind: "O", exemples: []string{"ECRIS MP \"A [ B C ]"}, descFr: "Ajoute obj en tête de liste.", descEn: "Adds obj at the front of list."},
 	"MD":        {en: "LPUT", frAliases: []string{"METSDERNIER"}, params: "obj liste", kind: "O", exemples: []string{"ECRIS MD \"C [ A B ]"}, descFr: "Ajoute obj en queue de liste.", descEn: "Adds obj at the end of list."},
@@ -245,7 +249,7 @@ var helpData = map[string]helpEntry{
 	"VT":     {en: "CLEARTEXT", params: "", kind: "C", exemples: []string{"VT"}, descFr: "Vide la zone de texte.", descEn: "Clears the text area."},
 	"FCT":    {en: "SETTEXTCOLOR", params: "n ou liste", kind: "C", palette: true, exemples: []string{"FCT 3", "FCT [ 255 200 0 ]"}, descFr: "Fixe la couleur du texte : code 0-15, ou [ rouge vert bleu ] (0-255).", descEn: "Sets the text color: code 0-15, or [ red green blue ] (0-255)."},
 	"FCFT":   {en: "SETTEXTBACKGROUND", params: "n ou liste", kind: "C", palette: true, exemples: []string{"FCFT 4", "FCFT [ 20 20 20 ]"}, descFr: "Fixe la couleur de fond du texte : code 0-15, ou [ rouge vert bleu ] (0-255).", descEn: "Sets the text background color: code 0-15, or [ red green blue ] (0-255)."},
-	"FCURS":  {en: "SETCURSOR", params: "[col lig]", kind: "C", exemples: []string{"FCURS [ 10 5 ]", "VT FCURS [ 0 24 ] TAPE \"BAS"}, descFr: "Place le curseur texte : colonne col (0-39) et ligne lig (0-24). Le prochain ECRIS/TAPE écrit à cet endroit.", descEn: "Places the text cursor: column col (0-39), line lig (0-24). The next PRINT/TYPE writes there."},
+	"FCURS":  {en: "SETCURSOR", params: "[col lig]", kind: "C", exemples: []string{"FCURS [ 10 5 ]", "VT FCURS [ 0 24 ] TAPE \"BAS"}, descFr: "Place le curseur texte : colonne col (0-79) et ligne lig (0-24). Le prochain ECRIS/TAPE écrit à cet endroit.", descEn: "Places the text cursor: column col (0-79), line lig (0-24). The next PRINT/TYPE writes there."},
 	"ME":     {en: "SETTEXTLINES", params: "n", kind: "C", exemples: []string{"ME 25", "ME 5"}, descFr: "Fixe le nombre de lignes de texte visibles (1-25). ME 25 = plein texte (cache le graphique) ; n < 25 = écran mixte (graphique + n lignes de texte).", descEn: "Sets the number of visible text lines (1-25). SETTEXTLINES 25 = full text (hides graphics); n < 25 = mixed screen (graphics + n text lines)."},
 
 	// clavier
@@ -268,6 +272,7 @@ var helpData = map[string]helpEntry{
 	"DUREE":  {en: "DURATION", params: "n", kind: "C", exemples: []string{"DUREE 24"}, descFr: "Fixe la durée des notes (1 à 96, défaut 24).", descEn: "Sets the note length (1 to 96, default 24)."},
 	"TEMPO":  {en: "TEMPO", params: "n", kind: "C", exemples: []string{"TEMPO 5"}, descFr: "Fixe le tempo (1 à 255, défaut 5) : plus grand = plus rapide.", descEn: "Sets the tempo (1 to 255, default 5): higher = faster."},
 	"TIMBRE": {en: "TIMBRE", params: "n", kind: "C", exemples: []string{"TIMBRE 0", "TIMBRE 200"}, descFr: "Fixe le timbre, c'est-à-dire la forme du son (0-63 carré, 64-127 dent de scie, 128-191 triangle, 192-255 sinus).", descEn: "Sets the timbre, i.e. the sound shape (0-63 square, 64-127 sawtooth, 128-191 triangle, 192-255 sine)."},
+	"VOLUME": {en: "VOLUME", params: "n", kind: "C", exemples: []string{"VOLUME 100", "VOLUME 30"}, descFr: "Fixe le volume des notes jouées par JOUE (0 muet à 100 à fond, défaut 100).", descEn: "Sets the volume of notes played by PLAY (0 silent to 100 full, default 100)."},
 
 	// espace de travail
 	"CONTENU": {en: "CONTENTS", params: "", kind: "O", exemples: []string{"ECRIS CONTENU"}, descFr: "Retourne la liste de tous les mots connus (procédures et noms).", descEn: "Outputs the list of all known words (procedures and names)."},
@@ -369,6 +374,7 @@ var helpData = map[string]helpEntry{
 	"AIDE":     {en: "HELP", params: "[ commande ]", kind: "C", exemples: []string{"AIDE REPETE"}, descFr: "Sans argument, liste toutes les commandes. Avec un nom (ex. AIDE AVANCE), affiche sa description, ses paramètres et ses alias.", descEn: "Without argument, lists all commands. With a name (e.g. HELP FORWARD), shows its description, parameters and aliases."},
 	"FRANCAIS": {en: "FRENCH", frAliases: []string{"FR"}, params: "", kind: "C", exemples: []string{"FRANCAIS"}, descFr: "Bascule l'aide et les messages en français. Alias : FR.", descEn: "Switches help and messages to French. Alias: FR."},
 	"ANGLAIS":  {en: "ENGLISH", enAliases: []string{"EN"}, params: "", kind: "C", exemples: []string{"ANGLAIS"}, descFr: "Bascule l'aide et les messages en anglais. Alias anglais : ENGLISH, EN.", descEn: "Switches help and messages to English. English aliases: ENGLISH, EN."},
+	"LANGUE":   {en: "LANGUAGE", params: "", kind: "O", exemples: []string{"SI LANGUE = \"FR [ ECRIS [ BONJOUR ] ]"}, exemplesEn: []string{"IF LANGUAGE = \"EN [ PRINT [ HELLO ] ]"}, descFr: "Retourne la langue courante : le mot FR ou EN. Pratique pour ecrire un programme bilingue.", descEn: "Outputs the current language: the word FR or EN. Handy for writing a bilingual program."},
 }
 
 // libelle long d'un type de primitive, selon la langue
@@ -641,7 +647,11 @@ func containsOutputCmd(ex string) bool {
 // rien ou se plante). on relance l'exemple dans un interpreteur jetable, sans ecran
 // ni clavier, en n'executant que ceux qui contiennent une commande d'affichage
 // (les autres ne produisent rien d'interessant, et ca evite ATTENDS et compagnie)
-func exampleResults(ex []string) []string {
+func exampleResults(ex []string) []string { return exampleResultsLang(ex, "FR") }
+
+// idem, mais dans une langue donnee : les sorties qui contiennent des mots (ex.
+// RESOUS qui rend "x = 2 ou x = 3") suivent la langue de la fiche.
+func exampleResultsLang(ex []string, lang string) []string {
 	res := make([]string, len(ex))
 	var sandbox *Interp
 	var buf *strings.Builder
@@ -652,6 +662,7 @@ func exampleResults(ex []string) []string {
 		if sandbox == nil {
 			buf = &strings.Builder{}
 			sandbox = New(turtle.New(turtle.NewRecorder()), buf)
+			sandbox.SetLang(lang)
 			sandbox.rng = rand.New(rand.NewSource(1))
 			// dossier jetable : un exemple fichier n'ecrit jamais dans ~/Logo
 			sandbox.SetWorkDir(filepath.Join(os.TempDir(), "gologo-aide"))

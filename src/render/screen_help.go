@@ -245,9 +245,13 @@ func (s *Screen) helpKey(ev event.Event) {
 		s.helpSwitchLang()
 		return
 	}
-	// F1 / Shift+F1 : bascule a chaud entre vue debutant (origine) et complete
+	// Shift+F1 : bascule a chaud entre vue debutant (origine) et complete, et retient
+	// le choix pour les prochaines ouvertures. F1 seul ne fait rien ici (deja dans l'aide)
 	if e, ok := ev.(key.Event); ok && e.State == key.Press && e.Name == key.NameF1 {
-		s.helpToggleMode(e.Modifiers.Contain(key.ModShift))
+		if e.Modifiers.Contain(key.ModShift) {
+			s.helpExtended = !s.helpExtended
+			s.helpToggleMode(s.helpExtended)
+		}
 		return
 	}
 	if s.pgDetail == "" {
@@ -707,13 +711,13 @@ func (s *Screen) composeHelpList() {
 	// bascule debutant <-> complet : montre la touche de l'autre vue
 	toggle := "  [Maj+F1] tout"
 	if s.pgExtended {
-		toggle = "  [F1] origine"
+		toggle = "  [Maj+F1] origine"
 	}
 	foot := fmt.Sprintf("AIDE  p.%d/%d  [%s-i] inserer  [%s-F] chercher  [%s-L] langue%s  [Q]", page+1, pages, c, c, c, toggle)
 	if s.pgLang == "EN" {
 		toggle = "  [Shift+F1] all"
 		if s.pgExtended {
-			toggle = "  [F1] basics"
+			toggle = "  [Shift+F1] basics"
 		}
 		foot = fmt.Sprintf("HELP  p.%d/%d  [%s-i] insert  [%s-F] search  [%s-L] lang%s  [Q]", page+1, pages, c, c, c, toggle)
 	}

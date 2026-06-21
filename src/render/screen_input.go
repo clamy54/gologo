@@ -311,7 +311,9 @@ func (s *Screen) handleInput(gtx layout.Context) {
 		// F1 : ouvre l'aide par-dessus. dans l'editeur, si le mot sous le curseur a
 		// une fiche, on l'ouvre direct ; sinon (et au REPL) l'aide generale
 		if e, ok := ev.(key.Event); ok && e.State == key.Press && e.Name == key.NameF1 {
-			extended := e.Modifiers.Contain(key.ModShift) // Shift+F1 : toutes les commandes
+			if e.Modifiers.Contain(key.ModShift) { // Shift+F1 : bascule debutant <-> complet
+				s.helpExtended = !s.helpExtended
+			}
 			if s.edActive.Load() && s.pgResolve != nil {
 				if word := s.edWordAtCursor(); word != "" {
 					if name, ok := s.pgResolve(word); ok {
@@ -325,7 +327,7 @@ func (s *Screen) handleInput(gtx layout.Context) {
 					}
 				}
 			}
-			s.openHelp(extended)
+			s.openHelp(s.helpExtended)
 			continue
 		}
 		// presse-papier (a besoin de gtx) : traite ici, hors editorKey/replKey
@@ -365,7 +367,7 @@ func (s *Screen) handleInput(gtx layout.Context) {
 // l'editeur, en une seule ligne au REPL
 func (s *Screen) paste(text string) {
 	text = strings.ReplaceAll(text, "\r", "")
-	text = strings.ToUpper(text)
+	text = typedText(text)
 	if text == "" {
 		return
 	}
@@ -395,7 +397,7 @@ func (s *Screen) paste(text string) {
 func (s *Screen) kbKey(ev event.Event) {
 	switch e := ev.(type) {
 	case key.EditEvent:
-		txt := strings.ToUpper(e.Text)
+		txt := typedText(e.Text)
 		if txt == "" {
 			return
 		}

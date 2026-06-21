@@ -36,7 +36,7 @@
   </div>
 
   <p>Each entry shows its type (<strong>C</strong> command that produces an effect, <strong>O</strong> operation that returns a value, <strong>P</strong> predicate that returns TRUE/FALSE) and its origin: <em>SOLI Logo</em> (the original Logo), <em>Extension</em> (modern addition) or <em>Compatibility</em> (period hardware, no effect).</p>
-  <div class="conseil">Sections: <a href="#deplacements">The turtle: movement</a> · <a href="#champ">The turtle: the graphics field</a> · <a href="#tortues">Multiple turtles</a> · <a href="#animation">Animating turtles</a> · <a href="#crayon">The turtle: the pen</a> · <a href="#examiner">Words and lists: examine</a> · <a href="#demonter">Words and lists: take apart</a> · <a href="#construire">Words and lists: build and transform</a> · <a href="#chaines">Strings: search, split, clean</a> · <a href="#tableaux">Arrays, stacks and queues</a> · <a href="#logique">Logical values</a> · <a href="#arithmetique">Arithmetic</a> · <a href="#variables">Names (variables)</a> · <a href="#procedures">Procedures</a> · <a href="#controle">Flow control</a> · <a href="#proprietes">Property lists</a> · <a href="#texte">Text output</a> · <a href="#clavier">Keyboard</a> · <a href="#souris">Mouse</a> · <a href="#manettes">Joysticks</a> · <a href="#musique">Music</a> · <a href="#travail">Workspace</a> · <a href="#fichiers">Files</a> · <a href="#fichiers-donnees">Data files (streams)</a> · <a href="#compat">Original hardware (compatibility)</a> · <a href="#divers">Miscellaneous</a></div>
+  <div class="conseil">Sections: <a href="#deplacements">The turtle: movement</a> · <a href="#champ">The turtle: the graphics field</a> · <a href="#tortues">Multiple turtles</a> · <a href="#animation">Animating turtles</a> · <a href="#crayon">The turtle: the pen</a> · <a href="#examiner">Words and lists: examine</a> · <a href="#demonter">Words and lists: take apart</a> · <a href="#construire">Words and lists: build and transform</a> · <a href="#chaines">Strings: search, split, clean</a> · <a href="#tableaux">Arrays, stacks and queues</a> · <a href="#logique">Logical values</a> · <a href="#arithmetique">Arithmetic</a> · <a href="#calcul">Symbolic algebra</a> · <a href="#variables">Names (variables)</a> · <a href="#procedures">Procedures</a> · <a href="#controle">Flow control</a> · <a href="#proprietes">Property lists</a> · <a href="#texte">Text output</a> · <a href="#clavier">Keyboard</a> · <a href="#souris">Mouse</a> · <a href="#manettes">Joysticks</a> · <a href="#musique">Music</a> · <a href="#travail">Workspace</a> · <a href="#fichiers">Files</a> · <a href="#fichiers-donnees">Data files (streams)</a> · <a href="#compat">Original hardware (compatibility)</a> · <a href="#divers">Miscellaneous</a></div>
 
   <h2 id="deplacements">The turtle: movement</h2>
   <div class="cmd-entry" id="cmd-forward">
@@ -1435,6 +1435,56 @@ PRINT ( RANDOM 1 6 )
     </div>
   </div>
 
+  <h2 id="calcul">Symbolic algebra</h2>
+  <div class="cmd-entry" id="cmd-expand">
+    <div class="cmd-header"><span class="cmd-name">EXPAND</span> <span class="cmd-params">expr</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: DEVELOPPE</div>
+      <p>Expands and simplifies a literal expression (with variables), given between brackets. Multiplication may stay implicit (3x, 2(x+1)) and case is ignored. Division by an expression simplifies the fraction when it comes out even, otherwise it gives the quotient and remainder (e.g. (x^2+1)/(x-1) gives x + 1 + 2/(x-1)). With a single variable you can also add and simplify fractions. Example: EXPAND [ (3x+5y)(3x-5y) ] outputs 9x^2 - 25y^2. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT EXPAND [ (3x+5y)(3x-5y) ]
+  -&gt; 9X^2 - 25Y^2
+PRINT EXPAND [ (x+2)^2 ]
+  -&gt; X^2 + 4X + 4</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-factor">FACTOR</a> <a href="#cmd-solve">SOLVE</a> <a href="#cmd-evaluate">EVALUATE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-factor">
+    <div class="cmd-header"><span class="cmd-name">FACTOR</span> <span class="cmd-params">expr</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: FACTORISE</div>
+      <p>Factors an expression given between brackets: common factor and remarkable identities (a^2-b^2, a^2±2ab+b^2); with a single variable, factoring by all rational roots, whatever the degree. Examples: FACTOR [ 9x^2 - 25y^2 ] outputs (3x + 5y)(3x - 5y), FACTOR [ x^3 - 6x^2 + 11x - 6 ] outputs (x - 1)(x - 2)(x - 3). What does not factor with these rules is returned unchanged. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT FACTOR [ 9x^2 - 25y^2 ]
+  -&gt; (3X + 5Y)(3X - 5Y)
+PRINT FACTOR [ x^2 + 4x + 4 ]
+  -&gt; (X + 2)^2</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-expand">EXPAND</a> <a href="#cmd-solve">SOLVE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-solve">
+    <div class="cmd-header"><span class="cmd-name">SOLVE</span> <span class="cmd-params">equation</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: RESOUDS RESOUS</div>
+      <p>Solves a one-unknown equation, of the first or second degree, given between brackets with an = sign. Outputs the solution(s) (or &#34;no real solution&#34;). Example: SOLVE [ x^2 - 5x + 6 = 0 ] outputs x = 2 or x = 3. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT SOLVE [ 2x + 3 = 7 ]
+  -&gt; X = 2
+PRINT SOLVE [ x^2 - 5x + 6 = 0 ]
+  -&gt; X = 2 or X = 3</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-expand">EXPAND</a> <a href="#cmd-factor">FACTOR</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-evaluate">
+    <div class="cmd-header"><span class="cmd-name">EVALUATE</span> <span class="cmd-params">expr valeurs</span><span class="cmd-kind">operation</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: EVALUE</div>
+      <p>Replaces variables with values in an expression (between brackets). The values are given as variable/number pairs, also between brackets. Evaluation may be partial (unset variables remain). Example: EVALUATE [ x^2 + 1 ] [ x 3 ] outputs 10. gologo extension.</p>
+      <div class="cmd-example"><pre><code>PRINT EVALUATE [ x^2 + 1 ] [ x 3 ]
+  -&gt; 10
+PRINT EVALUATE [ x^2 + y ] [ x 2 y 5 ]
+  -&gt; 9</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-expand">EXPAND</a> <a href="#cmd-solve">SOLVE</a></div>
+    </div>
+  </div>
+
   <h2 id="variables">Names (variables)</h2>
   <div class="cmd-entry" id="cmd-make">
     <div class="cmd-header"><span class="cmd-name">MAKE</span> <span class="cmd-params">word obj</span><span class="cmd-kind">command</span></div>
@@ -1556,7 +1606,7 @@ DEFINE &#34;POLY [ NB LG ] [ REPEAT :NB [ FD :LG RT 360 / :NB ] ]</code></pre></
       <div class="cmd-aliases">Extension (modern Logo)  ·  Aliases: TEXTE</div>
       <p>Outputs the definition of procedure name as a list [ [inputs] [body] ]. Inverse of DEFINE.</p>
       <div class="cmd-example"><pre><code>TO CARRE REPEAT 4 [ FD 50 RT 90 ] END SHOW TEXT &#34;CARRE
-  -&gt; VOUS VENEZ DE DEFINIR CARRE [[] [REPEAT 4 [FD 50 RT 90]]]</code></pre></div>
+  -&gt; CARRE DEFINED [[] [REPEAT 4 [FD 50 RT 90]]]</code></pre></div>
       <div class="cmd-aliases">See also: <a href="#cmd-define">DEFINE</a> <a href="#cmd-po">PO</a></div>
     </div>
   </div>
@@ -1855,7 +1905,7 @@ SETTEXTLINES 5</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">SETCURSOR</span> <span class="cmd-params">[col lig]</span><span class="cmd-kind">command</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: FCURS</div>
-      <p>Places the text cursor: column col (0-39), line lig (0-24). The next PRINT/TYPE writes there.</p>
+      <p>Places the text cursor: column col (0-79), line lig (0-24). The next PRINT/TYPE writes there.</p>
       <div class="cmd-example"><pre><code>SETCURSOR [ 10 5 ]
 CLEARTEXT SETCURSOR [ 0 24 ] TYPE &#34;BAS
   -&gt; BAS</code></pre></div>
@@ -1979,7 +2029,7 @@ SETTEXTBACKGROUND [ 20 20 20 ]</code></pre></div>
       <div class="cmd-example"><pre><code>PLAY &#34;DO
 PLAY [ DO RE MI FA SOL LA SI ]
 PLAY [ DO RE# MI ]</code></pre></div>
-      <div class="cmd-aliases">See also: <a href="#cmd-octave">OCTAVE</a> <a href="#cmd-duration">DURATION</a> <a href="#cmd-tempo">TEMPO</a> <a href="#cmd-timbre">TIMBRE</a></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-octave">OCTAVE</a> <a href="#cmd-duration">DURATION</a> <a href="#cmd-tempo">TEMPO</a> <a href="#cmd-timbre">TIMBRE</a> <a href="#cmd-volume">VOLUME</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-octave">
@@ -2016,7 +2066,17 @@ PLAY [ DO RE# MI ]</code></pre></div>
       <p>Sets the timbre, i.e. the sound shape (0-63 square, 64-127 sawtooth, 128-191 triangle, 192-255 sine).</p>
       <div class="cmd-example"><pre><code>TIMBRE 0
 TIMBRE 200</code></pre></div>
-      <div class="cmd-aliases">See also: <a href="#cmd-play">PLAY</a></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-play">PLAY</a> <a href="#cmd-volume">VOLUME</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-volume">
+    <div class="cmd-header"><span class="cmd-name">VOLUME</span> <span class="cmd-params">n</span><span class="cmd-kind">command</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Origin: SOLI Logo</div>
+      <p>Sets the volume of notes played by PLAY (0 silent to 100 full, default 100).</p>
+      <div class="cmd-example"><pre><code>VOLUME 100
+VOLUME 30</code></pre></div>
+      <div class="cmd-aliases">See also: <a href="#cmd-play">PLAY</a> <a href="#cmd-timbre">TIMBRE</a></div>
     </div>
   </div>
 
@@ -2027,7 +2087,7 @@ TIMBRE 200</code></pre></div>
       <div class="cmd-aliases">Origin: SOLI Logo  ·  Aliases: CONTENU</div>
       <p>Outputs the list of all known words (procedures and names).</p>
       <div class="cmd-example"><pre><code>PRINT CONTENTS
-  -&gt; .CHB .DEP .EFT .EXA .RES .ROUT .SER AIDE AJOUTE ANGLAIS ANIME APPLIQUE ARC ARCTAN ARRONDI ASCII ATAN ATTENDS AV AVANCE AVANT? BC BC? BINAIRE BOUTON? CADENCE CAP CAR CATALOGUE CATALOGUEEX CC CERCLE CF CHARGE CHARGEEX CHOSE CLOS COLLISION? COMPTE COMPTEUR CONTACT CONTACT? CONTENU COPIE COPIETABLEAU COS COSINUS CR CT DECOUPE DEF DEFILE DEFINIS DEFSPRITE DEMANDE DEPILE DEPUISBASE DER DERNIER DETRUIS DIF DIFF DISTANCE DISTORTUE DIV DIVISE DONNE DONNEPROP DUREE EC ECH ECRIS ED EFN EFP EFPROP EGAL? EMPILE ENFILE ENR ENT ENTREE ET ETIQUETTE EXEC EXECRESULTAT EXP FAUX FCAP FCB FCC FCFG FCFT FCR FCT FCURS FECH FEN FERME FERMETOUT FICHIERVERSTABLEAU FILTRE FIN FINFICHIER? FINLIGNE FIXE FIXEECRITURE FIXEFINLIGNE FIXEITEM FIXEITEMMD FIXELECTURE FIXEPOSECRITURE FIXEPOSLECTURE FIXETAILLECRAYON FIXETORTUE FLECTEUR FLI FLUXECRITURE FLUXLECTURE FORMATE FPOS FR FRANCAIS FXY HASARD HEXA IM IMNS IMTOUT IMTS INIT INVERSE ITEM ITEMMD JOUE LANCE LC LECTEUR LIS LISCAR LISCARS LISLIGNE LISMOT LISTE LISTE? LISTEPROP LISTEVERSTABLEAU LL LN LOCAL LOG10 LOGO MAJUSCULE MANETTE MD ME MEMBRE MEMBRE? METSDERNIER METSPREMIER MINUSCULE MODULO MOINS MONTRE MOT MOT? MP MT NBTORTUES NETTOIE NOM? NOMBRE? NON OCTAVE ORDONNE ORIGINE OTE OTETOUT OU OUEX OUVREAJOUT OUVREECRITURE OUVRELECTURE OUVREMAJ PH PHRASE PI PIEGE PIOCHE PLACE PLG? PLP? POINT POS POSECRITURE POSITION POSLECTURE POSOPT POUR POURCHAQUE PREM PREMIER PRIM? PROC? PROD PRODUIT PROP PUISSANCE QUITTE QUITTER QUOT RAC RACINE RAMENE RAMENEEX RAZ RC RE RECULE RECYCLE REDUIS REGLE REMPLACE REMPLIS RENDS REPETE REPETEPOUR RESTE RET RETOURNE ROGNE ROGNEDEBUT ROGNEFIN SANSDOUBLONS SAUFDERNIER SAUFPREMIER SAUVE SAUVED SAUVEPNG SCENE SD SI SIFAUX SIN SINUS SISINON SIVRAI SOMME SORTIE SOURISPOS SOURISPRESSEE SOUSCHAINE? SP SPRITE STOP STOPANIME STOPTOUT SUBSTITUE TABLEAU TABLEAU? TABLEAUMD TABLEAUVERSLISTE TAN TANGENTE TANTQUE TAPE TD TEMPO TESTE TEXTE TG TIMBRE TORTUE TOUCHE? TOURNEDROITE TOURNEGAUCHE TOUSOUVERTS TRANCHE TRIE TRONQUE VALABS VE VERSBASE VERSCAP VIDE? VISIBLE? VRAI VT XCOR YCOR</code></pre></div>
+  -&gt; .CHB .DEP .EXA .RES .ROUT .SER ABS ALLOPEN AND ANIMATE ARC ARCTAN ARRAY ARRAY? ARRAYP ARRAYTOLIST ASCII ASK BACK BACKGROUND BEFORE? BEFOREP BF BG BIN BK BL BUTFIRST BUTLAST BUTTON? BUTTONP BYE CAT CATALOG CATALOGEX CATCH CATEX CHAR CIRCLE CLEAN CLEARSCREEN CLEARTEXT CLEARTURTLES CLOSE CLOSEALL CLS COLLIDE? COLLIDEP CONTENTS COPIE COPY COPYARRAY COS COUNT CS DEFINE DEFSPRITE DELETE DEQUEUE DIFFERENCE DISTANCE DOT DRIVE DURATION EDIT EDLOAD EDLOADEX EDSAVE EMPTY? EMPTYP EN END ENGLISH ENTREE EOF? EOFP EOL EQUAL? EQUALP ER ERALL ERASE ERASEFILE ERN ERNAME EVALUATE EXP EXPAND FACTOR FALSE FD FENCE FILETOARRAY FILL FILTER FIRST FLI FLOODCOLOR FOR FOREACH FORMAT FORWARD FPUT FRENCH FROMBASE GOODBYE GPROP GREATER? GREATERP HEADING HELP HEX HIDETURTLE HOME HT IF IFELSE IFF IFFALSE IFT IFTRUE INSERTITEM INT INTQUOTIENT ITEM JOYSTICK KEY? KEYP LABEL LAST LEFT LESS? LESSP LIST LIST? LISTP LISTTOARRAY LN LOAD LOADEX LOCAL LOG10 LOWERCASE LPUT LT LTRIM MAKE MAP MDARRAY MDITEM MDSETITEM MEMBER MEMBER? MEMBERP MINUS MODULO MOUSEDOWN? MOUSEPOS NAME? NAMEP NODES NOT NUMBER? NUMBERP OCTAVE OP OPENAPPEND OPENREAD OPENUPDATE OPENWRITE OR OUTPUT PC PD PENCOLOR PENDOWN PENDOWN? PENDOWNP PENUP PI PICK PLAY PLIST PO POALL PONS POP POS POSITION POTS POWER PPROP PR PRIMITIVE? PRIMITIVEP PRINT PROCEDURE? PROCEDUREP PRODUCT PU PUSH QUEUE QUIT QUOTIENT RANDOM RCS READ READCHAR READCHARS READER READLIST READPOS READRAWLINE READWORD RECYCLE REDUCE REGLE REMAINDER REMDUP REMOVE REMPROP REPCOUNT REPEAT REPLACE RESET REVERSE RIGHT RL ROUND RT RTRIM RUN RUNRESULT RW SAVE SAVEPNG SCALE SCENE SE SENTENCE SETBACKGROUND SETBG SETBORDER SETCURSOR SETDRIVE SETEOL SETFC SETFLOODCOLOR SETFPS SETH SETHEADING SETITEM SETPC SETPENCOLOR SETPENSIZE SETPOS SETREAD SETREADPOS SETSCALE SETTEXTBACKGROUND SETTEXTCOLOR SETTEXTLINES SETTURTLE SETWRITE SETWRITEPOS SETXY SHOW SHOWN? SHOWNP SHOWTURTLE SIN SLICE SOLVE SORT SORTARRAY SORTIE SPLIT SPRITE SQRT ST STOP STOPALL STOPANIMATE SUBSTITUTE SUBSTRING? SUBSTRINGP SUM TAN TEMPO TEST TEXT THING THROW TIMBRE TO TOBASE TOPLEVEL TOWARDS TRIM TRUE TRUNCATE TURTLE TURTLES TYPE UPPERCASE VOLUME WAIT WHILE WINDOW WORD WORD? WORDP WRAP WRITEPOS WRITER XCOR XOR YCOR</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-po">

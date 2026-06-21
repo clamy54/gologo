@@ -131,8 +131,8 @@
     <tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Interrompt l'exécution en cours</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>E</kbd></td><td>Ouvre l'éditeur (si la ligne est vide)</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>Q</kbd></td><td>Quitte GoLogo</td></tr>
-    <tr><td><kbd>F1</kbd></td><td>Ouvre l'aide débutant (commandes d'origine du Logo SOLI, en noms complets)</td></tr>
-    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Ouvre l'aide complète (toutes les commandes)</td></tr>
+    <tr><td><kbd>F1</kbd></td><td>Ouvre l'aide dans le mode courant (aide débutant au départ)</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Bascule entre aide débutant et aide complète (le choix est retenu pour les prochaines ouvertures)</td></tr>
   </table>
 
   <h3>Autocomplétion</h3>
@@ -172,8 +172,8 @@
     <tr><th>Touche</th><th>Action</th></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Sauve le contenu et l'interprète (retour au REPL, procédures définies)</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>X</kbd></td><td>Quitte sans sauver (le contenu est perdu)</td></tr>
-    <tr><td><kbd>F1</kbd></td><td>Aide contextuelle : ouvre la fiche du mot sous le curseur s'il existe, sinon l'aide débutant</td></tr>
-    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Ouvre l'aide complète (toutes les commandes)</td></tr>
+    <tr><td><kbd>F1</kbd></td><td>Aide contextuelle : ouvre la fiche du mot sous le curseur s'il existe, sinon l'aide dans le mode courant</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Bascule entre aide débutant et aide complète (le choix est retenu)</td></tr>
     <tr><td><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd></td><td>Déplace le curseur</td></tr>
     <tr><td><kbd>Début</kbd> / <kbd>Fin</kbd></td><td>Début / fin de la ligne courante</td></tr>
     <tr><td><kbd>Pg. préc.</kbd> / <kbd>Pg. suiv.</kbd></td><td>Déplace le curseur d'une page vers le haut / bas</td></tr>
@@ -212,8 +212,8 @@
   <p>GoLogo dispose d'un navigateur d'aide intégré accessible&nbsp;:</p>
   <ul>
     <li>Par la commande <code>AIDE</code> ou <code>AIDE NOM</code> au REPL.</li>
-    <li>Par la touche <kbd>F1</kbd> (aide débutant) ou <kbd>Shift</kbd>+<kbd>F1</kbd>
-    (aide complète) depuis le REPL ou l'éditeur.</li>
+    <li>Par la touche <kbd>F1</kbd> depuis le REPL ou l'éditeur&nbsp;;
+    <kbd>Shift</kbd>+<kbd>F1</kbd> bascule entre aide débutant et aide complète.</li>
   </ul>
 
   <p>Le navigateur s'affiche en plein écran avec la grille des commandes et le
@@ -221,17 +221,18 @@
 
   <h3>Aide débutant et aide complète</h3>
 
-  <p><kbd>F1</kbd> ouvre l'<strong>aide débutant</strong>&nbsp;: elle ne liste que
+  <p>L'<strong>aide débutant</strong> ne liste que
   les commandes d'origine du Logo SOLI, sous leur nom complet (par exemple
   <code>CACHETORTUE</code> plutôt que <code>CT</code>, ou <code>RACINE</code> plutôt
-  que <code>RC</code>), pour ne pas submerger le débutant.</p>
+  que <code>RC</code>), pour ne pas submerger le débutant. C'est le mode de départ.</p>
 
-  <p><kbd>Shift</kbd>+<kbd>F1</kbd> ouvre l'<strong>aide complète</strong>&nbsp;:
+  <p>L'<strong>aide complète</strong> ajoute
   toutes les primitives, y compris les extensions modernes (la commande
-  <code>AIDE</code> ouvre elle aussi l'aide complète). On passe de l'une à l'autre
-  à tout moment, sans quitter l'aide, avec <kbd>F1</kbd> /
-  <kbd>Shift</kbd>+<kbd>F1</kbd>&nbsp;; le pied de page rappelle la touche de
-  l'autre vue.</p>
+  <code>AIDE</code> ouvre directement l'aide complète).
+  <kbd>Shift</kbd>+<kbd>F1</kbd> bascule de l'une à l'autre, à tout moment et même
+  sans quitter l'aide&nbsp;; le mode choisi est <strong>retenu</strong>, si bien que
+  <kbd>F1</kbd> rouvre ensuite l'aide dans ce mode. Le pied de page rappelle la
+  touche de bascule.</p>
 
   <h3>Raccourcis du navigateur d'aide</h3>
 
@@ -244,7 +245,7 @@
     <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd> ou <kbd>/</kbd></td><td>Ouvre le champ de recherche</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd> / <kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>Résultat de recherche suivant / précédent</td></tr>
     <tr><td><kbd>Ctrl</kbd>+<kbd>L</kbd></td><td>Bascule entre français et anglais</td></tr>
-    <tr><td><kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Bascule entre l'aide débutant et l'aide complète</td></tr>
+    <tr><td><kbd>Shift</kbd>+<kbd>F1</kbd></td><td>Bascule entre l'aide débutant et l'aide complète</td></tr>
     <tr><td>Une lettre (<kbd>A</kbd>…<kbd>Z</kbd>)</td><td>Saute à la première commande commençant par cette lettre</td></tr>
     <tr><td><kbd>Q</kbd> ou <kbd>Échap</kbd></td><td>Ferme l'aide</td></tr>
   </table>
@@ -293,11 +294,11 @@
     </tr>
     <tr>
       <td><kbd>F1</kbd></td>
-      <td>Ouvre l'aide débutant (contextuelle dans l'éditeur)</td>
+      <td>Ouvre l'aide dans le mode courant (contextuelle dans l'éditeur)</td>
     </tr>
     <tr>
       <td><kbd>Shift</kbd>+<kbd>F1</kbd></td>
-      <td>Ouvre l'aide complète (toutes les commandes)</td>
+      <td>Bascule aide débutant / aide complète (le choix est retenu)</td>
     </tr>
     <tr>
       <td><kbd>Ctrl</kbd>+<kbd>L</kbd></td>
@@ -347,7 +348,7 @@
     </tr>
     <tr>
       <td rowspan="5">Aide</td>
-      <td><kbd>F1</kbd> / <kbd>Shift</kbd>+<kbd>F1</kbd></td>
+      <td><kbd>Shift</kbd>+<kbd>F1</kbd></td>
       <td>Bascule aide débutant / aide complète</td>
     </tr>
     <tr>

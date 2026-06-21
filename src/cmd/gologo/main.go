@@ -1,6 +1,6 @@
 // commande gologo : l'interpreteur Logo dans une fenetre Gio.
 // gologo seul = plein ecran (Ctrl+Q pour sortir), -w pour une fenetre (dev),
-// -x pour forcer le dossier des exemples
+// -x pour forcer le dossier des exemples, -e pour demarrer en anglais
 package main
 
 import (
@@ -22,6 +22,7 @@ func main() {
 	fenetre := flag.Bool("w", false, "lance en fenêtré (windowed) au lieu du plein écran")
 	exec := flag.String("exec", "", "ligne Logo exécutée au démarrage (démo/cours)")
 	exDir := flag.String("x", "", "dossier des exemples (force son emplacement)")
+	anglais := flag.Bool("e", false, "démarre en anglais (English) ; par défaut en français")
 	flag.Parse()
 
 	// les 4 briques, puis on les relie
@@ -48,6 +49,9 @@ func main() {
 	screen.SetStartup(*exec)
 	if *exDir != "" {
 		interp.SetExamplesDir(*exDir) // -x force le dossier des exemples
+	}
+	if *anglais {
+		interp.SetLang("EN") // -e : demarre en anglais (defaut francais)
 	}
 
 	// moteur d'anim (ANIME) : le goroutine dort sur wake et ne tourne que

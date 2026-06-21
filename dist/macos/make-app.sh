@@ -7,7 +7,7 @@
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$(cd "$here/../.." && pwd)" # github/
-ver="${1:-2.0}"
+ver="${1:-2.1}"
 bin="$root/tools/build/bin/macos/gologo"
 icns="$root/tools/build/icons/gologo.icns"
 

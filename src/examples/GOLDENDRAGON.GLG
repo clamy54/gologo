@@ -1,0 +1,36 @@
+; Golden Dragon - le dragon dore par le jeu du chaos (systeme de fonctions iterees)
+; portage du BASIC de K. Moerman (2026), d'apres
+; larryriddle.agnesscott.org/ifs/heighway/goldenDragon.htm
+; on tire au sort une des deux transformations affines, on saute de point en
+; point, et a force le dragon se dessine tout seul. charge ce fichier puis tape START
+
+POUR START
+VE CT FCFG 0
+; champ fenetre : un point qui deborde l'ecran ne fait pas hurler la tortue
+FEN
+DONNE "NPOINTS 200000
+; mise a l'echelle et recentrage. reglages du BASIC d'origine reduits de 0.66
+; pour que tout le dragon tienne dans l'ecran de gologo (1600 x 1000)
+DONNE "SCLX 1109
+DONNE "SCLY 987
+DONNE "TRNX -459
+DONNE "TRNY -184.5
+DONNE "X 0
+DONNE "Y 0
+REPETE :NPOINTS [
+SI ( HASARD 10000 ) < 6445 [
+; fonction 1 (proba 0.6445) : rotation-contraction, tracee en or
+DONNE "NX :X * 0.62367 - :Y * 0.40337
+DONNE "NY :X * 0.40337 + :Y * 0.62367
+FCC [ 255 215 0 ]
+] [
+; fonction 2 (proba 0.3555) : l'autre moitie du dragon, en turquoise
+DONNE "NX -0.37633 * :X - 0.40337 * :Y + 1
+DONNE "NY :X * 0.40337 - :Y * 0.37633
+FCC [ 0 255 215 ]
+]
+DONNE "X :NX
+DONNE "Y :NY
+POINT PHRASE :X * :SCLX + :TRNX :Y * :SCLY + :TRNY
+]
+FIN

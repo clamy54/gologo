@@ -36,7 +36,7 @@
   </div>
 
   <p>Chaque fiche indique son type (<strong>C</strong> commande qui produit un effet, <strong>O</strong> opération qui retourne une valeur, <strong>P</strong> prédicat qui retourne VRAI/FAUX) et son origine&nbsp;: <em>Logo SOLI</em> (le Logo d'origine), <em>Extension</em> (ajout moderne) ou <em>Compatibilité</em> (matériel d'époque sans effet).</p>
-  <div class="conseil">Sections : <a href="#deplacements">La tortue : déplacements</a> · <a href="#champ">La tortue : le champ graphique</a> · <a href="#tortues">Plusieurs tortues</a> · <a href="#animation">Animer les tortues</a> · <a href="#crayon">La tortue : le crayon</a> · <a href="#examiner">Mots et listes : examiner</a> · <a href="#demonter">Mots et listes : démonter</a> · <a href="#construire">Mots et listes : construire et transformer</a> · <a href="#chaines">Chaînes : recherche, découpe, nettoyage</a> · <a href="#tableaux">Tableaux, piles et files</a> · <a href="#logique">Valeurs logiques</a> · <a href="#arithmetique">Arithmétique</a> · <a href="#variables">Les noms (variables)</a> · <a href="#procedures">Procédures</a> · <a href="#controle">Contrôle d&#39;exécution</a> · <a href="#proprietes">Listes de propriétés</a> · <a href="#texte">Sortie texte</a> · <a href="#clavier">Clavier</a> · <a href="#souris">Souris</a> · <a href="#manettes">Manettes de jeu</a> · <a href="#musique">Musique</a> · <a href="#travail">Espace de travail</a> · <a href="#fichiers">Fichiers</a> · <a href="#fichiers-donnees">Fichiers de données (flux)</a> · <a href="#compat">Matériel d&#39;origine (compatibilité)</a> · <a href="#divers">Divers</a></div>
+  <div class="conseil">Sections : <a href="#deplacements">La tortue : déplacements</a> · <a href="#champ">La tortue : le champ graphique</a> · <a href="#tortues">Plusieurs tortues</a> · <a href="#animation">Animer les tortues</a> · <a href="#crayon">La tortue : le crayon</a> · <a href="#examiner">Mots et listes : examiner</a> · <a href="#demonter">Mots et listes : démonter</a> · <a href="#construire">Mots et listes : construire et transformer</a> · <a href="#chaines">Chaînes : recherche, découpe, nettoyage</a> · <a href="#tableaux">Tableaux, piles et files</a> · <a href="#logique">Valeurs logiques</a> · <a href="#arithmetique">Arithmétique</a> · <a href="#calcul">Calcul littéral</a> · <a href="#variables">Les noms (variables)</a> · <a href="#procedures">Procédures</a> · <a href="#controle">Contrôle d&#39;exécution</a> · <a href="#proprietes">Listes de propriétés</a> · <a href="#texte">Sortie texte</a> · <a href="#clavier">Clavier</a> · <a href="#souris">Souris</a> · <a href="#manettes">Manettes de jeu</a> · <a href="#musique">Musique</a> · <a href="#travail">Espace de travail</a> · <a href="#fichiers">Fichiers</a> · <a href="#fichiers-donnees">Fichiers de données (flux)</a> · <a href="#compat">Matériel d&#39;origine (compatibilité)</a> · <a href="#divers">Divers</a></div>
 
   <h2 id="deplacements">La tortue : déplacements</h2>
   <div class="cmd-entry" id="cmd-avance">
@@ -1436,6 +1436,56 @@ ECRIS ( HASARD 1 6 )
     </div>
   </div>
 
+  <h2 id="calcul">Calcul littéral</h2>
+  <div class="cmd-entry" id="cmd-developpe">
+    <div class="cmd-header"><span class="cmd-name">DEVELOPPE</span> <span class="cmd-params">expr</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : EXPAND</div>
+      <p>Développe et réduit une expression littérale (à variables), donnée entre crochets. La multiplication peut rester implicite (3x, 2(x+1)) et la casse est libre. La division par une expression simplifie la fraction quand elle tombe juste, sinon elle donne le quotient et le reste (ex. (x^2+1)/(x-1) rend x + 1 + 2/(x-1)). À une variable, on peut aussi additionner et simplifier des fractions. Exemple : DEVELOPPE [ (3x+5y)(3x-5y) ] rend 9x^2 - 25y^2. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS DEVELOPPE [ (3x+5y)(3x-5y) ]
+  -&gt; 9X^2 - 25Y^2
+ECRIS DEVELOPPE [ (x+2)^2 ]
+  -&gt; X^2 + 4X + 4</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-factorise">FACTORISE</a> <a href="#cmd-resous">RESOUS</a> <a href="#cmd-evalue">EVALUE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-factorise">
+    <div class="cmd-header"><span class="cmd-name">FACTORISE</span> <span class="cmd-params">expr</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : FACTOR</div>
+      <p>Factorise une expression entre crochets : facteur commun et identités remarquables (a^2-b^2, a^2±2ab+b^2) ; à une variable, factorisation par toutes les racines rationnelles, quel que soit le degré. Exemples : FACTORISE [ 9x^2 - 25y^2 ] rend (3x + 5y)(3x - 5y), FACTORISE [ x^3 - 6x^2 + 11x - 6 ] rend (x - 1)(x - 2)(x - 3). Ce qui ne se factorise pas avec ces règles est rendu tel quel. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS FACTORISE [ 9x^2 - 25y^2 ]
+  -&gt; (3X + 5Y)(3X - 5Y)
+ECRIS FACTORISE [ x^2 + 4x + 4 ]
+  -&gt; (X + 2)^2</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-developpe">DEVELOPPE</a> <a href="#cmd-resous">RESOUS</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-resous">
+    <div class="cmd-header"><span class="cmd-name">RESOUS</span> <span class="cmd-params">equation</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : RESOUDS SOLVE</div>
+      <p>Résout une équation à une inconnue, du premier ou du second degré, donnée entre crochets avec un signe =. Rend la ou les solutions (ou &#34;pas de solution reelle&#34;). Exemple : RESOUS [ x^2 - 5x + 6 = 0 ] rend x = 2 ou x = 3. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS RESOUS [ 2x + 3 = 7 ]
+  -&gt; X = 2
+ECRIS RESOUS [ x^2 - 5x + 6 = 0 ]
+  -&gt; X = 2 ou X = 3</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-developpe">DEVELOPPE</a> <a href="#cmd-factorise">FACTORISE</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-evalue">
+    <div class="cmd-header"><span class="cmd-name">EVALUE</span> <span class="cmd-params">expr valeurs</span><span class="cmd-kind">opération</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Extension (Logo moderne)  ·  Alias : EVALUATE</div>
+      <p>Remplace les variables par des valeurs dans une expression (entre crochets). Les valeurs se donnent en couples variable/nombre, eux aussi entre crochets. L&#39;évaluation peut être partielle (les variables non données restent). Exemple : EVALUE [ x^2 + 1 ] [ x 3 ] rend 10. Extension gologo.</p>
+      <div class="cmd-example"><pre><code>ECRIS EVALUE [ x^2 + 1 ] [ x 3 ]
+  -&gt; 10
+ECRIS EVALUE [ x^2 + y ] [ x 2 y 5 ]
+  -&gt; 9</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-developpe">DEVELOPPE</a> <a href="#cmd-resous">RESOUS</a></div>
+    </div>
+  </div>
+
   <h2 id="variables">Les noms (variables)</h2>
   <div class="cmd-entry" id="cmd-donne">
     <div class="cmd-header"><span class="cmd-name">DONNE</span> <span class="cmd-params">mot obj</span><span class="cmd-kind">commande</span></div>
@@ -1856,7 +1906,7 @@ ME 5</code></pre></div>
     <div class="cmd-header"><span class="cmd-name">FCURS</span> <span class="cmd-params">[col lig]</span><span class="cmd-kind">commande</span></div>
     <div class="cmd-body">
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : SETCURSOR</div>
-      <p>Place le curseur texte : colonne col (0-39) et ligne lig (0-24). Le prochain ECRIS/TAPE écrit à cet endroit.</p>
+      <p>Place le curseur texte : colonne col (0-79) et ligne lig (0-24). Le prochain ECRIS/TAPE écrit à cet endroit.</p>
       <div class="cmd-example"><pre><code>FCURS [ 10 5 ]
 VT FCURS [ 0 24 ] TAPE &#34;BAS
   -&gt; BAS</code></pre></div>
@@ -1980,7 +2030,7 @@ FCFT [ 20 20 20 ]</code></pre></div>
       <div class="cmd-example"><pre><code>JOUE &#34;DO
 JOUE [ DO RE MI FA SOL LA SI ]
 JOUE [ DO RE# MI ]</code></pre></div>
-      <div class="cmd-aliases">Voir aussi : <a href="#cmd-octave">OCTAVE</a> <a href="#cmd-duree">DUREE</a> <a href="#cmd-tempo">TEMPO</a> <a href="#cmd-timbre">TIMBRE</a></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-octave">OCTAVE</a> <a href="#cmd-duree">DUREE</a> <a href="#cmd-tempo">TEMPO</a> <a href="#cmd-timbre">TIMBRE</a> <a href="#cmd-volume">VOLUME</a></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-octave">
@@ -2017,7 +2067,17 @@ JOUE [ DO RE# MI ]</code></pre></div>
       <p>Fixe le timbre, c&#39;est-à-dire la forme du son (0-63 carré, 64-127 dent de scie, 128-191 triangle, 192-255 sinus).</p>
       <div class="cmd-example"><pre><code>TIMBRE 0
 TIMBRE 200</code></pre></div>
-      <div class="cmd-aliases">Voir aussi : <a href="#cmd-joue">JOUE</a></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-joue">JOUE</a> <a href="#cmd-volume">VOLUME</a></div>
+    </div>
+  </div>
+  <div class="cmd-entry" id="cmd-volume">
+    <div class="cmd-header"><span class="cmd-name">VOLUME</span> <span class="cmd-params">n</span><span class="cmd-kind">commande</span></div>
+    <div class="cmd-body">
+      <div class="cmd-aliases">Origine : Logo SOLI</div>
+      <p>Fixe le volume des notes jouées par JOUE (0 muet à 100 à fond, défaut 100).</p>
+      <div class="cmd-example"><pre><code>VOLUME 100
+VOLUME 30</code></pre></div>
+      <div class="cmd-aliases">Voir aussi : <a href="#cmd-joue">JOUE</a> <a href="#cmd-timbre">TIMBRE</a></div>
     </div>
   </div>
 
@@ -2028,7 +2088,7 @@ TIMBRE 200</code></pre></div>
       <div class="cmd-aliases">Origine : Logo SOLI  ·  Alias : CONTENTS</div>
       <p>Retourne la liste de tous les mots connus (procédures et noms).</p>
       <div class="cmd-example"><pre><code>ECRIS CONTENU
-  -&gt; .CHB .DEP .EFT .EXA .RES .ROUT .SER AIDE AJOUTE ANGLAIS ANIME APPLIQUE ARC ARCTAN ARRONDI ASCII ATAN ATTENDS AV AVANCE AVANT? BC BC? BINAIRE BOUTON? CADENCE CAP CAR CATALOGUE CATALOGUEEX CC CERCLE CF CHARGE CHARGEEX CHOSE CLOS COLLISION? COMPTE COMPTEUR CONTACT CONTACT? CONTENU COPIE COPIETABLEAU COS COSINUS CR CT DECOUPE DEF DEFILE DEFINIS DEFSPRITE DEMANDE DEPILE DEPUISBASE DER DERNIER DETRUIS DIF DIFF DISTANCE DISTORTUE DIV DIVISE DONNE DONNEPROP DUREE EC ECH ECRIS ED EFN EFP EFPROP EGAL? EMPILE ENFILE ENR ENT ENTREE ET ETIQUETTE EXEC EXECRESULTAT EXP FAUX FCAP FCB FCC FCFG FCFT FCR FCT FCURS FECH FEN FERME FERMETOUT FICHIERVERSTABLEAU FILTRE FIN FINFICHIER? FINLIGNE FIXE FIXEECRITURE FIXEFINLIGNE FIXEITEM FIXEITEMMD FIXELECTURE FIXEPOSECRITURE FIXEPOSLECTURE FIXETAILLECRAYON FIXETORTUE FLECTEUR FLI FLUXECRITURE FLUXLECTURE FORMATE FPOS FR FRANCAIS FXY HASARD HEXA IM IMNS IMTOUT IMTS INIT INVERSE ITEM ITEMMD JOUE LANCE LC LECTEUR LIS LISCAR LISCARS LISLIGNE LISMOT LISTE LISTE? LISTEPROP LISTEVERSTABLEAU LL LN LOCAL LOG10 LOGO MAJUSCULE MANETTE MD ME MEMBRE MEMBRE? METSDERNIER METSPREMIER MINUSCULE MODULO MOINS MONTRE MOT MOT? MP MT NBTORTUES NETTOIE NOM? NOMBRE? NON OCTAVE ORDONNE ORIGINE OTE OTETOUT OU OUEX OUVREAJOUT OUVREECRITURE OUVRELECTURE OUVREMAJ PH PHRASE PI PIEGE PIOCHE PLACE PLG? PLP? POINT POS POSECRITURE POSITION POSLECTURE POSOPT POUR POURCHAQUE PREM PREMIER PRIM? PROC? PROD PRODUIT PROP PUISSANCE QUITTE QUITTER QUOT RAC RACINE RAMENE RAMENEEX RAZ RC RE RECULE RECYCLE REDUIS REGLE REMPLACE REMPLIS RENDS REPETE REPETEPOUR RESTE RET RETOURNE ROGNE ROGNEDEBUT ROGNEFIN SANSDOUBLONS SAUFDERNIER SAUFPREMIER SAUVE SAUVED SAUVEPNG SCENE SD SI SIFAUX SIN SINUS SISINON SIVRAI SOMME SORTIE SOURISPOS SOURISPRESSEE SOUSCHAINE? SP SPRITE STOP STOPANIME STOPTOUT SUBSTITUE TABLEAU TABLEAU? TABLEAUMD TABLEAUVERSLISTE TAN TANGENTE TANTQUE TAPE TD TEMPO TESTE TEXTE TG TIMBRE TORTUE TOUCHE? TOURNEDROITE TOURNEGAUCHE TOUSOUVERTS TRANCHE TRIE TRONQUE VALABS VE VERSBASE VERSCAP VIDE? VISIBLE? VRAI VT XCOR YCOR</code></pre></div>
+  -&gt; .CHB .DEP .EFT .EXA .RES .ROUT .SER AIDE AJOUTE ANGLAIS ANIME APPLIQUE ARC ARCTAN ARRONDI ASCII ATAN ATTENDS AV AVANCE AVANT? BC BC? BINAIRE BOUTON? CADENCE CAP CAR CATALOGUE CATALOGUEEX CC CERCLE CF CHARGE CHARGEEX CHOSE CLOS COLLISION? COMPTE COMPTEUR CONTACT CONTACT? CONTENU COPIE COPIETABLEAU COS COSINUS CR CT DECOUPE DEF DEFILE DEFINIS DEFSPRITE DEMANDE DEPILE DEPUISBASE DER DERNIER DETRUIS DEVELOPPE DIF DIFF DISTANCE DISTORTUE DIV DIVISE DONNE DONNEPROP DUREE EC ECH ECRIS ED EFN EFP EFPROP EGAL? EMPILE ENFILE ENR ENT ENTREE ET ETIQUETTE EVALUE EXEC EXECRESULTAT EXP FACTORISE FAUX FCAP FCB FCC FCFG FCFT FCR FCT FCURS FECH FEN FERME FERMETOUT FICHIERVERSTABLEAU FILTRE FIN FINFICHIER? FINLIGNE FIXE FIXEECRITURE FIXEFINLIGNE FIXEITEM FIXEITEMMD FIXELECTURE FIXEPOSECRITURE FIXEPOSLECTURE FIXETAILLECRAYON FIXETORTUE FLECTEUR FLI FLUXECRITURE FLUXLECTURE FORMATE FPOS FR FRANCAIS FXY HASARD HEXA IM IMNS IMTOUT IMTS INIT INVERSE ITEM ITEMMD JOUE LANCE LC LECTEUR LIS LISCAR LISCARS LISLIGNE LISMOT LISTE LISTE? LISTEPROP LISTEVERSTABLEAU LL LN LOCAL LOG10 LOGO MAJUSCULE MANETTE MD ME MEMBRE MEMBRE? METSDERNIER METSPREMIER MINUSCULE MODULO MOINS MONTRE MOT MOT? MP MT NBTORTUES NETTOIE NOM? NOMBRE? NON OCTAVE ORDONNE ORIGINE OTE OTETOUT OU OUEX OUVREAJOUT OUVREECRITURE OUVRELECTURE OUVREMAJ PH PHRASE PI PIEGE PIOCHE PLACE PLG? PLP? POINT POS POSECRITURE POSITION POSLECTURE POSOPT POUR POURCHAQUE PREM PREMIER PRIM? PROC? PROD PRODUIT PROP PUISSANCE QUITTE QUITTER QUOT RAC RACINE RAMENE RAMENEEX RAZ RC RE RECULE RECYCLE REDUIS REGLE REMPLACE REMPLIS RENDS REPETE REPETEPOUR RESOUDS RESOUS RESTE RET RETOURNE ROGNE ROGNEDEBUT ROGNEFIN SANSDOUBLONS SAUFDERNIER SAUFPREMIER SAUVE SAUVED SAUVEPNG SCENE SD SI SIFAUX SIN SINUS SISINON SIVRAI SOMME SORTIE SOURISPOS SOURISPRESSEE SOUSCHAINE? SP SPRITE STOP STOPANIME STOPTOUT SUBSTITUE TABLEAU TABLEAU? TABLEAUMD TABLEAUVERSLISTE TAN TANGENTE TANTQUE TAPE TD TEMPO TESTE TEXTE TG TIMBRE TORTUE TOUCHE? TOURNEDROITE TOURNEGAUCHE TOUSOUVERTS TRANCHE TRIE TRONQUE VALABS VE VERSBASE VERSCAP VIDE? VISIBLE? VOLUME VRAI VT XCOR YCOR</code></pre></div>
     </div>
   </div>
   <div class="cmd-entry" id="cmd-im">

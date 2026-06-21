@@ -1,0 +1,612 @@
+; GALOPIX - le grand classique des petits chevaux (les "dadas"), revisite.
+; Un cheval par joueur, 2 a 4 joueurs. Tu choisis ta couleur, l'ordinateur
+; tient les autres. A ton tour, le de tourne a droite de l'ecran : appuie sur
+; une touche pour l'arreter. Fais un 6 pour sortir de l'ecurie, tourne autour
+; du plateau, remonte ta colonne et atteins le centre le premier. Charge ce
+; fichier puis tape START. Le de, lui, n'a aucune morale.
+
+; ---- les formes : le pion (forme 3) et son contour, un poil plus gros (forme 4),
+; dessine en noir derriere le pion pour qu'il reste visible sur sa propre couleur ----
+POUR FORMES
+DEFSPRITE 3 [
+................
+......XXXX......
+.....XXXXXX.....
+.....XXXXXX.....
+......XXXX......
+......XXXX......
+.....XXXXXX.....
+......XXXX......
+......XXXX......
+......XXXX......
+.....XXXXXX.....
+....XXXXXXXX....
+...XXXXXXXXXX...
+...XXXXXXXXXX...
+................
+................
+]
+DEFSPRITE 4 [
+.....XXXXXX.....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+...XXXXXXXXXX...
+..XXXXXXXXXXXX..
+..XXXXXXXXXXXX..
+..XXXXXXXXXXXX..
+..XXXXXXXXXXXX..
+................
+]
+FIN
+
+; ---- un rectangle plein, par traits horizontaux : des bords bien droits ----
+POUR RECTPLEIN :XC :YBAS :W :H :COUL
+FCC :COUL FIXETAILLECRAYON 7
+DONNE "YY ( :YBAS + 3 )
+TANTQUE [ :YY < ( :YBAS + :H ) ] [
+LC FXY ( :XC - :W / 2 + 3 ) :YY BC FXY ( :XC + :W / 2 - 3 ) :YY LC
+DONNE "YY ( :YY + 5 )
+]
+FIN
+
+; ---- un gros point rond (D = epaisseur du crayon) ----
+POUR DISQUE :X :Y :D :COUL
+FCC :COUL FIXETAILLECRAYON :D
+LC FXY ( :X - 1 ) :Y BC FXY ( :X + 1 ) :Y LC
+FIN
+
+; ---- texte centre en x = 0 (N = nb de caracteres) ----
+POUR CENTRE :TXT :N :Y :COUL
+FCC :COUL LC FXY ( 0 - :N * 11.67 ) :Y ETIQUETTE :TXT
+FIN
+
+; ---- texte centre dans le panneau de droite (centre x = 480) ----
+POUR TEXTEP :TXT :N :Y :COUL
+FCC :COUL LC FXY ( 480 - :N * 11.67 ) :Y ETIQUETTE :TXT
+FIN
+
+; ---- abscisse / ordonnee du centre de la case (col, row) ; accepte les demis ----
+POUR CELLX :COL
+RENDS ( :BL + ( :COL + 0.5 ) * :CELL )
+FIN
+POUR CELLY :ROW
+RENDS ( :BT - ( :ROW + 0.5 ) * :CELL )
+FIN
+
+; ---- ajoute N cases a l'anneau, a partir de (CC,RR) en avancant de (DC,DR) ----
+POUR SEGMENT :CC :RR :DC :DR :N
+DONNE "C2 :CC
+DONNE "R2 :RR
+REPETE :N [
+DONNE "NL ( :NL + 1 )
+FIXEITEM :NL :LOOPC :C2
+FIXEITEM :NL :LOOPR :R2
+DONNE "C2 ( :C2 + :DC )
+DONNE "R2 ( :R2 + :DR )
+]
+FIN
+
+; ---- construit les 56 cases de l'anneau (la croix), dans le sens de la marche ----
+POUR BUILDLOOP
+DONNE "NL 0
+SEGMENT 1 6 1 0 6
+SEGMENT 6 5 0 -1 6
+SEGMENT 7 0 1 0 2
+SEGMENT 8 1 0 1 6
+SEGMENT 9 6 1 0 6
+SEGMENT 14 7 0 1 2
+SEGMENT 13 8 -1 0 6
+SEGMENT 8 9 0 1 6
+SEGMENT 7 14 -1 0 2
+SEGMENT 6 13 0 -1 6
+SEGMENT 5 8 -1 0 6
+SEGMENT 0 7 0 -1 2
+FIN
+
+; ---- la cellule (col, row) d'une couleur a la progression P (0 = ecurie).
+; resultat dans PCOL et PROW ----
+POUR POSCELL :C :P
+SI ( :P <= :PBASE ) [
+DONNE "K ( ( RESTE ( ( ( ITEM :C :STARTI ) - 1 ) + ( :P - 1 ) ) 56 ) + 1 )
+DONNE "PCOL ITEM :K :LOOPC
+DONNE "PROW ITEM :K :LOOPR
+STOP
+]
+SI ( :P <= ( :PBASE + 6 ) ) [ HOMECELL :C ( :P - :PBASE ) STOP ]
+DONNE "PCOL 7 DONNE "PROW 7
+FIN
+
+; ---- la H-ieme case (1 a 6) de la colonne maison d'une couleur, vers le centre ----
+POUR HOMECELL :C :H
+SI :C = 1 [ DONNE "PCOL :H DONNE "PROW 7 STOP ]
+SI :C = 2 [ DONNE "PCOL 7 DONNE "PROW :H STOP ]
+SI :C = 3 [ DONNE "PCOL ( 14 - :H ) DONNE "PROW 7 STOP ]
+DONNE "PCOL 7 DONNE "PROW ( 14 - :H )
+FIN
+
+; ---- nom de la couleur (pour les messages) ----
+POUR NOMCOUL :C
+SI :C = 1 [ RENDS "VERT ]
+SI :C = 2 [ RENDS "JAUNE ]
+SI :C = 3 [ RENDS "BLEU ]
+RENDS "ROUGE
+FIN
+
+; ---- un bloc plein de NC x NR cases, coin haut-gauche en (C0,R0) ----
+POUR BLOC :C0 :R0 :NC :NR :COUL
+DONNE "XC ( :BL + ( :C0 + :NC / 2 ) * :CELL )
+DONNE "YBAS ( :BT - ( :R0 + :NR ) * :CELL )
+RECTPLEIN :XC :YBAS ( :NC * :CELL ) ( :NR * :CELL ) :COUL
+FIN
+
+; ---- une case du plateau : fond colore et lisere gris ----
+POUR CASE :COL :ROW :COUL
+DONNE "X CELLX :COL
+DONNE "Y CELLY :ROW
+DONNE "HC ( :CELL / 2 )
+RECTPLEIN :X ( :Y - :HC + 1 ) ( :CELL - 2 ) ( :CELL - 2 ) :COUL
+FCC :CGRID FIXETAILLECRAYON 2
+LC FXY ( :X - :HC ) ( :Y - :HC ) BC FXY ( :X + :HC ) ( :Y - :HC ) FXY ( :X + :HC ) ( :Y + :HC ) FXY ( :X - :HC ) ( :Y + :HC ) FXY ( :X - :HC ) ( :Y - :HC ) LC
+FIN
+
+; ---- une ecurie (coin) : bloc colore, interieur blanc, pastille de la stalle ----
+POUR ECURIE :C0 :R0 :COUL
+BLOC :C0 :R0 6 6 :COUL
+BLOC ( :C0 + 1 ) ( :R0 + 1 ) 4 4 :CBLANC
+DISQUE ( CELLX ( :C0 + 2.5 ) ) ( CELLY ( :R0 + 2.5 ) ) 60 :COUL
+FIN
+
+; ---- toutes les cases blanches de l'anneau ----
+POUR PISTE
+REPETEPOUR [ I 1 56 ] [ CASE ( ITEM :I :LOOPC ) ( ITEM :I :LOOPR ) :CBLANC ]
+FIN
+
+; ---- recolore la case de depart d'une couleur ----
+POUR CASEDEPART :C :COUL
+DONNE "K ITEM :C :STARTI
+CASE ( ITEM :K :LOOPC ) ( ITEM :K :LOOPR ) :COUL
+FIN
+
+; ---- une fleche sur la case (COL,ROW) dans le sens ecran (SX,SY) : montre par ou
+; le cheval sort et dans quel sens il avance ----
+POUR FLECHE :COL :ROW :SX :SY
+DONNE "X CELLX :COL
+DONNE "Y CELLY :ROW
+DONNE "R 17
+DONNE "TPX ( :X + :SX * :R )
+DONNE "TPY ( :Y + :SY * :R )
+FCC :CFLECHE FIXETAILLECRAYON 6
+LC FXY ( :X - :SX * :R ) ( :Y - :SY * :R ) BC FXY :TPX :TPY
+FXY ( :TPX - :SX * 10 - :SY * 10 ) ( :TPY - :SY * 10 + :SX * 10 )
+FXY :TPX :TPY
+FXY ( :TPX - :SX * 10 + :SY * 10 ) ( :TPY - :SY * 10 - :SX * 10 )
+LC
+FIN
+
+; ---- les fleches de sortie des quatre couleurs ----
+POUR FLECHESDEPART
+FLECHE 0 6 1 0
+FLECHE 8 0 0 -1
+FLECHE 14 8 -1 0
+FLECHE 6 14 0 1
+FIN
+
+; ---- les 6 cases de la colonne maison d'une couleur, numerotees de 1 a 6
+; (1 a l'entree, 6 au pied du centre) ----
+POUR MAISONCOL :C :COUL
+SI :C = 2 [ DONNE "CN [ 30 30 30 ] ] [ DONNE "CN [ 250 250 250 ] ]
+REPETEPOUR [ H 1 6 ] [
+HOMECELL :C :H
+CASE :PCOL :PROW :COUL
+FCC :CN
+LC FXY ( ( CELLX :PCOL ) - 6 ) ( ( CELLY :PROW ) + 22 ) ETIQUETTE :H
+]
+FIN
+
+; ---- un quart du centre-but ----
+POUR QUART :CX :CY :COUL
+RECTPLEIN :CX ( :CY - :CELL / 4 ) ( :CELL / 2 ) ( :CELL / 2 ) :COUL
+FIN
+
+; ---- le centre-but : quatre quarts aux quatre couleurs ----
+POUR CENTREBUT
+DONNE "X CELLX 7
+DONNE "Y CELLY 7
+DONNE "Q ( :CELL / 4 )
+QUART ( :X - :Q ) ( :Y + :Q ) :CV
+QUART ( :X + :Q ) ( :Y + :Q ) :CJ
+QUART ( :X + :Q ) ( :Y - :Q ) :CB
+QUART ( :X - :Q ) ( :Y - :Q ) :CR
+FIN
+
+; ---- le fond du panneau de droite (le coin du de) ----
+POUR PANNEAUFOND
+RECTPLEIN 480 -510 664 1020 :CPANNEAU
+FIN
+
+; ---- tout le plateau, trace une seule fois (les pions sont des tortues) ----
+POUR DESSINEPLATEAU
+FIXETORTUE 0 CT
+FCFG :CFOND
+NETTOIE
+ECURIE 0 0 :CV
+ECURIE 9 0 :CJ
+ECURIE 9 9 :CB
+ECURIE 0 9 :CR
+PISTE
+CASEDEPART 1 :CV
+CASEDEPART 2 :CJ
+CASEDEPART 3 :CB
+CASEDEPART 4 :CR
+FLECHESDEPART
+MAISONCOL 1 :CV
+MAISONCOL 2 :CJ
+MAISONCOL 3 :CB
+MAISONCOL 4 :CR
+CENTREBUT
+PANNEAUFOND
+FIN
+
+; ---- un point du de a (DX,DY) du centre du de ----
+POUR PIPXY :DX :DY
+DISQUE ( :DIEX + :DX ) ( :DIECY + :DY ) 30 :CPIP
+FIN
+
+; ---- dessine la face F (1 a 6) du de (centre vertical sur DIECY).
+; tout passe par SCENE : la face s'affiche d'un coup, sans clignoter ----
+POUR DESSINEDE :F
+FIXETORTUE 0 CT
+DONNE "D 52
+SCENE [
+RECTPLEIN :DIEX ( :DIECY - 116 ) 232 232 :CDEBORD
+RECTPLEIN :DIEX ( :DIECY - 106 ) 212 212 :CDE
+SI ( OU ( :F = 1 ) ( OU ( :F = 3 ) ( :F = 5 ) ) ) [ PIPXY 0 0 ]
+SI ( :F >= 2 ) [ PIPXY ( 0 - :D ) :D PIPXY :D ( 0 - :D ) ]
+SI ( :F >= 4 ) [ PIPXY :D :D PIPXY ( 0 - :D ) ( 0 - :D ) ]
+SI ( :F = 6 ) [ PIPXY ( 0 - :D ) 0 PIPXY :D 0 ]
+]
+FIN
+
+; ---- le panneau du tour : qui joue, et le rappel de la commande ----
+POUR PANNEAUTOUR :C
+FIXETORTUE 0 CT
+SCENE [
+RECTPLEIN 480 -510 664 1020 :CPANNEAU
+TEXTEP [ LE DE ] 5 380 :CTEXTE
+SI ( ITEM :C :ISHUMAN ) [
+TEXTEP [ C EST A VOTRE TOUR DE JOUER ] 27 300 ( ITEM :C :CCOL )
+TEXTEP [ TOUCHE POUR ARRETER ] 20 -230 :CTEXTE
+] [
+TEXTEP ( PHRASE [ C EST A ] ( NOMCOUL :C ) [ DE JOUER ] ) ( 17 + ( COMPTE ( NOMCOUL :C ) ) ) 300 ( ITEM :C :CCOL )
+TEXTEP [ L ORDINATEUR JOUE ] 17 -230 :CTEXTE
+]
+DESSINEDE 1
+]
+FIN
+
+; ---- lance le de. HUMAIN vrai : les faces defilent dans l'ordre fixe 1 2 3 4 5 6,
+; et a la touche on s'arrete 2 ou 3 faces plus loin (au hasard). l'ordre etant
+; toujours le meme, un joueur adroit peut viser : le lance est moins une loterie.
+; Ordinateur : ~3 s puis face au hasard. Dans les deux cas, 1 s sur le resultat ----
+POUR LANCEDE :HUMAIN
+DONNE "F 1
+SI :HUMAIN [
+; on vide le tampon clavier : sinon une touche en attente arreterait le de aussitot
+TANTQUE [ TOUCHE? ] [ DONNE "K LISCAR ]
+DONNE "STOPDE FAUX
+TANTQUE [ NON :STOPDE ] [
+DONNE "F ( ( RESTE :F 6 ) + 1 )
+DESSINEDE :F
+ATTENDS 7
+SI TOUCHE? [ DONNE "K LISCAR DONNE "STOPDE VRAI ]
+]
+; 2 ou 3 faces de plus, en ralentissant : le joueur ne tombe pas pile sur sa touche
+DONNE "EXTRA ( ( HASARD 2 ) + 2 )
+REPETEPOUR [ I 1 :EXTRA ] [ DONNE "F ( ( RESTE :F 6 ) + 1 ) DESSINEDE :F ATTENDS ( :I * 12 ) ]
+DONNE "DEVAL :F
+] [
+REPETE 15 [ DONNE "F ( ( RESTE :F 6 ) + 1 ) DESSINEDE :F ATTENDS 6 ]
+REPETEPOUR [ I 1 4 ] [ DONNE "F ( ( RESTE :F 6 ) + 1 ) DESSINEDE :F ATTENDS ( :I * 5 ) ]
+DONNE "DEVAL ( ( HASARD 6 ) + 1 )
+]
+DESSINEDE :DEVAL
+ATTENDS 60
+RENDS :DEVAL
+FIN
+
+; ---- place le pion d'une couleur (contour + remplissage) selon sa progression.
+; variables locales : BOUGECHEVAL est appelee partout, elle ne doit ecraser
+; aucun :P de l'appelant ----
+POUR BOUGECHEVAL :C
+LOCAL [ BP BCX BCY ]
+DONNE "BP ITEM :C :PROG
+SI :BP = 0 [ DONNE "BCX ( CELLX ( ITEM :C :STX ) ) DONNE "BCY ( CELLY ( ITEM :C :STY ) ) ] [ POSCELL :C :BP DONNE "BCX ( CELLX :PCOL ) DONNE "BCY ( CELLY :PROW ) ]
+FIXETORTUE ( ITEM :C :THOUT ) FXY :BCX :BCY
+FIXETORTUE ( ITEM :C :THORSE ) FXY :BCX :BCY
+FIN
+
+; ---- cree et pose les pions (contour noir derriere, couleur devant) ----
+POUR INITHORSES
+REPETEPOUR [ C 1 4 ] [
+FIXETORTUE ( ITEM :C :THOUT ) FCC :CNOIR SPRITE :SPROUTLINE LC
+FIXETORTUE ( ITEM :C :THORSE ) FCC ( ITEM :C :CCOL ) SPRITE :SPRCHEVAL LC
+BOUGECHEVAL :C
+SI ( ITEM :C :ISACTIVE ) [ FIXETORTUE ( ITEM :C :THOUT ) MT FIXETORTUE ( ITEM :C :THORSE ) MT ] [ FIXETORTUE ( ITEM :C :THOUT ) CT FIXETORTUE ( ITEM :C :THORSE ) CT ]
+]
+FIN
+
+; ---- si le pion C tombe sur un adversaire (sur l'anneau), il le renvoie a l'ecurie ----
+POUR CAPTURE :C
+DONNE "P ITEM :C :PROG
+SI ( OU ( :P < 1 ) ( :P > :PBASE ) ) [ STOP ]
+POSCELL :C :P
+DONNE "MC :PCOL
+DONNE "MR :PROW
+DONNE "PRISE FAUX
+REPETEPOUR [ O 1 4 ] [
+SI ( ET ( ITEM :O :ISACTIVE ) ( NON ( :O = :C ) ) ) [
+DONNE "PO ITEM :O :PROG
+SI ( ET ( :PO >= 1 ) ( :PO <= :PBASE ) ) [
+POSCELL :O :PO
+SI ( ET ( :PCOL = :MC ) ( :PROW = :MR ) ) [ FIXEITEM :O :PROG 0 BOUGECHEVAL :O DONNE "PRISE VRAI ]
+]
+]
+]
+SI :PRISE [ TROMBONE ]
+FIN
+
+; ---- C atteint le centre : il a gagne ----
+POUR GAGNE :C
+DONNE "WINNER :C
+DONNE "FINI VRAI
+FIN
+
+; ---- annonce qu'un cheval vient de sortir de son ecurie ----
+POUR MESSAGESORTIE :C
+FIXETORTUE 0 CT
+SCENE [ TEXTEP ( PHRASE ( NOMCOUL :C ) [ SORT DE L ECURIE ] ) ( 17 + ( COMPTE ( NOMCOUL :C ) ) ) -100 ( ITEM :C :CCOL ) ]
+FIN
+
+; ---- regle le son du "toc" (une note grave et tres breve) ----
+POUR REGLETOC
+OCTAVE 3 DUREE 10 TEMPO 24 TIMBRE 150 VOLUME 100
+FIN
+
+; ---- un toc bref quand le pion avance d'une case ----
+POUR TOC
+JOUE "DO
+FIN
+
+; ---- le "sad trombone" quand un pion se fait renvoyer a l'ecurie : quatre notes
+; qui degringolent, la derniere bien trainante. on remet ensuite le son du toc ----
+POUR TROMBONE
+OCTAVE 3 TIMBRE 90 TEMPO 9
+DUREE 16 JOUE [ SI LA# LA ]
+DUREE 50 JOUE "SOL#
+REGLETOC
+FIN
+
+; ---- l'alarme des 3 six : deux notes stridentes (onde carree) qui alternent
+; pendant 2 s (8 notes de 250 ms), facon klaxon. on remet le son du toc apres ----
+POUR ALARME
+OCTAVE 5 DUREE 25 TEMPO 6 TIMBRE 20 VOLUME 35
+REPETE 4 [ JOUE "LA JOUE "RE ]
+REGLETOC
+FIN
+
+; ---- avance le pion de A a B (B >= A), un toc par case ----
+POUR DEPLACE :C :A :B
+REPETEPOUR [ K :A :B ] [ FIXEITEM :C :PROG :K BOUGECHEVAL :C TOC ATTENDS 3 ]
+FIN
+
+; ---- rebond : on monte jusqu'au pied de l'escalier (PBASE) puis on recule jusqu'a NP ----
+POUR REBOND :C :P :NP
+REPETEPOUR [ K ( :P + 1 ) :PBASE ] [ FIXEITEM :C :PROG :K BOUGECHEVAL :C TOC ATTENDS 3 ]
+REPETEPOUR [ K ( :PBASE - 1 ) :NP -1 ] [ FIXEITEM :C :PROG :K BOUGECHEVAL :C TOC ATTENDS 3 ]
+FIN
+
+; ---- montee de l'escalier marche par marche : il faut le chiffre exact de la
+; marche suivante (1,2,3,4,5,6) et un 6 pour entrer dans la coupe ----
+POUR MONTEESCALIER :C :DE
+LOCAL [ MP MP2 BESOIN ]
+DONNE "MP ITEM :C :PROG
+SI :MP = ( :PBASE + 6 ) [ DONNE "BESOIN 6 ] [ DONNE "BESOIN ( :MP - :PBASE + 1 ) ]
+SI ( :DE = :BESOIN ) [
+DONNE "MP2 ( :MP + 1 )
+FIXEITEM :C :PROG :MP2
+BOUGECHEVAL :C
+TOC
+SI ( :MP2 = ( :PBASE + 7 ) ) [ GAGNE :C ]
+]
+FIN
+
+; ---- applique un de DE au pion C : sortie, parcours (avec rebond), escalier, victoire ----
+POUR JOUECOUP :C :DE
+DONNE "P ITEM :C :PROG
+; sortie d'ecurie : il faut un 6
+SI :P = 0 [
+SI :DE = 6 [ FIXEITEM :C :PROG 1 BOUGECHEVAL :C TOC CAPTURE :C MESSAGESORTIE :C ATTENDS 60 ]
+STOP
+]
+; au pied de l'escalier ou dedans : on monte marche par marche
+SI ( :P >= :PBASE ) [ MONTEESCALIER :C :DE STOP ]
+; sur le parcours
+DONNE "NP ( :P + :DE )
+SI ( :NP < :PBASE ) [ DEPLACE :C ( :P + 1 ) :NP CAPTURE :C STOP ]
+SI ( :NP = :PBASE ) [ DEPLACE :C ( :P + 1 ) :PBASE CAPTURE :C STOP ]
+; trop loin : on touche le pied de l'escalier puis on recule du surplus
+REBOND :C :P ( 2 * :PBASE - :P - :DE )
+CAPTURE :C
+FIN
+
+; ---- trois 6 d'affilee : trop, c'est trop. message, alarme, retour a l'ecurie ----
+; ---- le pion rentre a l'ecurie en glissant en ligne droite depuis sa case
+; actuelle (crayon leve : pas de trace). au bout, on cale PROG a 0 ----
+POUR RENTRECURIE :C
+LOCAL [ RP X0 Y0 X1 Y1 FR GX GY ]
+DONNE "RP ITEM :C :PROG
+SI :RP = 0 [ STOP ]
+POSCELL :C :RP
+DONNE "X0 ( CELLX :PCOL ) DONNE "Y0 ( CELLY :PROW )
+DONNE "X1 ( CELLX ( ITEM :C :STX ) ) DONNE "Y1 ( CELLY ( ITEM :C :STY ) )
+REPETEPOUR [ K 1 20 ] [
+DONNE "FR ( :K / 20 )
+DONNE "GX ( :X0 + ( :X1 - :X0 ) * :FR )
+DONNE "GY ( :Y0 + ( :Y1 - :Y0 ) * :FR )
+FIXETORTUE ( ITEM :C :THOUT ) FXY :GX :GY
+FIXETORTUE ( ITEM :C :THORSE ) FXY :GX :GY
+ATTENDS 2
+]
+FIXEITEM :C :PROG 0
+BOUGECHEVAL :C
+FIN
+
+POUR TROISSIX :C
+FIXETORTUE 0 CT
+SCENE [ TEXTEP [ 3 SIX DE SUITE ! ] 16 -100 ( ITEM :C :CCOL ) ]
+ALARME
+RENTRECURIE :C
+ATTENDS 40
+FIN
+
+; ---- le tour d'un joueur ; un 6 fait rejouer, mais trois 6 de suite renvoient
+; le pion a l'ecurie et finissent le tour ----
+POUR TOURJOUEUR :C
+SI :FINI [ STOP ]
+DONNE "ENCORE VRAI
+DONNE "SIXSUITE 0
+TANTQUE [ :ENCORE ] [
+DONNE "ENCORE FAUX
+PANNEAUTOUR :C
+ATTENDS 20
+DONNE "DE LANCEDE ( ITEM :C :ISHUMAN )
+SI :DE = 6 [ DONNE "SIXSUITE ( :SIXSUITE + 1 ) ] [ DONNE "SIXSUITE 0 ]
+SI :SIXSUITE = 3 [ TROISSIX :C STOP ]
+JOUECOUP :C :DE
+SI ( ET ( :DE = 6 ) ( NON :FINI ) ) [ DONNE "ENCORE VRAI ]
+]
+FIN
+
+; ---- lit un nombre tape au clavier, entre MIN et MAX ----
+POUR LISNOMBRE :MIN :MAX
+DONNE "S LISMOT
+SI ( NON NOMBRE? :S ) [ ECRIS [ TAPE UN NOMBRE ] RENDS LISNOMBRE :MIN :MAX ]
+SI ( :S < :MIN ) [ ECRIS [ TROP PETIT ] RENDS LISNOMBRE :MIN :MAX ]
+SI ( :S > :MAX ) [ ECRIS [ TROP GRAND ] RENDS LISNOMBRE :MIN :MAX ]
+RENDS :S
+FIN
+
+; ---- choix du nombre de joueurs et de la couleur du joueur humain ----
+POUR SETUP
+ECRIS [ COMBIEN DE JOUEURS 2 A 4 ]
+DONNE "NJ LISNOMBRE 2 4
+ECRIS [ TA COULEUR 1 VERT 2 JAUNE 3 BLEU 4 ROUGE ]
+DONNE "HUMANCOLOR LISNOMBRE 1 4
+DONNE "ISACTIVE TABLEAU 4
+DONNE "ISHUMAN TABLEAU 4
+REPETEPOUR [ C 1 4 ] [ FIXEITEM :C :ISACTIVE FAUX FIXEITEM :C :ISHUMAN FAUX ]
+FIXEITEM :HUMANCOLOR :ISACTIVE VRAI
+FIXEITEM :HUMANCOLOR :ISHUMAN VRAI
+DONNE "CNT 1
+DONNE "C 1
+TANTQUE [ :CNT < :NJ ] [
+SI ( NON ( ITEM :C :ISACTIVE ) ) [ FIXEITEM :C :ISACTIVE VRAI DONNE "CNT ( :CNT + 1 ) ]
+DONNE "C ( :C + 1 )
+]
+FIN
+
+; ---- toutes les progressions a zero (chevaux a l'ecurie) ----
+POUR INITPROG
+DONNE "PROG TABLEAU 4
+REPETEPOUR [ C 1 4 ] [ FIXEITEM :C :PROG 0 ]
+FIN
+
+POUR ECRANTITRE
+FIXETORTUE 0 CT
+FCFG :CFOND
+NETTOIE
+CENTRE [ G A L O P I X ] 13 230 :CV
+CENTRE [ LE GRAND CLASSIQUE DES PETITS CHEVAUX ] 39 120 :CTEXTE
+CENTRE [ UN CHEVAL PAR JOUEUR ] 20 50 :CJ
+CENTRE [ FAIS 6 POUR SORTIR DE L ECURIE ] 31 -20 :CTEXTE
+CENTRE [ A TON TOUR APPUIE POUR ARRETER LE DE ] 36 -80 :CTEXTE
+CENTRE [ ATTEINS LE CENTRE LE PREMIER ] 28 -140 :CTEXTE
+CENTRE [ UNE TOUCHE POUR COMMENCER ] 25 -230 :CB
+DONNE "K LISCAR
+FIN
+
+POUR ECRANFIN
+; les pions sont des tortues : NETTOIE n'efface que les traits, on cache donc
+; les 8 sprites (contour + remplissage) pour ne pas les laisser trainer sur l'ecran de fin
+REPETEPOUR [ T 1 8 ] [ FIXETORTUE :T CT ]
+FIXETORTUE 0 CT
+FCFG :CFOND
+NETTOIE
+CENTRE ( PHRASE [ LE ] ( NOMCOUL :WINNER ) [ GAGNE LA PARTIE ] ) 28 60 ( ITEM :WINNER :CCOL )
+CENTRE [ UNE TOUCHE POUR QUITTER ] 25 -50 :CTEXTE
+DONNE "K LISCAR
+FIN
+
+; ---- toutes les valeurs de depart ----
+POUR REGLAGES
+DONNE "BL -790 DONNE "BT 450 DONNE "CELL 60
+DONNE "SPRCHEVAL 3 DONNE "SPROUTLINE 4
+DONNE "CNOIR [ 10 10 14 ]
+DONNE "DIEX 480 DONNE "DIECY 70
+; couleurs des joueurs (vert jaune bleu rouge)
+DONNE "CV [ 40 170 70 ]
+DONNE "CJ [ 245 210 40 ]
+DONNE "CB [ 50 140 230 ]
+DONNE "CR [ 225 55 55 ]
+DONNE "CCOL ( LISTE :CV :CJ :CB :CR )
+; couleurs du decor
+DONNE "CFOND [ 25 28 40 ]
+DONNE "CPANNEAU [ 38 42 58 ]
+DONNE "CBLANC [ 245 245 245 ]
+DONNE "CGRID [ 70 70 80 ]
+DONNE "CFLECHE [ 25 28 40 ]
+DONNE "CTEXTE [ 235 238 250 ]
+DONNE "CDE [ 248 248 248 ]
+DONNE "CDEBORD [ 200 200 205 ]
+DONNE "CPIP [ 30 30 38 ]
+; donnees par couleur : case de depart, stalle d'ecurie, numero de tortue
+DONNE "STARTI [ 56 14 28 42 ]
+DONNE "STX [ 2.5 11.5 11.5 2.5 ]
+DONNE "STY [ 2.5 2.5 11.5 11.5 ]
+; tortues : contour (1-4, derriere) puis remplissage (5-8, devant)
+DONNE "THOUT [ 1 2 3 4 ]
+DONNE "THORSE [ 5 6 7 8 ]
+; PBASE = progression au pied de l'escalier (apres le tour complet de 56 cases) ;
+; l'escalier est ensuite PBASE+1 .. PBASE+6, et la coupe (centre) PBASE+7
+DONNE "PBASE 56
+; l'anneau : 56 cases
+DONNE "LOOPC TABLEAU 56
+DONNE "LOOPR TABLEAU 56
+; le son du "toc" du pion
+REGLETOC
+FIN
+
+POUR START
+VE CT FEN
+REGLAGES
+FORMES
+BUILDLOOP
+ECRANTITRE
+SETUP
+INITPROG
+DESSINEPLATEAU
+INITHORSES
+DONNE "FINI FAUX
+DONNE "WINNER 0
+TANTQUE [ NON :FINI ] [
+REPETEPOUR [ C 1 4 ] [ SI ( ITEM :C :ISACTIVE ) [ TOURJOUEUR :C ] ]
+]
+ECRANFIN
+FIN

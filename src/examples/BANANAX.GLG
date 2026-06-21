@@ -1,0 +1,462 @@
+; BANANAX - Librement inspire de Gorilla (le jeu fourni avec QBasic).
+; Deux gorilles perches sur une ville se balancent des bananes a tour de
+; role. Chacun tape un angle et une force, la banane decrit son arc, le vent
+; la pousse et la pesanteur la rattrape. Touche l'autre gorille et la manche
+; est a toi. Premier a 3 manches gagne. Charge ce fichier puis tape START.
+; Le soleil, lui, n'a rien demande a personne.
+
+; ---- les formes : gorille au repos, gorille bras leves, et la banane ----
+POUR FORMES
+DEFSPRITE 3 [
+.....XXXXXX.....
+....XXXXXXXX....
+....XX.XX.XX....
+....XXXXXXXX....
+.....XXXXXX.....
+..XX.XXXXXX.XX..
+..XX.XXXXXX.XX..
+..XX.XXXXXX.XX..
+..XX.XXXXXX.XX..
+..XX.XXXXXX.XX..
+.....XXXXXX.....
+.....XXXXXX.....
+.....XX..XX.....
+.....XX..XX.....
+....XXX..XXX....
+....XXX..XXX....
+]
+DEFSPRITE 4 [
+..XX........XX..
+..XX........XX..
+..XX.XXXXXX.XX..
+..XXXXXXXXXXXX..
+.....XX.XX......
+....XXXXXXXX....
+....XXXXXXXX....
+....XXXXXXXX....
+.....XXXXXX.....
+.....XXXXXX.....
+.....XXXXXX.....
+.....XXXXXX.....
+.....XX..XX.....
+.....XX..XX.....
+....XXX..XXX....
+....XXX..XXX....
+]
+DEFSPRITE 5 [
+................
+................
+................
+.........XXX....
+........XXX.....
+.......XXX......
+......XXX.......
+......XXX.......
+......XXXX......
+.......XXXX.....
+........XXX.....
+.........X......
+................
+................
+................
+................
+]
+FIN
+
+; ---- un rectangle plein, par traits horizontaux : des bords bien droits ----
+POUR RECTPLEIN :XC :YBAS :W :H :COUL
+FCC :COUL FIXETAILLECRAYON 7
+DONNE "YY ( :YBAS + 3 )
+TANTQUE [ :YY < ( :YBAS + :H ) ] [
+LC FXY ( :XC - :W / 2 + 3 ) :YY BC FXY ( :XC + :W / 2 - 3 ) :YY LC
+DONNE "YY ( :YY + 5 )
+]
+FIN
+
+; ---- un gros point rond (D = epaisseur du crayon) ----
+POUR DISQUE :X :Y :D :COUL
+FCC :COUL FIXETAILLECRAYON :D
+LC FXY ( :X - 1 ) :Y BC FXY ( :X + 1 ) :Y LC
+FIN
+
+; ---- un point a la position courante du crayon (couleur et taille en cours) ----
+POUR POINTXY :X :Y
+LC FXY :X :Y BC FXY :X :Y LC
+FIN
+
+; ---- texte centre horizontalement (N = nb de caracteres), a la hauteur Y ----
+POUR CENTRE :TXT :N :Y :COUL
+FCC :COUL LC FXY ( 0 - :N * 11.67 ) :Y ETIQUETTE :TXT
+FIN
+
+; ---- distance entre deux points ----
+POUR DIST :X1 :Y1 :X2 :Y2
+RENDS RC ( ( ( :X1 - :X2 ) * ( :X1 - :X2 ) ) + ( ( :Y1 - :Y2 ) * ( :Y1 - :Y2 ) ) )
+FIN
+
+; ---- tire une ville au hasard : largeur, hauteur et couleur de chaque immeuble ----
+POUR FABRIQUEVILLE
+DONNE "NB 0
+DONNE "X -800
+TANTQUE [ :X < 800 ] [
+DONNE "NB ( :NB + 1 )
+DONNE "W ( :IMMWMIN + ( HASARD ( :IMMWMAX - :IMMWMIN + 1 ) ) )
+SI ( ( :X + :W ) > 800 ) [ DONNE "W ( 800 - :X ) ]
+DONNE "TOP ( :BTOPMIN + ( HASARD ( :BTOPMAX - :BTOPMIN + 1 ) ) )
+FIXEITEM :NB :BLEFT :X
+FIXEITEM :NB :BW :W
+FIXEITEM :NB :BTOP :TOP
+FIXEITEM :NB :BCOL ( 1 + ( HASARD :NBCOUL ) )
+DONNE "X ( :X + :W )
+]
+FIN
+
+; ---- range les fenetres allumees ou eteintes selon un motif stable ----
+POUR FENETRES :L :W :TOP
+FIXETAILLECRAYON 7
+DONNE "WX ( :L + 16 )
+TANTQUE [ :WX < ( :L + :W - 12 ) ] [
+DONNE "WY ( :BASEY + 34 )
+TANTQUE [ :WY < ( :TOP - 22 ) ] [
+SI ( ( RESTE ( ( ENT ( :WX / 8 ) ) + ( ENT ( :WY / 6 ) ) ) 5 ) < 3 ) [ FCC :CFEN ] [ FCC :CFENOFF ]
+LC FXY :WX :WY BC FXY ( :WX + 7 ) :WY LC
+DONNE "WY ( :WY + 30 )
+]
+DONNE "WX ( :WX + 26 )
+]
+FIN
+
+; ---- un immeuble : le corps colore puis ses fenetres ----
+POUR IMMEUBLE :I
+DONNE "L ITEM :I :BLEFT
+DONNE "W ITEM :I :BW
+DONNE "TOP ITEM :I :BTOP
+RECTPLEIN ( :L + :W / 2 ) :BASEY :W ( :TOP - :BASEY ) ( ITEM ( ITEM :I :BCOL ) :CIMMS )
+FENETRES :L :W :TOP
+FIN
+
+POUR VILLE
+REPETEPOUR [ I 1 :NB ] [ IMMEUBLE :I ]
+FIN
+
+; ---- la bande de sol tout en bas ----
+POUR SOL
+RECTPLEIN 0 -500 1640 ( :BASEY + 500 ) :CSOL
+FIN
+
+; ---- le ciel en degrade, du crepuscule pres de l'horizon au bleu nuit en haut.
+; sous l'horizon on garde le bleu plein (c'est la que vivent immeubles et trous) ----
+POUR CIEL
+DONNE "YB -150
+TANTQUE [ :YB < 520 ] [
+DONNE "F ( ( :YB + 150 ) / 670 )
+RECTPLEIN 0 :YB 1640 44 ( LISTE ( ARRONDI ( 60 - 36 * :F ) ) ( ARRONDI ( 92 - 56 * :F ) ) ( ARRONDI ( 158 - 72 * :F ) ) )
+DONNE "YB ( :YB + 40 )
+]
+FIN
+
+; ---- les trous creuses par les bananes : des disques couleur du ciel ----
+POUR CRATERES
+REPETEPOUR [ I 1 :NCRAT ] [ DISQUE ( ITEM :I :CRATX ) ( ITEM :I :CRATY ) ( ( ITEM :I :CRATR ) * 1.5 ) :CCIEL ]
+FIN
+
+; ---- le soleil et sa frimousse : sourire, ou bouche ronde s'il s'est pris une banane ----
+POUR SOLEIL :CHOQUE
+DISQUE :SUNX :SUNY 58 :CSOLEIL
+FCC :CSOLTRAIT FIXETAILLECRAYON 7
+POINTXY ( :SUNX - 15 ) ( :SUNY + 8 )
+POINTXY ( :SUNX + 15 ) ( :SUNY + 8 )
+FIXETAILLECRAYON 5
+SI :CHOQUE [ LC FXY :SUNX ( :SUNY - 12 ) BC CERCLE 9 LC ] [ LC FXY :SUNX :SUNY BC ARC 20 120 240 LC ]
+FIN
+
+; ---- la fleche du vent, en bas : longueur et sens montrent sa force ----
+POUR FLECHEVENT
+DONNE "WY -478
+FCC :CVENT FIXETAILLECRAYON 6
+SI :WIND = 0 [ POINTXY 0 :WY STOP ]
+DONNE "SGN 1
+SI :WIND < 0 [ DONNE "SGN -1 ]
+DONNE "LX ( :SGN * ( VALABS :WIND ) * 7 )
+LC FXY 0 :WY BC FXY :LX :WY
+FXY ( :LX - :SGN * 16 ) ( :WY + 9 )
+FXY ( :LX - :SGN * 16 ) ( :WY - 9 )
+FXY :LX :WY
+LC
+FIN
+
+; ---- scores, vent et joueur courant ----
+POUR HUD
+FCC :CTEXTE
+LC FXY -785 455 ETIQUETTE ( PHRASE [ J1 ] :SCORE1 )
+LC FXY 700 455 ETIQUETTE ( PHRASE [ J2 ] :SCORE2 )
+LC FXY -95 455 ETIQUETTE ( PHRASE [ VENT ] :WIND )
+LC FXY -785 -432 ETIQUETTE ( PHRASE [ AU TOUR DE J ] :JOUEUR )
+FIN
+
+; ---- redessine toute la scene (les gorilles sont des tortues, dessinees par-dessus) ----
+POUR DESSINE
+FIXETORTUE 0 CT
+SCENE [ NETTOIE CIEL SOL VILLE CRATERES SOLEIL FAUX FLECHEVENT HUD ]
+FIN
+
+; ---- l'immeuble dont le sommet est le plus proche de l'abscisse TX ----
+POUR BATIMENTPROCHE :TX
+DONNE "BEST 1
+DONNE "BESTD 99999
+REPETEPOUR [ I 1 :NB ] [
+DONNE "CX ( ( ITEM :I :BLEFT ) + ( ITEM :I :BW ) / 2 )
+DONNE "DD VALABS ( :CX - :TX )
+SI ( :DD < :BESTD ) [ DONNE "BESTD :DD DONNE "BEST :I ]
+]
+RENDS :BEST
+FIN
+
+; ---- pose les deux gorilles, rentres vers le centre pour laisser de la marge
+; au-dela de chacun : un tir trop fort retombe sur la ville au lieu de filer ----
+POUR PLACEGORILLES
+DONNE "G1B BATIMENTPROCHE ( 0 - :GORX )
+DONNE "G2B BATIMENTPROCHE :GORX
+DONNE "P1X ( ( ITEM :G1B :BLEFT ) + ( ITEM :G1B :BW ) / 2 )
+DONNE "P1Y ( ( ITEM :G1B :BTOP ) + :GORHALF )
+DONNE "P2X ( ( ITEM :G2B :BLEFT ) + ( ITEM :G2B :BW ) / 2 )
+DONNE "P2Y ( ( ITEM :G2B :BTOP ) + :GORHALF )
+FIN
+
+POUR INITSPRITES
+FIXETORTUE :TG1 FCC :CGOR1 SPRITE :SPRGOR LC FXY :P1X :P1Y MT
+FIXETORTUE :TG2 FCC :CGOR2 SPRITE :SPRGOR LC FXY :P2X :P2Y MT
+FIN
+
+POUR CACHEGORILLES
+FIXETORTUE :TG1 CT FIXETORTUE :TG2 CT
+FIN
+
+; ---- petit elan : le lanceur leve les bras un instant ----
+POUR WINDUP :J
+SI :J = 1 [ FIXETORTUE :TG1 ] [ FIXETORTUE :TG2 ]
+SPRITE :SPRGORUP ATTENDS 9 SPRITE :SPRGOR
+FIN
+
+; ---- la danse du vainqueur : il saute en levant les bras ----
+POUR DANSE :J
+SI :J = 1 [ FIXETORTUE :TG1 DONNE "GX :P1X DONNE "GY :P1Y ] [ FIXETORTUE :TG2 DONNE "GX :P2X DONNE "GY :P2Y ]
+REPETE 4 [ SPRITE :SPRGORUP FXY :GX ( :GY + 16 ) ATTENDS 9 SPRITE :SPRGOR FXY :GX :GY ATTENDS 9 ]
+FIN
+
+; ---- le gorille touche disparait (c'est l'ennemi du joueur courant) ----
+POUR PERDGORILLE
+SI :JOUEUR = 1 [ FIXETORTUE :TG2 CT ] [ FIXETORTUE :TG1 CT ]
+FIN
+
+; ---- la banane a-t-elle touche le gorille adverse ? ----
+POUR TOUCHEGORILLE :DIR :X :Y
+SI :DIR = 1 [ RENDS ( ( DIST :X :Y :P2X :P2Y ) < :HITR ) ]
+RENDS ( ( DIST :X :Y :P1X :P1Y ) < :HITR )
+FIN
+
+; ---- le point est-il dans un trou deja creuse (on passe au travers) ? ----
+POUR DANSCRATERE :X :Y
+DONNE "DEDANS FAUX
+REPETEPOUR [ I 1 :NCRAT ] [
+SI ( ( DIST :X :Y ( ITEM :I :CRATX ) ( ITEM :I :CRATY ) ) < ( ITEM :I :CRATR ) ) [ DONNE "DEDANS VRAI ]
+]
+RENDS :DEDANS
+FIN
+
+; ---- la banane percute-t-elle un immeuble (hors trou) ? ----
+POUR TOUCHEIMMEUBLE :X :Y
+SI ( DANSCRATERE :X :Y ) [ RENDS FAUX ]
+DONNE "HIT FAUX
+REPETEPOUR [ I 1 :NB ] [
+DONNE "BL ITEM :I :BLEFT
+SI ( ET ( :X >= :BL ) ( :X <= ( :BL + ( ITEM :I :BW ) ) ) ) [
+SI ( :Y <= ( ITEM :I :BTOP ) ) [ DONNE "HIT VRAI ]
+]
+]
+RENDS :HIT
+FIN
+
+; ---- ajoute un trou la ou la banane a explose ----
+POUR AJOUTECRATERE :X :Y
+DONNE "NCRAT ( :NCRAT + 1 )
+FIXEITEM :NCRAT :CRATX :X
+FIXEITEM :NCRAT :CRATY :Y
+FIXEITEM :NCRAT :CRATR ( 48 + ( HASARD 22 ) )
+FIN
+
+; ---- le boom : des disques qui enflent ----
+POUR EXPLOSION :X :Y
+FIXETORTUE 0 CT
+DONNE "R 14
+REPETE 6 [
+DISQUE :X :Y :R :CEXPLOA
+DISQUE :X :Y ( :R * 0.55 ) :CEXPLOB
+ATTENDS 2
+DONNE "R ( :R + 16 )
+]
+FIN
+
+; ---- le vol de la banane. Rend : 1 touche l'ennemi, 2 immeuble, 3 sol, 4 hors champ ----
+POUR VOL :DIR :GX :GY
+DONNE "S ( :VITESSE * :VSCALE )
+DONNE "VX0 ( :DIR * :S * ( COS :ANGLE ) )
+DONNE "VY0 ( :S * ( SIN :ANGLE ) )
+DONNE "WACC ( :WIND * :WINDK )
+DONNE "X0 ( :GX + :DIR * 6 )
+DONNE "Y0 ( :GY + 34 )
+FIXETORTUE :TBANANE FCC :CBANANE SPRITE :SPRBANANE LC FXY :X0 :Y0 MT
+DONNE "T 0
+DONNE "RES 0
+DONNE "SUNHIT FAUX
+TANTQUE [ :RES = 0 ] [
+DONNE "T ( :T + :DT )
+DONNE "BX ( :X0 + ( :VX0 * :T ) + ( 0.5 * :WACC * :T * :T ) )
+DONNE "BY ( :Y0 + ( :VY0 * :T ) - ( 0.5 * :G * :T * :T ) )
+SI ( OU ( :BX < -800 ) ( :BX > 800 ) ) [ DONNE "RES 4 ]
+SI ( :RES = 0 ) [ SI ( :BY < :BASEY ) [ DONNE "RES 3 ] ]
+SI ( :RES = 0 ) [ SI ( TOUCHEGORILLE :DIR :BX :BY ) [ DONNE "RES 1 ] ]
+SI ( :RES = 0 ) [ SI ( NON :SUNHIT ) [ SI ( ( DIST :BX :BY :SUNX :SUNY ) < :SUNR ) [ FIXETORTUE 0 CT SOLEIL VRAI DONNE "SUNHIT VRAI FIXETORTUE :TBANANE ] ] ]
+SI ( :RES = 0 ) [ SI ( TOUCHEIMMEUBLE :BX :BY ) [ DONNE "RES 2 ] ]
+SI ( :RES = 0 ) [ FIXETORTUE :TBANANE FCAP ( :T * 55 ) FXY :BX :BY ATTENDS 1 ]
+]
+FIXETORTUE :TBANANE CT
+RENDS :RES
+FIN
+
+; ---- lit un nombre tape au clavier, entre MIN et MAX, sinon on redemande ----
+POUR LISNOMBRE :MIN :MAX
+DONNE "S LISMOT
+SI ( NON NOMBRE? :S ) [ ECRIS [ TAPE UN NOMBRE ] RENDS LISNOMBRE :MIN :MAX ]
+SI ( :S < :MIN ) [ ECRIS [ TROP PETIT ] RENDS LISNOMBRE :MIN :MAX ]
+SI ( :S > :MAX ) [ ECRIS [ TROP GRAND ] RENDS LISNOMBRE :MIN :MAX ]
+RENDS :S
+FIN
+
+POUR LISANGLEFORCE
+ECRIS ( PHRASE [ JOUEUR ] :JOUEUR [ ANGLE 0 A 90 ] )
+DONNE "ANGLE LISNOMBRE 0 90
+ECRIS [ FORCE 10 A 100 ]
+DONNE "VITESSE LISNOMBRE 10 100
+FIN
+
+; ---- un tour de jeu : on dessine, on demande, on lance, on encaisse ----
+POUR TOUR
+DESSINE
+SI :JOUEUR = 1 [ DONNE "DIR 1 DONNE "GX :P1X DONNE "GY :P1Y ] [ DONNE "DIR -1 DONNE "GX :P2X DONNE "GY :P2Y ]
+LISANGLEFORCE
+WINDUP :JOUEUR
+DONNE "RES VOL :DIR :GX :GY
+SI :RES = 1 [ EXPLOSION :BX :BY PERDGORILLE DONNE "GAGNANT :JOUEUR STOP ]
+SI :RES = 2 [ EXPLOSION :BX :BY AJOUTECRATERE :BX :BY DESSINE ATTENDS 18 ]
+SI :RES = 3 [ EXPLOSION :BX :BY ATTENDS 14 ]
+SI :RES = 4 [ ATTENDS 10 ]
+SI :JOUEUR = 1 [ DONNE "JOUEUR 2 ] [ DONNE "JOUEUR 1 ]
+FIN
+
+; ---- une manche : nouvelle ville, nouveau vent, jusqu'a ce qu'un gorille tombe ----
+POUR MANCHE
+FABRIQUEVILLE
+PLACEGORILLES
+INITSPRITES
+DONNE "WIND ( ( HASARD 25 ) - 12 )
+DONNE "NCRAT 0
+DONNE "GAGNANT 0
+DONNE "JOUEUR :DEPART
+TANTQUE [ :GAGNANT = 0 ] [ TOUR ]
+DANSE :GAGNANT
+CACHEGORILLES
+RENDS :GAGNANT
+FIN
+
+; ---- l'annonce entre deux manches ----
+POUR ANNONCE :G
+FIXETORTUE 0 CT
+SCENE [
+NETTOIE CIEL SOL VILLE CRATERES SOLEIL FAUX FLECHEVENT HUD
+CENTRE ( PHRASE [ MANCHE GAGNEE PAR JOUEUR ] :G ) 26 70 :CBANANE
+CENTRE ( PHRASE [ SCORE ] :SCORE1 [ - ] :SCORE2 ) 11 0 :CTEXTE
+]
+ATTENDS 150
+FIN
+
+POUR ECRANTITRE
+FIXETORTUE 0 CT
+SCENE [
+NETTOIE CIEL
+CENTRE [ B A N A N A X ] 13 180 :CBANANE
+CENTRE [ DUEL DE LANCERS DE BANANES ] 26 70 :CTEXTE
+CENTRE [ LIBREMENT INSPIRE DE GORILLA ] 28 20 :CTEXTE
+CENTRE [ CHACUN SON TOUR TAPE ANGLE ET FORCE ] 35 -60 :CTEXTE
+CENTRE [ ATTENTION AU VENT ! ] 19 -110 :CTEXTE
+CENTRE [ PREMIER A 3 MANCHES GAGNE ] 25 -160 :CTEXTE
+CENTRE [ UNE TOUCHE POUR COMMENCER ] 25 -240 :CSOLEIL
+]
+DONNE "K LISCAR
+FIN
+
+POUR ECRANFIN
+FIXETORTUE :TG1 CT FIXETORTUE :TG2 CT FIXETORTUE :TBANANE CT
+FIXETORTUE 0 CT
+SCENE [
+NETTOIE CIEL
+SI :SCORE1 >= :BUT [ CENTRE [ JOUEUR 1 GAGNE LA PARTIE ! ] 26 80 :CBANANE ] [ CENTRE [ JOUEUR 2 GAGNE LA PARTIE ! ] 26 80 :CBANANE ]
+CENTRE ( PHRASE [ SCORE FINAL ] :SCORE1 [ - ] :SCORE2 ) 17 0 :CTEXTE
+]
+DONNE "K LISCAR
+FIN
+
+; ---- toutes les valeurs de depart ----
+POUR REGLAGES
+DONNE "TG1 1 DONNE "TG2 2 DONNE "TBANANE 3
+DONNE "SPRGOR 3 DONNE "SPRGORUP 4 DONNE "SPRBANANE 5
+; le ciel, le sol, les couleurs d'immeubles, les fenetres
+DONNE "CCIEL [ 60 92 158 ]
+DONNE "CSOL [ 40 46 44 ]
+DONNE "CIMMS [ [ 70 86 140 ] [ 124 80 132 ] [ 78 132 120 ] [ 152 110 86 ] [ 96 104 156 ] [ 134 122 80 ] ]
+DONNE "NBCOUL COMPTE :CIMMS
+DONNE "CFEN [ 255 226 120 ]
+DONNE "CFENOFF [ 44 50 70 ]
+; le soleil, les bananes, les gorilles, les booms, le texte, le vent
+DONNE "CSOLEIL [ 255 218 70 ]
+DONNE "CSOLTRAIT [ 120 80 20 ]
+DONNE "CBANANE [ 255 224 56 ]
+DONNE "CGOR1 [ 158 116 74 ]
+DONNE "CGOR2 [ 96 86 80 ]
+DONNE "CEXPLOA [ 255 170 44 ]
+DONNE "CEXPLOB [ 255 240 150 ]
+DONNE "CTEXTE [ 238 240 255 ]
+DONNE "CVENT [ 250 250 255 ]
+; le terrain
+DONNE "BASEY -460
+DONNE "IMMWMIN 110 DONNE "IMMWMAX 176
+DONNE "BTOPMIN -340 DONNE "BTOPMAX -150
+DONNE "GORHALF 24
+; les gorilles sont poses pres de x = -400 et x = +400 (pas tout au bord)
+DONNE "GORX 400
+DONNE "SUNX 0 DONNE "SUNY 412 DONNE "SUNR 56
+; la physique du lancer : pesanteur, pas de temps, poids du vent, rayon de touche.
+; VSCALE adoucit l'echelle de force : il faut ~80 pour atteindre l'autre gorille,
+; et il reste de la marge avant que la banane ne quitte l'ecran (~100)
+DONNE "G 4 DONNE "DT 0.4 DONNE "WINDK 0.04 DONNE "HITR 34 DONNE "VSCALE 0.72
+; le match se joue en 3 manches gagnantes
+DONNE "BUT 3
+; immeubles et crateres ranges dans des tableaux
+DONNE "BLEFT TABLEAU 20 DONNE "BW TABLEAU 20 DONNE "BTOP TABLEAU 20 DONNE "BCOL TABLEAU 20
+DONNE "CRATX TABLEAU 80 DONNE "CRATY TABLEAU 80 DONNE "CRATR TABLEAU 80
+FIN
+
+POUR START
+VE CT FEN
+REGLAGES
+FCFG :CCIEL
+FORMES
+ECRANTITRE
+DONNE "SCORE1 0 DONNE "SCORE2 0 DONNE "DEPART 1
+TANTQUE [ ET ( :SCORE1 < :BUT ) ( :SCORE2 < :BUT ) ] [
+DONNE "G MANCHE
+SI :G = 1 [ DONNE "SCORE1 ( :SCORE1 + 1 ) DONNE "DEPART 2 ] [ DONNE "SCORE2 ( :SCORE2 + 1 ) DONNE "DEPART 1 ]
+ANNONCE :G
+]
+ECRANFIN
+FIN

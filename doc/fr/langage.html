@@ -927,7 +927,161 @@
   </div>
 
   <!-- ============================================================ -->
-  <h2 id="espacedetravail">15. Espace de travail</h2>
+  <h2 id="calcul">15. Calcul littéral</h2>
+
+  <p>GoLogo sait manipuler des expressions <strong>avec des lettres</strong>, pas seulement
+  des nombres&nbsp;: les développer, les factoriser et résoudre des équations, comme en cours
+  de maths. L'expression se donne <strong>entre crochets</strong> (un mot Logo ne peut contenir
+  ni espace ni parenthèse), la multiplication peut rester implicite (<code>3x</code>,
+  <code>2(x+1)</code>) et la casse est libre (<code>X</code> = <code>x</code>). Une lettre = une
+  variable&nbsp;: <code>xy</code> vaut donc <code>x</code>&nbsp;×&nbsp;<code>y</code>. Les
+  puissances s'écrivent avec <code>^</code>, ou avec <code>**</code> ou <code>²</code>&nbsp;<code>³</code>
+  quand le <code>^</code> est malcommode au clavier (touche morte AZERTY)&nbsp;: <code>x^2</code>,
+  <code>x**2</code> et <code>x²</code> sont identiques.</p>
+
+  <p><code>DEVELOPPE</code> développe et réduit&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">DEVELOPPE</span> [ (3x+5y)(3x-5y) ]
+<span class="cmt">9X^2 - 25Y^2</span>
+
+<span class="kw">ECRIS</span> <span class="kw">DEVELOPPE</span> [ (x+2)^2 ]
+<span class="cmt">X^2 + 4X + 4</span></code></pre>
+
+  <p>La division par une expression marche aussi. Si elle <strong>tombe juste</strong>, on
+  simplifie la fraction&nbsp;; sinon on obtient le <strong>quotient et le reste</strong>, sous
+  la forme partie entière + reste sur le diviseur (la division euclidienne au sens classique
+  quand il n'y a qu'une variable&nbsp;; avec plusieurs, le quotient suit l'ordre des monômes de
+  gologo)&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">DEVELOPPE</span> [ (x^2 - 1) / (x + 1) ]
+<span class="cmt">X - 1</span>
+
+<span class="kw">ECRIS</span> <span class="kw">DEVELOPPE</span> [ (x^2 + 1) / (x - 1) ]
+<span class="cmt">X + 1 + 2/(X - 1)</span></code></pre>
+
+  <p>À une variable, on peut même <strong>additionner et simplifier des fractions</strong>&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">DEVELOPPE</span> [ 1/(x-1) + 1/(x+1) ]
+<span class="cmt">2X/(X^2 - 1)</span>
+
+<span class="kw">ECRIS</span> <span class="kw">DEVELOPPE</span> [ (x+1)/(x^2-1) ]
+<span class="cmt">1/(X - 1)</span></code></pre>
+
+  <p><code>FACTORISE</code> fait le chemin inverse. Il connaît le facteur commun et les
+  identités remarquables (<code>a^2-b^2</code>, <code>a^2&plusmn;2ab+b^2</code>)&nbsp;; à une
+  variable, il va plus loin et factorise par <strong>toutes les racines rationnelles</strong>,
+  quel que soit le degré&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">FACTORISE</span> [ 9x^2 - 25y^2 ]
+<span class="cmt">(3X + 5Y)(3X - 5Y)</span>
+
+<span class="kw">ECRIS</span> <span class="kw">FACTORISE</span> [ x^3 - 6x^2 + 11x - 6 ]
+<span class="cmt">(X - 1)(X - 2)(X - 3)</span></code></pre>
+
+  <p><code>RESOUS</code> résout une équation à une inconnue, du premier ou du second degré
+  (avec un signe <code>=</code>)&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">RESOUS</span> [ 2x + 3 = 7 ]
+<span class="cmt">X = 2</span>
+
+<span class="kw">ECRIS</span> <span class="kw">RESOUS</span> [ x^2 - 5x + 6 = 0 ]
+<span class="cmt">X = 2 ou X = 3</span>
+
+<span class="kw">ECRIS</span> <span class="kw">RESOUS</span> [ x^2 - 2 = 0 ]
+<span class="cmt">X = -√2 ou X = √2</span></code></pre>
+
+  <p><code>EVALUE</code> remplace les variables par des valeurs&nbsp;: pratique pour vérifier
+  qu'une lettre n'est au fond qu'un nombre. On peut n'en remplacer qu'une partie&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">EVALUE</span> [ x^2 + 1 ] [ x 3 ]
+<span class="cmt">10</span>
+
+<span class="kw">ECRIS</span> <span class="kw">EVALUE</span> [ x^2 + y ] [ x 2 ]
+<span class="cmt">Y + 4</span></code></pre>
+
+  <div class="note">
+    <strong>Calcul exact.</strong> Tout passe par des fractions exactes, jamais par des
+    arrondis&nbsp;: <code>RESOUS [ 2x = 1 ]</code> rend <code>X = 1/2</code>, pas
+    <code>0.5</code>.
+  </div>
+
+  <div class="note">
+    <strong>Ce que ça couvre (et ce que ça ne couvre pas).</strong> Ce n'est pas un système
+    de calcul formel complet, et c'est volontaire&nbsp;: on reste sur ce qu'on apprend au
+    collège et en seconde. <strong>Couvert</strong>&nbsp;: développement, réduction, facteur
+    commun, identités remarquables, factorisation à une variable par toutes ses racines
+    rationnelles (tout degré), équations du premier et du second degré (solutions exactes, avec
+    radical si besoin), substitution de valeurs, division et calcul de fractions à une variable
+    (simplification, ou quotient + reste). <strong>Hors champ</strong>&nbsp;: le multivariable
+    poussé (factorisation générale ou simplification de fractions à plusieurs variables) et la
+    factorisation sur les irrationnels (au-delà, l'expression est rendue telle quelle). Ces
+    primitives sont des extensions gologo, pensées pour l'âge où l'on apprend justement à
+    développer, factoriser et résoudre.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="matrices">16. Arithmétique matricielle</h2>
+
+  <p>GoLogo n'a pas de type «&nbsp;matrice&nbsp;» dédié, et il n'en a pas besoin&nbsp;:
+  une matrice se représente très bien comme une <strong>liste de lignes</strong>, chaque
+  ligne étant elle-même une liste. Ainsi <code>[ [ 1 2 ] [ 3 4 ] ]</code> est la matrice
+  2×2 dont la première ligne est 1 2 et la seconde 3 4.</p>
+
+  <p>L'outil clé pour les manipuler est <code>APPLIQUE</code> (la «&nbsp;fonction d'ordre
+  supérieur&nbsp;» <em>map</em>)&nbsp;: <code>APPLIQUE <em>liste</em> [ <em>gabarit</em> ]</code>
+  applique le gabarit à chaque élément et rend la liste des résultats, où <code>:?</code>
+  désigne l'élément courant. Par exemple <code><span class="kw">APPLIQUE</span> [ 1 2 3 ] [ <span class="var">:?</span> * <span class="num">10</span> ]</code>
+  rend <code>[ 10 20 30 ]</code>.</p>
+
+  <p>Avec ça et un peu de récursion (voir la <a href="#recursion">section&nbsp;8</a>), toute
+  l'algèbre de base tient en quelques lignes. D'abord le <strong>produit scalaire</strong> de
+  deux vecteurs&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> PRODSCALAIRE <span class="var">:A</span> <span class="var">:B</span>
+  <span class="kw">SI</span> <span class="kw">VIDE?</span> <span class="var">:A</span> [ <span class="kw">RENDS</span> <span class="num">0</span> ]
+  <span class="kw">RENDS</span> ( ( <span class="kw">PREMIER</span> <span class="var">:A</span> ) * ( <span class="kw">PREMIER</span> <span class="var">:B</span> ) ) + ( <span class="kw">PRODSCALAIRE</span> ( <span class="kw">SAUFPREMIER</span> <span class="var">:A</span> ) ( <span class="kw">SAUFPREMIER</span> <span class="var">:B</span> ) )
+<span class="kw">FIN</span></code></pre>
+
+  <p>La <strong>transposée</strong> (les lignes deviennent les colonnes) s'écrit joliment
+  avec <code>APPLIQUE</code>&nbsp;: à chaque étape on prend le premier élément de chaque ligne
+  pour former une colonne, puis on recommence avec le reste des lignes&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> TRANSPOSEM <span class="var">:M</span>
+  <span class="kw">SI</span> <span class="kw">VIDE?</span> ( <span class="kw">PREMIER</span> <span class="var">:M</span> ) [ <span class="kw">RENDS</span> [] ]
+  <span class="kw">RENDS</span> <span class="kw">METSPREMIER</span> ( <span class="kw">APPLIQUE</span> <span class="var">:M</span> [ <span class="kw">PREMIER</span> <span class="var">:?</span> ] ) ( <span class="kw">TRANSPOSEM</span> ( <span class="kw">APPLIQUE</span> <span class="var">:M</span> [ <span class="kw">SAUFPREMIER</span> <span class="var">:?</span> ] ) )
+<span class="kw">FIN</span></code></pre>
+
+  <p>Le <strong>produit de deux matrices</strong> en découle&nbsp;: chaque case du résultat est
+  le produit scalaire d'une ligne de la première par une colonne de la seconde, c'est-à-dire
+  une ligne de la transposée de la seconde&nbsp;:</p>
+
+  <pre><code><span class="kw">POUR</span> LIGNEPROD <span class="var">:LIGNE</span> <span class="var">:BT</span>
+  <span class="kw">RENDS</span> <span class="kw">APPLIQUE</span> <span class="var">:BT</span> [ <span class="kw">PRODSCALAIRE</span> <span class="var">:LIGNE</span> <span class="var">:?</span> ]
+<span class="kw">FIN</span>
+
+<span class="kw">POUR</span> PRODMAT <span class="var">:A</span> <span class="var">:B</span>
+  <span class="kw">DONNE</span> <span class="str">"BT</span> <span class="kw">TRANSPOSEM</span> <span class="var">:B</span>
+  <span class="kw">RENDS</span> <span class="kw">APPLIQUE</span> <span class="var">:A</span> [ <span class="kw">LIGNEPROD</span> <span class="var">:?</span> <span class="var">:BT</span> ]
+<span class="kw">FIN</span></code></pre>
+
+  <p>À l'usage&nbsp;:</p>
+
+  <pre><code><span class="kw">ECRIS</span> <span class="kw">PRODMAT</span> [ [ <span class="num">1</span> <span class="num">2</span> ] [ <span class="num">3</span> <span class="num">4</span> ] ] [ [ <span class="num">5</span> <span class="num">6</span> ] [ <span class="num">7</span> <span class="num">8</span> ] ]
+<span class="cmt">[19 22] [43 50]</span></code></pre>
+
+  <div class="note">
+    <strong>La voie Logo.</strong> C'est exactement l'approche des Logo
+    historiques&nbsp;: pas de primitive matricielle, mais des listes et des
+    fonctions d'ordre supérieur (<code>APPLIQUE</code>, <code>REDUIS</code>,
+    <code>FILTRE</code>) qui rendent ces opérations naturelles. Le petit
+    <code>LIGNEPROD</code>, avec son paramètre nommé <code>:LIGNE</code>, sert juste à éviter
+    l'ambiguïté du <code>:?</code> quand un <code>APPLIQUE</code> en imbrique un autre. Pour de
+    très grands tableaux de nombres, voir aussi les tableaux multi-dimensionnels
+    <code>TABLEAUMD</code> / <code>ITEMMD</code> / <code>FIXEITEMMD</code>.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="espacedetravail">17. Espace de travail</h2>
 
   <p>GoLogo conserve en mémoire toutes les procédures et variables définies pendant
   la session. On peut les consulter et les gérer&nbsp;:</p>
@@ -941,7 +1095,7 @@
 <span class="kw">RAZ</span>                <span class="cmt">; remet tout à zéro (demande confirmation)</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="messages">16. Messages d'erreur courants</h2>
+  <h2 id="messages">18. Messages d'erreur courants</h2>
 
   <p>Quand GoLogo ne comprend pas ce qu'on lui demande, il répond avec un
   message d'erreur explicite&nbsp;:</p>

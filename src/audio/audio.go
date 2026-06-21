@@ -34,8 +34,9 @@ func New() *Player {
 }
 
 // joue une note de freq Hz pendant ms et bloque jusqu'a la fin. la forme d'onde
-// depend du timbre. freq <= 0 (ou pas d'audio) : on attend juste la duree, en silence
-func (p *Player) Tone(freq float64, ms, timbre int) {
+// depend du timbre, le niveau du volume (0 a 100). freq <= 0 (ou pas d'audio) : on
+// attend juste la duree, en silence
+func (p *Player) Tone(freq float64, ms, timbre, volume int) {
 	if ms <= 0 {
 		return
 	}
@@ -43,7 +44,7 @@ func (p *Player) Tone(freq float64, ms, timbre int) {
 		time.Sleep(time.Duration(ms) * time.Millisecond)
 		return
 	}
-	pl := p.ctx.NewPlayer(bytes.NewReader(wave(freq, ms, timbre)))
+	pl := p.ctx.NewPlayer(bytes.NewReader(wave(freq, ms, timbre, volume)))
 	pl.Play()
 	for pl.IsPlaying() {
 		time.Sleep(2 * time.Millisecond)
@@ -52,12 +53,18 @@ func (p *Player) Tone(freq float64, ms, timbre int) {
 }
 
 // genere un signal 16 bits mono, avec une courte attaque/extinction pour eviter
-// les claquements. la forme depend du timbre (cf sample)
-func wave(freq float64, ms, timbre int) []byte {
+// les claquements. la forme depend du timbre (cf sample), l'amplitude du volume
+func wave(freq float64, ms, timbre, volume int) []byte {
 	n := sampleRate * ms / 1000
 	period := float64(sampleRate) / freq
 	fade := sampleRate / 200 // ~5 ms
-	const amp = 6000
+	// volume 0 a 100 : a fond (100) on retrouve l'ancien niveau
+	if volume < 0 {
+		volume = 0
+	} else if volume > 100 {
+		volume = 100
+	}
+	amp := 6000 * float64(volume) / 100
 	buf := bytes.NewBuffer(make([]byte, 0, n*2))
 	for i := 0; i < n; i++ {
 		phase := math.Mod(float64(i), period) / period // position 0..1 dans la periode

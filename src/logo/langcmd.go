@@ -7,6 +7,10 @@ import "strings"
 func (i *Interp) registerLang() {
 	i.register(cmd(0, func(in *Interp, a []Value) error { in.setLang("FR"); return nil }), "FRANCAIS", "FR")
 	i.register(cmd(0, func(in *Interp, a []Value) error { in.setLang("EN"); return nil }), "ANGLAIS")
+	// rend la langue courante (FR/EN), pour les programmes bilingues
+	i.register(&primitive{arity: 0, reporter: true, fn: func(in *Interp, a []Value) (Value, error) {
+		return WordValue(in.Lang()), nil
+	}}, "LANGUE")
 }
 
 // ajoute les noms anglais (en + enAliases) de chaque primitive

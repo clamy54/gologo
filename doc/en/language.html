@@ -904,7 +904,155 @@
   </div>
 
   <!-- ============================================================ -->
-  <h2 id="workspace">15. Workspace</h2>
+  <h2 id="calcul">15. Symbolic algebra</h2>
+
+  <p>GoLogo can handle expressions <strong>with letters</strong>, not just numbers&nbsp;:
+  expanding them, factoring them and solving equations, just like in maths class. The
+  expression is given <strong>between brackets</strong> (a Logo word cannot contain a space or
+  a parenthesis), multiplication may stay implicit (<code>3x</code>, <code>2(x+1)</code>) and
+  case is ignored (<code>X</code> = <code>x</code>). One letter = one variable, so <code>xy</code>
+  means <code>x</code>&nbsp;×&nbsp;<code>y</code>. Powers are written with <code>^</code>, or with
+  <code>**</code> or <code>²</code>&nbsp;<code>³</code> when <code>^</code> is awkward to type (a
+  dead key on AZERTY keyboards)&nbsp;: <code>x^2</code>, <code>x**2</code> and <code>x²</code> are
+  the same.</p>
+
+  <p><code>EXPAND</code> expands and simplifies&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">EXPAND</span> [ (3x+5y)(3x-5y) ]
+<span class="cmt">9X^2 - 25Y^2</span>
+
+<span class="kw">PRINT</span> <span class="kw">EXPAND</span> [ (x+2)^2 ]
+<span class="cmt">X^2 + 4X + 4</span></code></pre>
+
+  <p>Division by an expression also works. When it <strong>comes out even</strong>, it
+  simplifies the fraction&nbsp;; otherwise you get the <strong>quotient and remainder</strong>,
+  as a whole part plus remainder over the divisor (the classic Euclidean division when there is
+  a single variable&nbsp;; with several, the quotient follows gologo's monomial order)&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">EXPAND</span> [ (x^2 - 1) / (x + 1) ]
+<span class="cmt">X - 1</span>
+
+<span class="kw">PRINT</span> <span class="kw">EXPAND</span> [ (x^2 + 1) / (x - 1) ]
+<span class="cmt">X + 1 + 2/(X - 1)</span></code></pre>
+
+  <p>With a single variable you can even <strong>add and simplify fractions</strong>&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">EXPAND</span> [ 1/(x-1) + 1/(x+1) ]
+<span class="cmt">2X/(X^2 - 1)</span>
+
+<span class="kw">PRINT</span> <span class="kw">EXPAND</span> [ (x+1)/(x^2-1) ]
+<span class="cmt">1/(X - 1)</span></code></pre>
+
+  <p><code>FACTOR</code> goes the other way. It knows the common factor and the remarkable
+  identities (<code>a^2-b^2</code>, <code>a^2&plusmn;2ab+b^2</code>)&nbsp;; with a single
+  variable it goes further and factors by <strong>all rational roots</strong>, whatever the
+  degree&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">FACTOR</span> [ 9x^2 - 25y^2 ]
+<span class="cmt">(3X + 5Y)(3X - 5Y)</span>
+
+<span class="kw">PRINT</span> <span class="kw">FACTOR</span> [ x^3 - 6x^2 + 11x - 6 ]
+<span class="cmt">(X - 1)(X - 2)(X - 3)</span></code></pre>
+
+  <p><code>SOLVE</code> solves a one-unknown equation, of the first or second degree (with an
+  <code>=</code> sign)&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">SOLVE</span> [ 2x + 3 = 7 ]
+<span class="cmt">X = 2</span>
+
+<span class="kw">PRINT</span> <span class="kw">SOLVE</span> [ x^2 - 5x + 6 = 0 ]
+<span class="cmt">X = 2 or X = 3</span>
+
+<span class="kw">PRINT</span> <span class="kw">SOLVE</span> [ x^2 - 2 = 0 ]
+<span class="cmt">X = -√2 or X = √2</span></code></pre>
+
+  <p><code>EVALUATE</code> replaces variables with values&nbsp;: handy to check that a letter is
+  really just a number. You may replace only some of them&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">EVALUATE</span> [ x^2 + 1 ] [ x 3 ]
+<span class="cmt">10</span>
+
+<span class="kw">PRINT</span> <span class="kw">EVALUATE</span> [ x^2 + y ] [ x 2 ]
+<span class="cmt">Y + 4</span></code></pre>
+
+  <div class="note">
+    <strong>Exact arithmetic.</strong> Everything goes through exact fractions, never
+    rounding&nbsp;: <code>SOLVE [ 2x = 1 ]</code> outputs <code>X = 1/2</code>, not
+    <code>0.5</code>.
+  </div>
+
+  <div class="note">
+    <strong>What it covers (and what it does not).</strong> This is not a full computer
+    algebra system, and that is on purpose&nbsp;: it stays with what you learn in middle and
+    early high school. <strong>Covered</strong>&nbsp;: expanding, simplifying, common factor,
+    remarkable identities, single-variable factoring by all rational roots (any degree), first-
+    and second-degree equations (exact solutions, with a radical when needed), substituting
+    values, and single-variable division and fraction arithmetic (simplification, or quotient +
+    remainder). <strong>Out of scope</strong>&nbsp;: heavy multivariable work (general factoring
+    or simplifying fractions in several variables) and factoring over irrationals (beyond that,
+    the expression is returned unchanged). These primitives are gologo extensions, meant for the
+    age when you learn exactly how to expand, factor and solve.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="matrices">16. Matrix arithmetic</h2>
+
+  <p>GoLogo has no dedicated «&nbsp;matrix&nbsp;» type, and it doesn't need one&nbsp;: a matrix
+  is nicely represented as a <strong>list of rows</strong>, each row being itself a list. So
+  <code>[ [ 1 2 ] [ 3 4 ] ]</code> is the 2×2 matrix whose first row is 1 2 and second row 3 4.</p>
+
+  <p>The key tool to work on them is <code>MAP</code> (the higher-order <em>map</em>
+  function)&nbsp;: <code>MAP <em>list</em> [ <em>template</em> ]</code> applies the template
+  to each element and returns the list of results, where <code>:?</code> is the current element.
+  For instance <code><span class="kw">MAP</span> [ 1 2 3 ] [ <span class="var">:?</span> * <span class="num">10</span> ]</code>
+  returns <code>[ 10 20 30 ]</code>.</p>
+
+  <p>With that and a bit of recursion (see <a href="#recursion">section&nbsp;8</a>), all the basic
+  algebra fits in a few lines. First the <strong>dot product</strong> of two vectors&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> DOTPRODUCT <span class="var">:A</span> <span class="var">:B</span>
+  <span class="kw">IF</span> <span class="kw">EMPTY?</span> <span class="var">:A</span> [ <span class="kw">OUTPUT</span> <span class="num">0</span> ]
+  <span class="kw">OUTPUT</span> ( ( <span class="kw">FIRST</span> <span class="var">:A</span> ) * ( <span class="kw">FIRST</span> <span class="var">:B</span> ) ) + ( <span class="kw">DOTPRODUCT</span> ( <span class="kw">BUTFIRST</span> <span class="var">:A</span> ) ( <span class="kw">BUTFIRST</span> <span class="var">:B</span> ) )
+<span class="kw">END</span></code></pre>
+
+  <p>The <strong>transpose</strong> (rows become columns) reads nicely with <code>MAP</code>&nbsp;:
+  at each step we take the first element of every row to form a column, then repeat with the rest
+  of the rows&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> TRANSPOSEM <span class="var">:M</span>
+  <span class="kw">IF</span> <span class="kw">EMPTY?</span> ( <span class="kw">FIRST</span> <span class="var">:M</span> ) [ <span class="kw">OUTPUT</span> [] ]
+  <span class="kw">OUTPUT</span> <span class="kw">FPUT</span> ( <span class="kw">MAP</span> <span class="var">:M</span> [ <span class="kw">FIRST</span> <span class="var">:?</span> ] ) ( <span class="kw">TRANSPOSEM</span> ( <span class="kw">MAP</span> <span class="var">:M</span> [ <span class="kw">BUTFIRST</span> <span class="var">:?</span> ] ) )
+<span class="kw">END</span></code></pre>
+
+  <p>The <strong>product of two matrices</strong> follows&nbsp;: each cell of the result is the dot
+  product of a row of the first by a column of the second, that is, a row of the second's transpose&nbsp;:</p>
+
+  <pre><code><span class="kw">TO</span> ROWPRODUCT <span class="var">:ROW</span> <span class="var">:BT</span>
+  <span class="kw">OUTPUT</span> <span class="kw">MAP</span> <span class="var">:BT</span> [ <span class="kw">DOTPRODUCT</span> <span class="var">:ROW</span> <span class="var">:?</span> ]
+<span class="kw">END</span>
+
+<span class="kw">TO</span> MATPRODUCT <span class="var">:A</span> <span class="var">:B</span>
+  <span class="kw">MAKE</span> <span class="str">"BT</span> <span class="kw">TRANSPOSEM</span> <span class="var">:B</span>
+  <span class="kw">OUTPUT</span> <span class="kw">MAP</span> <span class="var">:A</span> [ <span class="kw">ROWPRODUCT</span> <span class="var">:?</span> <span class="var">:BT</span> ]
+<span class="kw">END</span></code></pre>
+
+  <p>In use&nbsp;:</p>
+
+  <pre><code><span class="kw">PRINT</span> <span class="kw">MATPRODUCT</span> [ [ <span class="num">1</span> <span class="num">2</span> ] [ <span class="num">3</span> <span class="num">4</span> ] ] [ [ <span class="num">5</span> <span class="num">6</span> ] [ <span class="num">7</span> <span class="num">8</span> ] ]
+<span class="cmt">[19 22] [43 50]</span></code></pre>
+
+  <div class="note">
+    <strong>The Logo way.</strong> This is exactly how historical Logos do
+    it&nbsp;: no matrix primitive, but lists and higher-order functions (<code>MAP</code>,
+    <code>REDUCE</code>, <code>FILTER</code>) that make these operations natural. The little
+    <code>ROWPRODUCT</code>, with its named parameter <code>:ROW</code>, is only there to avoid
+    the ambiguity of <code>:?</code> when one <code>MAP</code> nests another. For very large
+    number grids, see also the multi-dimensional arrays <code>MDARRAY</code> /
+    <code>MDITEM</code> / <code>MDSETITEM</code>.
+  </div>
+
+  <!-- ============================================================ -->
+  <h2 id="workspace">17. Workspace</h2>
 
   <p>GoLogo keeps in memory all the procedures and variables defined during the
   session. You can inspect and manage them&nbsp;:</p>
@@ -918,7 +1066,7 @@
 <span class="kw">RESET</span>              <span class="cmt">; resets everything (asks for confirmation)</span></code></pre>
 
   <!-- ============================================================ -->
-  <h2 id="messages">16. Common error messages</h2>
+  <h2 id="messages">18. Common error messages</h2>
 
   <p>When GoLogo does not understand what you ask, it replies with a clear error
   message. The messages keep their original French wording&nbsp;; switch to English with

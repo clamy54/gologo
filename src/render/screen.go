@@ -39,7 +39,7 @@ const (
 	textScale  = 2
 	lineH      = 13*textScale + 6
 	margin     = 16
-	textCols   = 40 // grille texte adressable (FCURS/ME) : 40 colonnes
+	textCols   = 80 // grille texte adressable (FCURS/ME) : 80 colonnes (remplit la largeur)
 	textRows   = 25 // ... x 25 lignes
 )
 
@@ -188,12 +188,12 @@ type Screen struct {
 
 	userShapes map[int]turtleShape // formes 16x16 definies par DEFSPRITE (index >= 3)
 
-	// grille texte adressable 40x25 (FCURS/ME), a la place d'un journal qui defile.
+	// grille texte adressable 80x25 (FCURS/ME), a la place d'un journal qui defile.
 	// grid = caracteres, gridFg = couleur par cellule, curseur = ou on ecrit
 	grid       [textRows][textCols]rune
 	gridFg     [textRows][textCols]color.RGBA
 	curRow     int  // ligne du curseur texte (0..24)
-	curCol     int  // colonne du curseur texte (0..39)
+	curCol     int  // colonne du curseur texte (0..79)
 	meLines    int  // ME : nb de lignes texte visibles (1..25), defaut 25
 	meTextOnly bool // ME 25 : plein texte (cache le champ graphique)
 
@@ -259,6 +259,10 @@ type Screen struct {
 	pgOverlay  bool                // aide ouverte en superposition (F1) : aucune tache n'attend pgDone
 	pgExtended bool                // aide complete (Shift+F1 / AIDE) vs debutant (F1 = commandes d'origine)
 	pgDone     chan struct{}
+
+	// preference qui survit a la fermeture de l'aide : Shift+F1 bascule debutant <->
+	// complet, et F1 rouvre dans ce mode-la (au lieu de toujours retomber en debutant)
+	helpExtended bool
 
 	// recherche dans l'aide generale (Ctrl+F ou '/') : saisie dans la barre du bas,
 	// puis surbrillance jaune des commandes dont la fiche contient la phrase
@@ -503,7 +507,7 @@ func (s *Screen) TurtlesMoved(states []turtle.State, current int) {
 	s.invalidate()
 }
 
-// --- grille texte 40x25 (FCURS/ME) ---
+// --- grille texte 80x25 (FCURS/ME) ---
 
 // borne v dans [lo, hi]
 func clampInt(v, lo, hi int) int {
@@ -716,6 +720,16 @@ func (s *Screen) draw(gtx layout.Context) {
 		// sur 600 ms avec peu de redraws, sans faire clignoter la decoration.
 		gtx.Execute(op.InvalidateCmd{At: gtx.Now.Add(100 * time.Millisecond)})
 	}
+	// Un programme tourne (jeu, animation...) : on garde la boucle d'evenements en
+	// vie a la cadence ecran, pour que chaque image redessinee s'affiche tout de
+	// suite. Sur Wayland, un win.Invalidate() isole depuis la tache de fond ne
+	// reveille pas toujours une boucle endormie : une animation espacee par des
+	// ATTENDS (le de qui tourne) reste alors figee jusqu'au prochain evenement
+	// clavier. Ce battement de coeur "in-frame", lui, est fiable. Au repos (pas de
+	// programme en cours), on ne programme rien : cpu quasi nul.
+	if s.running.Load() {
+		gtx.Execute(op.InvalidateCmd{At: gtx.Now.Add(16 * time.Millisecond)})
+	}
 	// Fond noir sur toute la fenetre (evite les bords blancs sur les cotes).
 	paint.FillShape(gtx.Ops, color.NRGBA{A: 255}, clip.Rect{Max: win}.Op())
 	sc := float32(win.X) / ScreenW
@@ -795,7 +809,7 @@ func (s *Screen) compose() {
 		draw.Draw(s.frame, bord, uniform(rgba(border)), image.Point{}, draw.Src) // bord FCB
 		fr := image.Rect(fieldX, fieldY, fieldX+fieldW, fieldY+fieldH)
 		draw.Draw(s.frame, fr, uniform(rgba(bg)), image.Point{}, draw.Src) // fond champ
-		draw.Draw(s.frame, fr, s.fieldImg, image.Point{}, draw.Over)                // traits
+		draw.Draw(s.frame, fr, s.fieldImg, image.Point{}, draw.Over)       // traits
 		for _, tst := range tsts {
 			if tst.Visible {
 				s.drawTurtle(tst, ushapes)

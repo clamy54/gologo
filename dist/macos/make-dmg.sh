@@ -9,7 +9,7 @@
 #   xcrun stapler staple GoLogo-<ver>.dmg
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ver="${1:-2.0}"
+ver="${1:-2.1}"
 app="$here/build/GoLogo.app"
 
 if [ ! -d "$app" ]; then

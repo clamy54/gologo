@@ -26,8 +26,8 @@ func gridNewline(g *[textRows][textCols]rune, fg *[textRows][textCols]color.RGBA
 	}
 }
 
-// ramene le curseur sur une cellule valide : arrive au bord droit (col 40), on
-// passe au debut de la ligne suivante
+// ramene le curseur sur une cellule valide : arrive au bord droit (apres la
+// derniere colonne), on passe au debut de la ligne suivante
 func gridNormalize(g *[textRows][textCols]rune, fg *[textRows][textCols]color.RGBA, cr, cc *int) {
 	if *cc >= textCols {
 		gridNewline(g, fg, cr, cc)
@@ -65,7 +65,7 @@ func gridClear(g *[textRows][textCols]rune, fg *[textRows][textCols]color.RGBA, 
 	*cr, *cc = 0, 0
 }
 
-// FCURS (screenControl) : place le curseur texte (col 0-39, lig 0-24)
+// FCURS (screenControl) : place le curseur texte (col 0-79, lig 0-24)
 func (s *Screen) SetCursor(col, lig int) {
 	s.mu.Lock()
 	s.curCol = clampInt(col, 0, textCols-1)
@@ -84,7 +84,7 @@ func (s *Screen) SetTextLines(n int) {
 	s.invalidate()
 }
 
-// dessine la grille texte 40x25 (la fenetre visible depend de ME et de la place) ;
+// dessine la grille texte 80x25 (la fenetre visible depend de ME et de la place) ;
 // l'invite REPL (ou la saisie LL) est ecrite au curseur dans une copie
 func (s *Screen) drawGrid(top int, grid [textRows][textCols]rune, fg [textRows][textCols]color.RGBA, curRow, curCol, meLines int, col color.RGBA) {
 	// invite : au repos (REPL) ou pendant une lecture de ligne LL (montre la saisie)
@@ -94,7 +94,7 @@ func (s *Screen) drawGrid(top int, grid [textRows][textCols]rune, fg [textRows][
 		prompt, in, inCol = true, s.kbInput, s.kbInputCol
 	}
 	// ecrit l'invite "?"+saisie dans la copie depuis le curseur, et note la cellule
-	// du curseur de saisie (position lineaire row*40+col, -1 si pas d'invite)
+	// du curseur de saisie (position lineaire row*textCols+col, -1 si pas d'invite)
 	curCell := -1
 	if prompt {
 		cr, cc := curRow, curCol
