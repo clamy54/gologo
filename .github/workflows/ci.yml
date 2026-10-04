@@ -1,0 +1,83 @@
+# CI : a chaque push et pull request, verification statique, tests et compilation
+# de l'executable sur les trois plateformes. Gio a besoin de CGO et des
+# bibliotheques graphiques natives : chaque OS compile donc pour lui-meme.
+# La version de Go est celle de src/go.mod.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: src/go.mod
+          cache-dependency-path: src/go.sum
+      - name: Dependances systeme (Gio, son)
+        run: bash .github/install-deps-linux.sh
+      - name: Mise en forme (gofmt)
+        working-directory: src
+        run: |
+          mal="$(gofmt -l .)"
+          if [ -n "$mal" ]; then
+            echo "Fichiers a passer a gofmt :" >&2
+            echo "$mal" >&2
+            exit 1
+          fi
+      - name: go vet
+        working-directory: src
+        run: go vet ./...
+      - name: Tests
+        working-directory: src
+        run: go test ./...
+      - name: Compiler
+        run: bash tools/build/build-linux.sh
+
+  windows:
+    runs-on: windows-latest # x64 ; gcc (mingw-w64) est fourni par l'image
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: src/go.mod
+          cache-dependency-path: src/go.sum
+      - name: go vet
+        working-directory: src
+        run: go vet ./...
+      - name: Tests
+        working-directory: src
+        run: go test ./...
+      - name: Compiler
+        run: ./tools/build/build-windows.ps1
+
+  macos:
+    # arm64 (Apple Silicon), la seule cible Mac distribuee
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: src/go.mod
+          cache-dependency-path: src/go.sum
+      - name: go vet
+        working-directory: src
+        run: go vet ./...
+      - name: Tests
+        working-directory: src
+        run: go test ./...
+      - name: Compiler
+        run: bash tools/build/build-macos.sh
