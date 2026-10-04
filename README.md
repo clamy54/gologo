@@ -42,8 +42,9 @@ Ready-to-use binaries for **Windows, Linux and macOS** are published on the
 - **Windows** — download and run the installer `GoLogo-Setup-x.x.exe`.
 - **Linux (Debian / Ubuntu)** — download the `.deb` package and install it with apt:
   `sudo apt install ./gologo_x.x_amd64.deb`.
-- **macOS (Apple Silicon only — M1 and later)** — unzip the archive and drag
-  `GoLogo.app` into Applications. Intel-based Macs are **not** supported.
+- **macOS (Apple Silicon only — M1 and later, macOS 13 Ventura or newer)** — open
+  `GoLogo-x.x.dmg` and drag `GoLogo.app` into Applications. Intel-based Macs are
+  **not** supported.
 
 On **Windows and macOS the binaries are not signed** (code signing certificates are
 expensive and not justified for a free application), so your system may show a
@@ -57,7 +58,7 @@ click-by-click steps for each platform.
 GoLogo uses [Gio](https://gioui.org), which needs **CGO** and the native GUI
 libraries of each platform, so it is built on each OS.
 
-Requirements: **Go 1.25+**, a C toolchain, and the Gio system dependencies
+Requirements: **Go 1.27+**, a C toolchain, and the Gio system dependencies
 (see the [Gio install guide](https://gioui.org/doc/install)).
 
 Requirements on ubuntu 26.04 :
@@ -120,9 +121,9 @@ Des binaires prêts à l'emploi pour **Windows, Linux et macOS** sont publiés s
 - **Windows** — téléchargez et lancez l'installeur `GoLogo-Setup-x.x.exe`.
 - **Linux (Debian / Ubuntu)** — téléchargez le paquet `.deb` et installez-le avec apt :
   `sudo apt install ./gologo_x.x_amd64.deb`.
-- **macOS (Apple Silicon uniquement — M1 et ultérieurs)** — décompressez l'archive et
-  glissez `GoLogo.app` dans Applications. Les Mac à processeur Intel ne sont **pas**
-  pris en charge.
+- **macOS (Apple Silicon uniquement — M1 et ultérieurs, macOS 13 Ventura ou plus
+  récent)** — ouvrez `GoLogo-x.x.dmg` et glissez `GoLogo.app` dans Applications. Les
+  Mac à processeur Intel ne sont **pas** pris en charge.
 
 Sous **Windows et macOS, les binaires ne sont pas signés** (les certificats de
 signature de code sont coûteux et ne se justifient pas pour une application gratuite) :
@@ -137,7 +138,7 @@ GoLogo utilise [Gio](https://gioui.org), qui nécessite **CGO** et les
 bibliothèques graphiques natives de chaque plateforme : on le compile donc sur
 chaque OS.
 
-Prérequis : **Go 1.25+**, une chaîne C, et les dépendances système de Gio
+Prérequis : **Go 1.27+**, une chaîne C, et les dépendances système de Gio
 (voir le [guide d'installation Gio](https://gioui.org/doc/install)).
 
 Dépendances nécessaires sur ubuntu 26.04 :

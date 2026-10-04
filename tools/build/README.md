@@ -4,7 +4,7 @@ GoLogo uses [Gio](https://gioui.org), which relies on **CGO** and the native GUI
 libraries of each platform. It is therefore built **on each target OS** rather
 than cross-compiled.
 
-Common requirements: **Go 1.25+** and a C compiler.
+Common requirements: **Go 1.27+** and a C compiler.
 
 | Platform | Script | Extra requirements |
 |----------|--------|--------------------|

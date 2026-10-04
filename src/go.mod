@@ -1,6 +1,6 @@
 module beroot.com/logo
 
-go 1.25.4
+go 1.27.1
 
 require (
 	gioui.org v0.10.0

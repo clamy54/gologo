@@ -4,7 +4,10 @@
 ; Compilation de l'installeur : ISCC.exe gologo.iss  (ou via l'IDE Inno Setup).
 
 #define AppName "GoLogo"
-#define AppVersion "2.1"
+; La version peut etre imposee a la compilation : ISCC.exe /DAppVersion=x.y gologo.iss
+#ifndef AppVersion
+  #define AppVersion "2.2"
+#endif
 #define AppPublisher "Cyril Lamy"
 #define AppExe "gologo.exe"
 
@@ -23,6 +26,9 @@ SetupIconFile=..\..\tools\build\icons\gologo.ico
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
+; L'executable est un binaire amd64 : on n'installe que la ou il peut tourner
+; (x64, ou Arm64 avec emulation x64), pas sur un Windows 32 bits.
+ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 
 [Languages]

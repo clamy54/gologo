@@ -1,6 +1,6 @@
 # Compile GoLogo pour Windows, avec icone et metadonnees embarquees dans l'exe.
 # Sortie : tools/build/bin/windows/gologo.exe
-# Prerequis : Go 1.25+, un compilateur C (ex. MSYS2/mingw-w64), CGO active.
+# Prerequis : Go 1.27+, un compilateur C (ex. MSYS2/mingw-w64), CGO active.
 $ErrorActionPreference = "Stop"
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -21,6 +21,10 @@ if ($LASTEXITCODE -ne 0) { throw "goversioninfo a echoue" }
 Push-Location $src
 try {
     $env:CGO_ENABLED = "1"
+    # Cible fixee : la ressource (.syso) est generee en amd64 et l'installeur est
+    # prevu pour du 64 bits ; on n'herite pas d'un GOOS/GOARCH de l'environnement.
+    $env:GOOS = "windows"
+    $env:GOARCH = "amd64"
     & go build -trimpath -ldflags "-H=windowsgui -s -w" -o (Join-Path $bin "gologo.exe") ./cmd/gologo
     if ($LASTEXITCODE -ne 0) { throw "go build a echoue" }
 }
