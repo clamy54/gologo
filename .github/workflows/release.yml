@@ -1,4 +1,4 @@
-# Release : push d'un tag v* -> executables et paquets des 3 OS -> release GitHub
+# Release : push d'un tag de version (2.2, 2.2.1...) -> executables et paquets des 3 OS -> release GitHub
 # en brouillon (installeur Inno Setup, .dmg, .deb).
 # Les scripts du depot font tout le travail, ici on orchestre seulement.
 # Repetition a blanc : Actions > release > Run workflow (artefacts, pas de release).
@@ -6,7 +6,8 @@ name: release
 
 on:
   push:
-    tags: ['v*']
+    # les tags du depot sont le numero de version nu, sans prefixe : 2.1, 2.2...
+    tags: ['[0-9]+.[0-9]+', '[0-9]+.[0-9]+.[0-9]+']
   workflow_dispatch:
 
 # un seul run par ref ; pas d'annulation en vol (release a moitie faite sinon)
@@ -33,8 +34,8 @@ jobs:
         run: |
           ver="$(sed -n 's/^const Version = "\(.*\)"$/\1/p' src/logo/version.go)"
           [ -n "$ver" ] || { echo "Version introuvable dans src/logo/version.go" >&2; exit 1; }
-          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$ver" ]; then
-            echo "tag $GITHUB_REF_NAME != v$ver (version.go) : version pas montee ou tag mal nomme" >&2
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "$ver" ]; then
+            echo "tag $GITHUB_REF_NAME != $ver (version.go) : version pas montee ou tag mal nomme" >&2
             exit 1
           fi
           for champ in FileVersion ProductVersion; do
@@ -131,7 +132,7 @@ jobs:
 
   release:
     # publication seulement sur push de tag ; un dispatch reste une repetition a blanc
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs: [guard, build-linux, build-macos, build-windows]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -159,5 +160,5 @@ jobs:
             # relance apres echec : la release existe deja, on remplace les fichiers
             gh release upload "$TAG" assets/* --clobber
           else
-            gh release create "$TAG" assets/* --draft --title "GoLogo $VER" --notes "$notes"
+            gh release create "$TAG" assets/* --draft --title "$VER" --notes "$notes"
           fi

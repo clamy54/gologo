@@ -46,10 +46,10 @@ Two GitHub Actions workflows (`.github/workflows/`) run these same scripts:
 
 - `ci.yml` — on every push and pull request: `gofmt`, `go vet`, the tests and the
   build on Linux, Windows and macOS.
-- `release.yml` — on a `v<version>` tag: checks that the tag and the three version
+- `release.yml` — on a version tag (`2.2`, as for earlier releases): checks that the tag and the three version
   locations agree, builds the installer, the `.dmg` and the `.deb`, and attaches
   them to a **draft** release. Started by hand (*Run workflow*), it only produces
   the packages as artifacts.
 
-To release: bump the three version locations, commit, then `git tag v<version>`
+To release: bump the three version locations, commit, then `git tag <version>`
 and push the tag.
