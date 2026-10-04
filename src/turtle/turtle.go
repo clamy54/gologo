@@ -108,11 +108,15 @@ const (
 const AnimDefaultFPS = 30
 
 // mouvement auto d'une tortue (ANIME), inactif par defaut.
-// sx,sy = depart ; tx,ty = cible ; speed = pas Logo par cran
+// sx,sy = depart ; tx,ty = cible ; speed = pas Logo par cran.
+// px,py = ou en est le trajet, dans le repere NON enroule : en mode ENR la position
+// de la tortue est ramenee dans le champ a chaque bord franchi, et ne pourrait
+// jamais rejoindre une cible situee dehors. la progression se mesure donc ici
 type motionState struct {
 	active bool
 	sx, sy float64
 	tx, ty float64
+	px, py float64
 	speed  float64
 	mode   AnimMode
 }
@@ -180,6 +184,9 @@ func defaultState() State {
 
 // FECH ; Scale rend l'inverse (ECH), en %
 func (t *Turtle) SetScale(h, v float64) {
+	if !finite(h) || !finite(v) {
+		return
+	}
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.scaleH, t.scaleV = h, v
@@ -353,8 +360,16 @@ func (t *Turtle) move(d float64) error {
 	return t.goTo(nx, ny)
 }
 
+// vrai pour un nombre fini (ni infini ni NaN)
+func finite(x float64) bool { return !math.IsNaN(x) && !math.IsInf(x, 0) }
+
 // amene la tortue en (nx,ny) selon le mode de champ, en tracant au besoin
 func (t *Turtle) goTo(nx, ny float64) error {
+	// une position non finie (calcul qui a deborde) n'est nulle part : NaN passerait
+	// tous les tests de bornes et resterait dans l'etat de la tortue
+	if !finite(nx) || !finite(ny) {
+		return ErrSortir
+	}
 	switch t.field {
 	case Clos:
 		if nx < MinX || nx > MaxX || ny < MinY || ny > MaxY {
@@ -593,12 +608,19 @@ func (t *Turtle) SetShape(n int) {
 	t.notify()
 }
 
-// mode du champ CLOS/ENR/FEN (primitive graphique)
+// mode du champ CLOS/ENR/FEN (primitive graphique). en entrant en ENR, une tortue
+// restee hors champ (apres un FEN) est ramenee dedans : le trace enroule suppose un
+// depart a l'interieur, sinon il partirait a reculons vers le bord
 func (t *Turtle) SetField(m FieldMode) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.activate()
 	t.field = m
+	if m == Enroule {
+		for k := range t.states {
+			t.states[k].X, t.states[k].Y = wrap(t.states[k].X, t.states[k].Y)
+		}
+	}
 	t.notify()
 }
 
@@ -665,8 +687,11 @@ func (t *Turtle) Reset() {
 	t.notify()
 }
 
-// ramene un angle dans [0,360)
+// ramene un angle dans [0,360) (un angle non fini vaut 0)
 func normalizeAngle(a float64) float64 {
+	if !finite(a) {
+		return 0
+	}
 	a = math.Mod(a, 360)
 	if a < 0 {
 		a += 360
@@ -720,7 +745,7 @@ func (t *Turtle) SetMotion(id int, tx, ty, speed float64, mode AnimMode) error {
 	}
 	t.ensureMotions()
 	st := t.states[id]
-	t.motions[id] = motionState{active: true, sx: st.X, sy: st.Y, tx: tx, ty: ty, speed: math.Abs(speed), mode: mode}
+	t.motions[id] = motionState{active: true, sx: st.X, sy: st.Y, tx: tx, ty: ty, px: st.X, py: st.Y, speed: math.Abs(speed), mode: mode}
 	wake := t.animWake
 	t.notify() // la tortue id vient peut-etre de naitre : on l'affiche
 	t.mu.Unlock()
@@ -795,27 +820,38 @@ func (t *Turtle) stepMotion(i int) {
 	t.current = i
 	defer func() { t.current = saved }()
 
-	st := t.states[i]
-	dx, dy := m.tx-st.X, m.ty-st.Y
+	// deplace la tortue de (dx,dy) et fait suivre la progression. en ENR goTo
+	// enroule la position ; px,py, eux, continuent tout droit vers la cible
+	advance := func(dx, dy float64) bool {
+		st := t.states[i]
+		if t.goTo(st.X+dx, st.Y+dy) != nil {
+			m.active = false // sortie du champ CLOS : arret propre
+			return false
+		}
+		m.px, m.py = m.px+dx, m.py+dy
+		return true
+	}
+
+	dx, dy := m.tx-m.px, m.ty-m.py
 	dist := math.Hypot(dx, dy)
 	if dist > m.speed && dist > 0 {
-		if t.goTo(st.X+dx/dist*m.speed, st.Y+dy/dist*m.speed) != nil {
-			m.active = false // sortie du champ CLOS : arret propre
-		}
+		advance(dx/dist*m.speed, dy/dist*m.speed)
 		return
 	}
 	// cible atteinte : on s'y pose pile, puis le mode decide la suite
-	if t.goTo(m.tx, m.ty) != nil {
-		m.active = false
+	if !advance(dx, dy) {
 		return
 	}
+	m.px, m.py = m.tx, m.ty
 	switch m.mode {
 	case Once:
 		m.active = false
 	case Loop:
-		if t.goTo(m.sx, m.sy) != nil { // retour instantane au depart
-			m.active = false
-		}
+		// retour au depart d'un SAUT : la tortue se repose sur son point de depart
+		// sans rien tracer, meme crayon baisse
+		t.states[i].X, t.states[i].Y = m.sx, m.sy
+		m.px, m.py = m.sx, m.sy
+		t.notify()
 	case PingPong:
 		m.sx, m.sy, m.tx, m.ty = m.tx, m.ty, m.sx, m.sy // on inverse depart/cible
 	}

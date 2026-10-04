@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -27,7 +28,8 @@ func main() {
 	in := logo.New(turtle.New(turtle.NewRecorder()), os.Stdout)
 	in.Quiet = true
 	in.SetWorkDir(*dir)
-	if err := in.RunString(string(src)); err != nil {
+	// QUITTE n'est pas une erreur : le programme a demande a s'arreter la
+	if err := in.RunString(string(src)); err != nil && !errors.Is(err, logo.ErrQuitter) {
 		fmt.Fprintln(os.Stderr, "ERREUR:", in.ErrorText(err))
 		if cerr := in.CloseFiles(); cerr != nil {
 			fmt.Fprintln(os.Stderr, "fermeture fichiers:", cerr)

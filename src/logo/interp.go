@@ -24,6 +24,9 @@ var ErrInterrompu = errors.New("INTERROMPU !")
 // procedure (donc pas de "DANS ...")
 var errPlusDePlace = errors.New("PLUS DE PLACE")
 
+// liste ou tableau emboite au-dela de maxDataDepth (meme message que le lecteur)
+var errTropProfond = errors.New("IMBRICATION TROP PROFONDE")
+
 // erreur de conversion ; invoke y accroche le nom de la primitive pour faire
 // "<PRIMITIVE> N'AIME PAS <objet>"
 type badData struct{ obj string }
@@ -96,14 +99,17 @@ func (i *Interp) SetPager(p Pager) { i.pager = p }
 
 // envoie un texte multi-lignes au pager si branche, sinon l'imprime ligne a
 // ligne sur Out (headless / tests)
-func (i *Interp) showPaged(title string, lines []string) {
+func (i *Interp) showPaged(title string, lines []string) error {
 	if i.pager != nil {
 		i.pager(title, lines)
-		return
+		return nil
 	}
 	for _, l := range lines {
-		fmt.Fprintln(i.Out, l)
+		if err := i.printLine(l); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 // langue courante "FR"/"EN", pour localiser l'UI du backend (cf barre de statut
@@ -186,6 +192,10 @@ func (i *Interp) Interrupt() {
 	}
 }
 
+// une interruption est-elle demandee ? pour les backends qui bloquent longtemps
+// (le son d'une note) et doivent s'arreter des le Ctrl+C
+func (i *Interp) Interrupted() bool { return i.brk.Load() }
+
 // une primitive native : soit fn (arite fixe), soit special (forme speciale qui
 // lit elle-meme ses arguments via le curseur)
 type primitive struct {
@@ -193,8 +203,17 @@ type primitive struct {
 	arity    int  // nb d'arguments hors parentheses
 	reporter bool // rend une valeur (operation)
 	variadic bool // arite variable entre parentheses
+	minArgs  int  // forme ( OP ... ) : nb minimal d'arguments
+	maxArgs  int  // forme ( OP ... ) : nb maximal d'arguments (0 = sans limite)
 	fn       func(i *Interp, args []Value) (Value, error)
 	special  func(e *eval) (Value, error)
+}
+
+// borne le nombre d'arguments de la forme entre parentheses. sans ca, (TABLEAU) ou
+// (HASARD) appelleraient la primitive sans l'argument qu'elle lit d'office
+func (p *primitive) argRange(min, max int) *primitive {
+	p.minArgs, p.maxArgs = min, max
+	return p
 }
 
 // une procedure utilisateur (POUR ... FIN)
@@ -203,29 +222,6 @@ type userProc struct {
 	params []string
 	body   []Datum
 	text   string // source brute (saisie editeur) ; vide => on la reconstruit
-}
-
-// texte source de la proc pour l'editeur : la saisie brute si on l'a, sinon on
-// rebatit un "POUR nom :p ... <corps> FIN"
-func (p *userProc) sourceText() string {
-	if p.text != "" {
-		return p.text
-	}
-	var b strings.Builder
-	b.WriteString("POUR ")
-	b.WriteString(p.name)
-	for _, par := range p.params {
-		b.WriteString(" :")
-		b.WriteString(par)
-	}
-	b.WriteByte('\n')
-	parts := make([]string, len(p.body))
-	for i, d := range p.body {
-		parts[i] = d.String()
-	}
-	b.WriteString(strings.Join(parts, " "))
-	b.WriteString("\nFIN")
-	return b.String()
 }
 
 // signal de controle de flux (STOP / RENDS / LOGO), trimballe comme une erreur
@@ -313,12 +309,22 @@ func (i *Interp) RunString(src string) (err error) {
 	i.runDepth++
 	// filet de securite : une primitive ne devrait jamais paniquer, mais si ca arrive
 	// (entree pathologique...) on transforme la panique en erreur Logo au lieu de tuer
-	// toute l'appli. au retour au niveau racine on remet aussi les piles a plat
+	// toute l'appli. la panique a saute les depilements en cours : on remet les piles
+	// a leur hauteur d'entree, a chaque niveau (un CHARGE/ED imbrique qui rattrape la
+	// panique rend une erreur ordinaire, le niveau du dessus ne nettoierait rien)
+	nFrames, nRep, depth := len(i.frames), len(i.repStack), i.evalDepth
 	defer func() {
 		i.runDepth--
 		if r := recover(); r != nil {
+			if len(i.frames) > nFrames {
+				i.frames = i.frames[:nFrames]
+			}
+			if len(i.repStack) > nRep {
+				i.repStack = i.repStack[:nRep]
+			}
+			i.evalDepth = depth
 			if i.runDepth == 0 {
-				i.frames, i.repStack, i.testSet = nil, nil, false
+				i.testSet = false
 			}
 			err = fmt.Errorf("ERREUR INTERNE : %v", r)
 		}
@@ -329,8 +335,12 @@ func (i *Interp) RunString(src string) (err error) {
 	}
 	err = i.runSeq(data)
 	if c, ok := err.(*ctrl); ok {
-		_ = c // tout en haut, les signaux de controle sont avales
-		return nil
+		// LOGO et RAZ arretent TOUT le programme : dans un texte imbrique (RAMENE,
+		// ED) le signal continue de remonter. les autres signaux s'arretent ici
+		if c.kind == ctlLogo && i.runDepth > 1 {
+			return err
+		}
+		return nil // tout en haut, les signaux de controle sont avales
 	}
 	return err
 }
@@ -415,7 +425,10 @@ type displayResetter interface {
 }
 
 // RAZ : remet l'interpreteur et l'affichage a neuf. procedures et variables
-// effacees, parametres par defaut, ecran reinitialise
+// effacees, parametres par defaut, ecran reinitialise. les piles (contextes locaux,
+// compteurs de REPETE) ne sont PAS videes ici : des boucles et des procedures sont
+// peut-etre encore en cours et les depileront en sortant (RAZ rend la main tout en
+// haut, cf la primitive)
 func (i *Interp) resetAll() {
 	if err := i.closeAllFiles(); err != nil { // referme les fichiers ouverts
 		fmt.Fprintln(i.Out, "fermeture fichiers:", err)
@@ -425,12 +438,12 @@ func (i *Interp) resetAll() {
 	i.vars = map[string]Value{}
 	i.plists = map[string][]propEntry{}
 	i.spriteDefs = nil // RAZ efface aussi les sprites definis (VE les conserve)
-	i.frames = nil
-	i.repStack = nil
+	i.testSet, i.testResult = false, false
 	i.edBuf = ""
 	i.musOctave, i.musDuree, i.musTempo, i.musTimbre, i.musVolume = octaveDefaut, dureeDefaut, tempoDefaut, timbreDefaut, volumeDefaut
 	i.setLang("FR")
-	i.Turtle.Reset() // tortue recentree + graphique efface + fond bleu
+	i.Turtle.Reset()                       // tortue recentree + graphique efface + fond bleu
+	i.Turtle.SetFPS(turtle.AnimDefaultFPS) // VE garde la cadence, RAZ revient a celle du demarrage
 	if r, ok := i.Out.(displayResetter); ok {
 		r.ResetScreen() // texte (banniere), champ cache, couleurs par defaut
 	}
@@ -527,6 +540,12 @@ func (e *eval) invoke0(up string, tail bool) (Value, error) {
 			if err != nil {
 				return Value{}, err
 			}
+			if len(args) < p.minArgs {
+				return Value{}, fmt.Errorf("PAS ASSEZ DE DONNEES POUR %s", up)
+			}
+			if p.maxArgs > 0 && len(args) > p.maxArgs {
+				return Value{}, fmt.Errorf("TROP DE DONNEES POUR %s", up)
+			}
 			return p.fn(e.i, args)
 		}
 		args, err := e.readArgs(up, p.arity)
@@ -591,6 +610,14 @@ const maxCallDepth = 5000
 // execute une proc utilisateur, parametres ranges en variables locales.
 // trampoline : un appel terminal (tailCall) ne reempile pas d'appel Go ; on
 // remplace proc/args et on reboucle sur place. la TCO tourne donc a pile constante
+//
+// la portee des variables est dynamique : la procedure appelee voit les variables
+// locales de celle qui l'appelle. un appel terminal ne doit donc pas faire
+// disparaitre le contexte qu'il quitte. ses liaisons que l'appelee ne redefinit pas
+// sont versees dans un contexte "heritage" unique, garde juste sous le contexte
+// courant : la recherche d'une variable donne le meme resultat que si tous les
+// contextes de la chaine etaient restes empiles, et la pile ne grossit pas (au
+// plus une entree par nom de variable distinct)
 func (i *Interp) callProc(proc *userProc, args []Value) (Value, error) {
 	// le trampoline aplatit la chaine d'appels terminaux ; on retient le dernier
 	// appel "commande" et le dernier "RENDS" pour rejouer, sur la valeur finale, le
@@ -599,8 +626,11 @@ func (i *Interp) callProc(proc *userProc, args []Value) (Value, error) {
 	//   - un RENDS <proc> terminal DOIT en remonter une (PAS ASSEZ DE DONNEES)
 	var needNone, needValue bool
 	var noneCaller, valueCaller string
+	base := len(i.frames)          // hauteur de pile a l'entree, retablie en sortant
+	var inherited map[string]Value // liaisons des appelants terminaux (nil tant qu'inutile)
 	for {
 		if len(i.frames) >= maxCallDepth {
+			i.frames = i.frames[:base]
 			return Value{}, errPlusDePlace
 		}
 		frame := make(map[string]Value, len(proc.params))
@@ -609,7 +639,6 @@ func (i *Interp) callProc(proc *userProc, args []Value) (Value, error) {
 		}
 		i.frames = append(i.frames, frame)
 		err := i.runSeqTail(proc.body, true)
-		i.frames = i.frames[:len(i.frames)-1]
 
 		if tc, ok := err.(*tailCall); ok {
 			// proc vient de faire un appel terminal : on note ce qu'il exige de la
@@ -620,9 +649,24 @@ func (i *Interp) callProc(proc *userProc, args []Value) (Value, error) {
 			} else {
 				needNone, noneCaller = true, proc.name
 			}
+			// ce que la cible ne redefinit pas reste visible d'elle : heritage. un
+			// nom qu'elle prend en parametre serait masque de toute facon
+			for name, v := range frame {
+				if !hasParam(tc.proc, name) {
+					if inherited == nil {
+						inherited = map[string]Value{}
+					}
+					inherited[name] = v
+				}
+			}
+			i.frames = i.frames[:base]
+			if inherited != nil {
+				i.frames = append(i.frames, inherited)
+			}
 			proc, args = tc.proc, tc.args
 			continue
 		}
+		i.frames = i.frames[:base]
 		v, ferr := i.finishProc(proc, err)
 		if ferr != nil {
 			return v, ferr
@@ -635,6 +679,16 @@ func (i *Interp) callProc(proc *userProc, args []Value) (Value, error) {
 		}
 		return v, nil
 	}
+}
+
+// name est-il un parametre de proc ? (liste courte : un parcours suffit)
+func hasParam(proc *userProc, name string) bool {
+	for _, p := range proc.params {
+		if p == name {
+			return true
+		}
+	}
+	return false
 }
 
 // traduit le resultat d'un corps de proc (signal de controle ou erreur) en valeur
@@ -654,6 +708,11 @@ func (i *Interp) finishProc(proc *userProc, err error) (Value, error) {
 		// rattache l'erreur a cette proc ("... DANS nom"), sauf interruption, QUITTE
 		// ou erreur deja rattachee plus bas (on garde la proc la plus interne)
 		if errors.Is(err, ErrInterrompu) || errors.Is(err, ErrQuitter) || errors.Is(err, errPlusDePlace) {
+			return Value{}, err
+		}
+		// un LANCE traverse les procedures tel quel jusqu'a son PIEGE : emballe dans
+		// un "DANS nom", le piege de meme etiquette ne le reconnaitrait plus
+		if _, ok := err.(*throwSignal); ok {
 			return Value{}, err
 		}
 		if _, ok := err.(*procErr); ok {
@@ -713,8 +772,21 @@ func (e *eval) exprFrom(left Value, minPrec int) (Value, error) {
 }
 
 // evalue un terme : valeur directe, variable, liste, parenthese, moins unaire, ou
-// appel d'operation
+// appel d'operation. chaque terme compte dans la profondeur de l'evaluateur : une
+// chaine d'operations prefixes (MOINS MOINS MOINS ... 1) ou de signes recurse ici
+// sans passer par runSeq, et finirait par faire deborder la pile Go
 func (e *eval) primary() (Value, error) {
+	in := e.i
+	if in.evalDepth >= maxEvalDepth {
+		return Value{}, errPlusDePlace
+	}
+	in.evalDepth++
+	v, err := e.primary0()
+	in.evalDepth--
+	return v, err
+}
+
+func (e *eval) primary0() (Value, error) {
 	if e.atEnd() {
 		return Value{}, fmt.Errorf("OBJET MANQUANT")
 	}
@@ -727,6 +799,8 @@ func (e *eval) primary() (Value, error) {
 		return NumberValue(d.Num), nil
 	case DWord:
 		return WordValue(d.Text), nil
+	case DBool:
+		return BoolValue(d.Text == "VRAI"), nil
 	case DVarRef:
 		v, ok := e.i.lookupVar(d.Text)
 		if !ok {

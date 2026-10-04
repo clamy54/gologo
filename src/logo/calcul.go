@@ -15,6 +15,7 @@ import (
 	"math/big"
 	"sort"
 	"strings"
+	"sync/atomic"
 )
 
 // au-dela, developper (x+1)^n produirait des milliers de termes pour rien :
@@ -26,6 +27,70 @@ const maxExposant = 1000
 // au-dela, on renonce a chercher plus loin. le resultat reste correct, juste
 // parfois moins simplifie (radical pas reduit, ou facteur non trouve).
 const maxFacteur = 1000000
+
+// garde-fous d'un calcul. le plafond d'exposant ne suffit pas : (a+b+c+d+e+f+g+h)^100
+// le respecte et compte pourtant des milliards de monomes ; des puissances
+// emboitees font exploser les degres et les coefficients
+const (
+	maxAlgTermes  = 20000      // monomes dans un polynome
+	maxAlgDegre   = 10000      // exposant d'une variable dans un monome
+	maxAlgBits    = 1 << 16    // taille en bits d'un coefficient (num. ou denom.)
+	maxAlgTravail = 30_000_000 // monomes manipules en tout dans un calcul
+	maxAlgNiveaux = 1000       // parentheses emboitees dans une expression
+)
+
+var errAlgTropGros = fmt.Errorf("CALCUL TROP GROS")
+
+// contexte d'UN calcul litteral (une primitive DEVELOPPE, FACTORISE...) : son budget
+// de travail, l'interruption a surveiller, et les denominateurs rencontres
+type algCtx struct {
+	brk       *atomic.Bool // Ctrl+C
+	work      int          // monomes manipules depuis le debut
+	interdits []poly       // expressions par lesquelles on a divise : doivent rester non nulles
+}
+
+// arret d'un calcul (trop gros, ou interrompu) : remonte par panique jusqu'a algRun,
+// ce qui evite de trainer un code d'erreur dans chaque operation sur les polynomes
+type algAbort struct{ err error }
+
+// compte n monomes de travail. c'est aussi le point d'interruption : toutes les
+// boucles du moteur passent par ici
+func (c *algCtx) tick(n int) {
+	c.work += n + 1
+	if c.work > maxAlgTravail {
+		panic(algAbort{errAlgTropGros})
+	}
+	if c.brk != nil && c.brk.Load() {
+		panic(algAbort{ErrInterrompu})
+	}
+}
+
+func (c *algCtx) checkCoeff(r *big.Rat) {
+	if r.Num().BitLen() > maxAlgBits || r.Denom().BitLen() > maxAlgBits {
+		panic(algAbort{errAlgTropGros})
+	}
+}
+
+func (c *algCtx) checkSize(p poly) {
+	if len(p) > maxAlgTermes {
+		panic(algAbort{errAlgTropGros})
+	}
+}
+
+// lance un calcul litteral dans un contexte neuf et rattrape son arret eventuel
+func (i *Interp) algRun(f func(c *algCtx) (Value, error)) (v Value, err error) {
+	c := &algCtx{brk: &i.brk}
+	defer func() {
+		if r := recover(); r != nil {
+			ab, ok := r.(algAbort)
+			if !ok {
+				panic(r)
+			}
+			v, err = Value{}, ab.err
+		}
+	}()
+	return f(c)
+}
 
 // un monome = un coefficient et les exposants de chaque variable.
 // exemple : 9 x^2 -> coeff 9, exps {x:2}. la constante 5 a exps vide.
@@ -91,7 +156,8 @@ func varPoly(name string) poly {
 	return p
 }
 
-func addPoly(a, b poly) poly {
+func (c *algCtx) addPoly(a, b poly) poly {
+	c.tick(len(a) + len(b))
 	r := poly{}
 	for _, t := range a {
 		r.add(cloneExps(t.exps), t.coeff)
@@ -103,29 +169,38 @@ func addPoly(a, b poly) poly {
 }
 
 // multiplie tous les coefficients par s (0 -> polynome vide)
-func scalePoly(a poly, s *big.Rat) poly {
+func (c *algCtx) scalePoly(a poly, s *big.Rat) poly {
+	c.tick(len(a))
 	r := poly{}
 	for _, t := range a {
-		r.add(cloneExps(t.exps), new(big.Rat).Mul(t.coeff, s))
+		k := new(big.Rat).Mul(t.coeff, s)
+		c.checkCoeff(k)
+		r.add(cloneExps(t.exps), k)
 	}
 	return r
 }
 
-func negPoly(a poly) poly { return scalePoly(a, big.NewRat(-1, 1)) }
+func (c *algCtx) negPoly(a poly) poly { return c.scalePoly(a, big.NewRat(-1, 1)) }
 
-func subPoly(a, b poly) poly { return addPoly(a, negPoly(b)) }
+func (c *algCtx) subPoly(a, b poly) poly { return c.addPoly(a, c.negPoly(b)) }
 
 // produit de deux polynomes : chaque monome de a contre chaque monome de b.
-func mulPoly(a, b poly) poly {
+func (c *algCtx) mulPoly(a, b poly) poly {
 	r := poly{}
 	for _, ta := range a {
+		c.tick(len(b))
 		for _, tb := range b {
 			exps := cloneExps(ta.exps)
 			for v, e := range tb.exps {
-				exps[v] += e
+				if exps[v] += e; exps[v] > maxAlgDegre {
+					panic(algAbort{errAlgTropGros})
+				}
 			}
-			r.add(exps, new(big.Rat).Mul(ta.coeff, tb.coeff))
+			k := new(big.Rat).Mul(ta.coeff, tb.coeff)
+			c.checkCoeff(k)
+			r.add(exps, k)
 		}
+		c.checkSize(r)
 	}
 	return r
 }
@@ -139,31 +214,36 @@ type frac struct {
 
 func polyFrac(p poly) frac { return frac{p, constPoly(big.NewRat(1, 1))} }
 
-func fracNeg(f frac) frac { return frac{negPoly(f.num), f.den} }
+func (c *algCtx) fracNeg(f frac) frac { return frac{c.negPoly(f.num), f.den} }
 
-func fracAdd(a, b frac) frac {
-	return frac{addPoly(mulPoly(a.num, b.den), mulPoly(b.num, a.den)), mulPoly(a.den, b.den)}.reduced()
+func (c *algCtx) fracAdd(a, b frac) frac {
+	return c.reduce(frac{c.addPoly(c.mulPoly(a.num, b.den), c.mulPoly(b.num, a.den)), c.mulPoly(a.den, b.den)})
 }
 
-func fracSub(a, b frac) frac {
-	return frac{subPoly(mulPoly(a.num, b.den), mulPoly(b.num, a.den)), mulPoly(a.den, b.den)}.reduced()
+func (c *algCtx) fracSub(a, b frac) frac {
+	return c.reduce(frac{c.subPoly(c.mulPoly(a.num, b.den), c.mulPoly(b.num, a.den)), c.mulPoly(a.den, b.den)})
 }
 
-func fracMul(a, b frac) frac {
-	return frac{mulPoly(a.num, b.num), mulPoly(a.den, b.den)}.reduced()
+func (c *algCtx) fracMul(a, b frac) frac {
+	return c.reduce(frac{c.mulPoly(a.num, b.num), c.mulPoly(a.den, b.den)})
 }
 
-func fracDiv(a, b frac) (frac, error) {
+func (c *algCtx) fracDiv(a, b frac) (frac, error) {
 	if len(b.num) == 0 {
 		return frac{}, fmt.Errorf("DIVISION PAR ZERO")
 	}
-	return frac{mulPoly(a.num, b.den), mulPoly(a.den, b.num)}.reduced(), nil
+	// on divise par une expression : elle ne devra jamais valoir zero, meme si elle
+	// disparait ensuite par simplification ((x-1)/(x-1) = 1... sauf en x = 1)
+	if _, cst := b.num.asConst(); !cst {
+		c.interdits = append(c.interdits, b.num)
+	}
+	return c.reduce(frac{c.mulPoly(a.num, b.den), c.mulPoly(a.den, b.num)}), nil
 }
 
-func fracPow(a frac, n int) frac {
+func (c *algCtx) fracPow(a frac, n int) frac {
 	r := polyFrac(constPoly(big.NewRat(1, 1)))
 	for i := 0; i < n; i++ {
-		r = fracMul(r, a)
+		r = c.fracMul(r, a)
 	}
 	return r
 }
@@ -172,19 +252,20 @@ func fracPow(a frac, n int) frac {
 // denominateur de tete positif ; un denominateur constant se replie dans le
 // numerateur (on retombe alors sur un simple polynome). a plusieurs variables,
 // pas de PGCD (trop lourd) : la fraction reste telle quelle, juste normalisee.
-func (f frac) reduced() frac {
+func (c *algCtx) reduce(f frac) frac {
 	if len(f.num) == 0 {
 		return polyFrac(poly{}) // zero
 	}
-	if len(fracVars(f)) <= 1 {
-		g := polyGCD(f.num, f.den)
-		f = frac{exactQuo(f.num, g), exactQuo(f.den, g)}
+	// denominateur constant : rien a simplifier, on evite un PGCD pour rien
+	if _, cst := f.den.asConst(); !cst && len(fracVars(f)) <= 1 {
+		g := c.polyGCD(f.num, f.den)
+		f = frac{c.exactQuo(f.num, g), c.exactQuo(f.den, g)}
 	}
-	if f.den.sorted()[0].coeff.Sign() < 0 {
-		f = frac{negPoly(f.num), negPoly(f.den)}
+	if f.den.lead().coeff.Sign() < 0 {
+		f = frac{c.negPoly(f.num), c.negPoly(f.den)}
 	}
-	if c, ok := f.den.asConst(); ok {
-		return frac{scalePoly(f.num, new(big.Rat).Inv(c)), constPoly(big.NewRat(1, 1))}
+	if k, ok := f.den.asConst(); ok {
+		return frac{c.scalePoly(f.num, new(big.Rat).Inv(k)), constPoly(big.NewRat(1, 1))}
 	}
 	return f
 }
@@ -206,20 +287,20 @@ func fracVars(f frac) []string {
 }
 
 // PGCD de deux polynomes a une variable (Euclide), rendu unitaire
-func polyGCD(a, b poly) poly {
+func (c *algCtx) polyGCD(a, b poly) poly {
 	for len(b) != 0 {
-		_, r := divPolyLong(a, b)
+		_, r := c.divPolyLong(a, b)
 		a, b = b, r
 	}
 	if len(a) == 0 {
 		return constPoly(big.NewRat(1, 1))
 	}
-	return scalePoly(a, new(big.Rat).Inv(a.sorted()[0].coeff)) // unitaire
+	return c.scalePoly(a, new(big.Rat).Inv(a.lead().coeff)) // unitaire
 }
 
 // quotient d'une division exacte (le reste est nul par construction)
-func exactQuo(p, g poly) poly {
-	q, _ := divPolyLong(p, g)
+func (c *algCtx) exactQuo(p, g poly) poly {
+	q, _ := c.divPolyLong(p, g)
 	return q
 }
 
@@ -228,19 +309,20 @@ func exactQuo(p, g poly) poly {
 // qu'il se divise, sinon ce terme tombe au reste. l'ordre des monomes garantit
 // que ca s'arrete. a une variable c'est la division euclidienne classique ; a
 // plusieurs, le quotient depend de cet ordre (mais reste nul = vrai diviseur).
-func divPolyLong(a, b poly) (poly, poly) {
+func (c *algCtx) divPolyLong(a, b poly) (poly, poly) {
 	q := poly{}
 	rem := poly{}
-	cur := addPoly(poly{}, a) // copie de travail
-	bl := b.sorted()[0]       // terme de tete du diviseur
+	cur := c.addPoly(poly{}, a) // copie de travail
+	bl := b.lead()              // terme de tete du diviseur
 	for len(cur) > 0 {
-		cl := cur.sorted()[0]
+		c.tick(len(cur))
+		cl := cur.lead()
 		if t, ok := monoDivide(cl, bl); ok {
 			q.add(cloneExps(t.exps), t.coeff)
-			cur = subPoly(cur, mulPoly(termPoly(t), b))
+			cur = c.subPoly(cur, c.mulPoly(termPoly(t), b))
 		} else {
 			rem.add(cloneExps(cl.exps), cl.coeff)
-			cur = subPoly(cur, termPoly(cl))
+			cur = c.subPoly(cur, termPoly(cl))
 		}
 	}
 	return q, rem
@@ -341,6 +423,22 @@ func (p poly) sorted() []*term {
 	return ts
 }
 
+// le terme de tete : le premier de sorted(), trouve sans trier (nil si polynome nul)
+func (p poly) lead() *term {
+	var best *term
+	for _, t := range p {
+		if best == nil {
+			best = t
+			continue
+		}
+		dt, db := degOf(t.exps), degOf(best.exps)
+		if dt > db || (dt == db && lessMono(t.exps, best.exps)) {
+			best = t
+		}
+	}
+	return best
+}
+
 // rend le polynome facon "9x^2 - 25y^2" : le premier signe colle au terme, les
 // suivants espaces avec + ou -.
 func (p poly) String() string {
@@ -413,12 +511,13 @@ func printRat(r *big.Rat) string {
 
 // evalAlg lit une expression litterale et rend sa forme normale.
 // accepte le * implicite (9x, 2(x+1), xy) et la casse libre (X = x).
-func evalFrac(src string) (frac, error) {
+func (c *algCtx) evalFrac(src string) (frac, error) {
 	toks, err := lexAlg(src)
 	if err != nil {
 		return frac{}, err
 	}
-	ps := &algParser{toks: toks}
+	c.tick(len(toks)) // la longueur de l'expression compte dans le budget
+	ps := &algParser{toks: toks, c: c}
 	f, err := ps.parseExpr()
 	if err != nil {
 		return frac{}, err
@@ -426,21 +525,21 @@ func evalFrac(src string) (frac, error) {
 	if ps.peek().kind != tkEnd {
 		return frac{}, fmt.Errorf("JE NE COMPRENDS PAS LA SUITE DE L'EXPRESSION")
 	}
-	return f.reduced(), nil
+	return c.reduce(f), nil
 }
 
 // evalAlg : pour les usages qui exigent un vrai polynome (FACTORISE, RESOUS,
 // EVALUE). une fraction a denominateur non constant est refusee proprement.
-func evalAlg(src string) (poly, error) {
-	f, err := evalFrac(src)
+func (c *algCtx) evalAlg(src string) (poly, error) {
+	f, err := c.evalFrac(src)
 	if err != nil {
 		return nil, err
 	}
-	c, ok := f.den.asConst()
+	k, ok := f.den.asConst()
 	if !ok {
 		return nil, fmt.Errorf("CETTE EXPRESSION N'EST PAS UN POLYNOME (DIVISION PAR UNE EXPRESSION)")
 	}
-	return scalePoly(f.num, new(big.Rat).Inv(c)), nil
+	return c.scalePoly(f.num, new(big.Rat).Inv(k)), nil
 }
 
 type tkKind int
@@ -537,8 +636,10 @@ func lexAlg(src string) ([]algTok, error) {
 }
 
 type algParser struct {
-	toks []algTok
-	pos  int
+	toks  []algTok
+	pos   int
+	c     *algCtx
+	depth int // imbrication en cours (signes, parentheses)
 }
 
 func (p *algParser) peek() algTok { return p.toks[p.pos] }
@@ -550,6 +651,7 @@ func (p *algParser) advance() algTok {
 
 // expr := terme ( (+|-) terme )*
 func (p *algParser) parseExpr() (frac, error) {
+	c := p.c
 	left, err := p.parseTerm()
 	if err != nil {
 		return frac{}, err
@@ -562,14 +664,14 @@ func (p *algParser) parseExpr() (frac, error) {
 			if err != nil {
 				return frac{}, err
 			}
-			left = fracAdd(left, r)
+			left = c.fracAdd(left, r)
 		case tkMinus:
 			p.advance()
 			r, err := p.parseTerm()
 			if err != nil {
 				return frac{}, err
 			}
-			left = fracSub(left, r)
+			left = c.fracSub(left, r)
 		default:
 			return left, nil
 		}
@@ -578,6 +680,7 @@ func (p *algParser) parseExpr() (frac, error) {
 
 // terme := facteur ( (*|/) facteur | facteur )*   (le dernier cas = * implicite)
 func (p *algParser) parseTerm() (frac, error) {
+	c := p.c
 	left, err := p.parseFactor()
 	if err != nil {
 		return frac{}, err
@@ -590,14 +693,14 @@ func (p *algParser) parseTerm() (frac, error) {
 			if err != nil {
 				return frac{}, err
 			}
-			left = fracMul(left, r)
+			left = c.fracMul(left, r)
 		case tkDiv:
 			p.advance()
 			r, err := p.parseFactor()
 			if err != nil {
 				return frac{}, err
 			}
-			left, err = fracDiv(left, r)
+			left, err = c.fracDiv(left, r)
 			if err != nil {
 				return frac{}, err
 			}
@@ -607,7 +710,7 @@ func (p *algParser) parseTerm() (frac, error) {
 			if err != nil {
 				return frac{}, err
 			}
-			left = fracMul(left, r)
+			left = c.fracMul(left, r)
 		default:
 			return left, nil
 		}
@@ -617,17 +720,15 @@ func (p *algParser) parseTerm() (frac, error) {
 // facteur := (-|+) facteur | base (^ entier)?
 // le moins unaire est moins prioritaire que la puissance : -x^2 = -(x^2)
 func (p *algParser) parseFactor() (frac, error) {
-	switch p.peek().kind {
-	case tkMinus:
-		p.advance()
-		f, err := p.parseFactor()
-		if err != nil {
-			return frac{}, err
+	c := p.c
+	// les signes se lisent en boucle, pas par recursion : une longue suite de
+	// "- - - -" ne doit pas creuser la pile
+	neg := false
+	for k := p.peek().kind; k == tkMinus || k == tkPlus; k = p.peek().kind {
+		if k == tkMinus {
+			neg = !neg
 		}
-		return fracNeg(f), nil
-	case tkPlus:
 		p.advance()
-		return p.parseFactor()
 	}
 	base, err := p.parseBase()
 	if err != nil {
@@ -648,7 +749,10 @@ func (p *algParser) parseFactor() (frac, error) {
 			return frac{}, fmt.Errorf("EXPOSANT TROP GRAND (MAX %d)", maxExposant)
 		}
 		p.advance()
-		base = fracPow(base, int(n.Int64()))
+		base = c.fracPow(base, int(n.Int64()))
+	}
+	if neg { // le moins unaire passe apres la puissance : -x^2 = -(x^2)
+		base = c.fracNeg(base)
 	}
 	return base, nil
 }
@@ -664,7 +768,11 @@ func (p *algParser) parseBase() (frac, error) {
 		return polyFrac(varPoly(t.name)), nil
 	case tkLParen:
 		p.advance()
+		if p.depth++; p.depth > maxAlgNiveaux {
+			return frac{}, errTropProfond
+		}
 		e, err := p.parseExpr()
+		p.depth--
 		if err != nil {
 			return frac{}, err
 		}
@@ -681,31 +789,31 @@ func (p *algParser) parseBase() (frac, error) {
 // developpeStr : le resultat affiche par DEVELOPPE. L'expression est evaluee
 // comme fraction rationnelle reduite. Si le denominateur est constant, c'est un
 // simple polynome. Sinon on montre la division : partie entiere + reste/diviseur.
-func developpeStr(src string) (string, error) {
-	f, err := evalFrac(src)
+func (c *algCtx) developpeStr(src string) (string, error) {
+	f, err := c.evalFrac(src)
 	if err != nil {
 		return "", err
 	}
-	return fracRender(f)
+	return c.fracRender(f)
 }
 
 // met en mots une fraction : un simple polynome si le denominateur est constant,
 // sinon partie entiere + reste/diviseur.
-func fracRender(f frac) (string, error) {
+func (c *algCtx) fracRender(f frac) (string, error) {
 	if len(f.den) == 0 {
 		return "", fmt.Errorf("DIVISION PAR ZERO")
 	}
-	if c, ok := f.den.asConst(); ok {
-		return scalePoly(f.num, new(big.Rat).Inv(c)).String(), nil
+	if k, ok := f.den.asConst(); ok {
+		return c.scalePoly(f.num, new(big.Rat).Inv(k)).String(), nil
 	}
-	q, r := divPolyLong(f.num, f.den)
-	return fracString(q, r, f.den), nil
+	q, r := c.divPolyLong(f.num, f.den)
+	return c.fracString(q, r, f.den), nil
 }
 
 // met en forme "quotient + reste/diviseur" (la valeur exacte de A/B). Le reste
 // est rendu en valeur absolue, son signe enchaine le quotient (+ ou -). Reste
 // nul : juste le quotient. Quotient nul : juste la fraction.
-func fracString(q, r, den poly) string {
+func (c *algCtx) fracString(q, r, den poly) string {
 	if len(r) == 0 {
 		return q.String()
 	}
@@ -713,7 +821,7 @@ func fracString(q, r, den poly) string {
 	if len(den) > 1 {
 		denStr = "(" + denStr + ")"
 	}
-	neg, mag := splitPolySign(r)
+	neg, mag := c.splitPolySign(r)
 	num := mag.String()
 	if len(mag) > 1 {
 		num = "(" + num + ")"
@@ -732,12 +840,12 @@ func fracString(q, r, den poly) string {
 }
 
 // rend le signe du terme de tete a part, pour que le reste s'affiche positif
-func splitPolySign(r poly) (bool, poly) {
+func (c *algCtx) splitPolySign(r poly) (bool, poly) {
 	if len(r) == 0 {
 		return false, r
 	}
-	if r.sorted()[0].coeff.Sign() < 0 {
-		return true, negPoly(r)
+	if r.lead().coeff.Sign() < 0 {
+		return true, c.negPoly(r)
 	}
 	return false, r
 }
@@ -786,7 +894,17 @@ func coeffDeg(p poly, v string, k int) *big.Rat {
 	return big.NewRat(0, 1)
 }
 
-func polyEqual(a, b poly) bool { return len(subPoly(a, b)) == 0 }
+func polyEqual(a, b poly) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for k, t := range a {
+		if u, ok := b[k]; !ok || t.coeff.Cmp(u.coeff) != 0 {
+			return false
+		}
+	}
+	return true
+}
 
 // multiplie un rationnel par un petit entier
 func ratScale(r *big.Rat, k int64) *big.Rat {
@@ -830,7 +948,7 @@ func lcmInt(a, b *big.Int) *big.Int {
 
 // sort le plus grand carre d'un entier : m = g^2 * d, d sans facteur carre.
 // rend g et d (par divisions d'essai, largement suffisant a taille scolaire).
-func squareFreePart(m *big.Int) (g, d *big.Int) {
+func (c *algCtx) squareFreePart(m *big.Int) (g, d *big.Int) {
 	g = big.NewInt(1)
 	d = new(big.Int).Set(m)
 	i := big.NewInt(2)
@@ -839,6 +957,7 @@ func squareFreePart(m *big.Int) (g, d *big.Int) {
 		if i.Cmp(limite) > 0 {
 			break // trop loin : on laisse le reste sous le radical (toujours juste)
 		}
+		c.tick(0)
 		i2 := new(big.Int).Mul(i, i)
 		if i2.Cmp(d) > 0 {
 			break
@@ -858,17 +977,17 @@ func squareFreePart(m *big.Int) (g, d *big.Int) {
 
 // les deux racines exactes d'un trinome a discriminant non carre, sous forme
 // (p +/- q√d)/c. disc > 0 et n'est pas un carre parfait.
-func quadRadicalRoots(a, b, disc *big.Rat) (string, string) {
+func (c *algCtx) quadRadicalRoots(a, b, disc *big.Rat) (string, string) {
 	// √disc = g√d / Denom(disc), avec disc = Num/Denom
-	g, d := squareFreePart(new(big.Int).Mul(disc.Num(), disc.Denom()))
+	g, d := c.squareFreePart(new(big.Int).Mul(disc.Num(), disc.Denom()))
 	twoA := ratScale(a, 2)
 	r1 := new(big.Rat).Quo(new(big.Rat).Neg(b), twoA)                   // partie rationnelle
 	r2 := new(big.Rat).Quo(new(big.Rat).SetFrac(g, disc.Denom()), twoA) // coeff du radical
 	r2.Abs(r2)                                                          // le +/- porte le signe
-	c := lcmInt(r1.Denom(), r2.Denom())
-	p := new(big.Int).Mul(r1.Num(), new(big.Int).Div(c, r1.Denom()))
-	q := new(big.Int).Mul(r2.Num(), new(big.Int).Div(c, r2.Denom()))
-	return radRoot(p, q, d, c, true), radRoot(p, q, d, c, false)
+	den := lcmInt(r1.Denom(), r2.Denom())
+	p := new(big.Int).Mul(r1.Num(), new(big.Int).Div(den, r1.Denom()))
+	q := new(big.Int).Mul(r2.Num(), new(big.Int).Div(den, r2.Denom()))
+	return radRoot(p, q, d, den, true), radRoot(p, q, d, den, false)
 }
 
 // met en forme une racine (p +/- q√d)/c, sans afficher les 1 ni les /1 inutiles
@@ -907,51 +1026,89 @@ func solveWord(en bool, fr, ang string) string {
 	return fr
 }
 
-func solveEquation(src, lang string) (string, error) {
+func (c *algCtx) solveEquation(src, lang string) (string, error) {
 	en := lang == "EN"
 	sides := strings.Split(src, "=")
 	if len(sides) != 2 {
 		return "", fmt.Errorf("UNE EQUATION DOIT AVOIR UN SEUL SIGNE = (EXEMPLE [ 2x + 3 = 7 ])")
 	}
-	left, err := evalAlg(sides[0])
+	left, err := c.evalAlg(sides[0])
 	if err != nil {
 		return "", err
 	}
-	right, err := evalAlg(sides[1])
+	right, err := c.evalAlg(sides[1])
 	if err != nil {
 		return "", err
 	}
+	// les denominateurs des deux membres : une valeur qui en annule un n'est pas
+	// une solution, meme si la simplification l'a fait disparaitre de l'equation
+	interdits := c.interdits
+	aucune := solveWord(en, "aucune solution", "no solution")
 	// tout du meme cote : p = 0
-	p := subPoly(left, right)
+	p := c.subPoly(left, right)
 	vars := varsOf(p)
-	if len(vars) > 1 {
+	// les inconnues sont celles de l'equation ET celles de ses denominateurs : dans
+	// (Y/Y) = X, Y a disparu de l'equation mais doit toujours etre non nul
+	inconnues := map[string]bool{}
+	for _, v := range vars {
+		inconnues[v] = true
+	}
+	for _, d := range interdits {
+		for _, v := range varsOf(d) {
+			inconnues[v] = true
+		}
+	}
+	if len(inconnues) > 1 {
 		return "", fmt.Errorf("JE NE RESOUS QU'UNE EQUATION A UNE SEULE INCONNUE")
 	}
 	if len(vars) == 0 {
 		// plus d'inconnue : ou bien c'est toujours vrai, ou bien jamais
-		c, _ := p.asConst()
-		if c.Sign() == 0 {
-			return solveWord(en, "toujours vrai : n'importe quel nombre convient",
-				"always true: any number works"), nil
+		k, _ := p.asConst()
+		if k.Sign() != 0 {
+			return aucune, nil
 		}
-		return solveWord(en, "aucune solution", "no solution"), nil
+		toujours := solveWord(en, "toujours vrai : n'importe quel nombre convient",
+			"always true: any number works")
+		if len(interdits) == 0 {
+			return toujours, nil
+		}
+		if list, ok := c.excludedValues(interdits, solveWord(en, " et ", " and ")); ok {
+			if list == "" { // des denominateurs qui ne s'annulent jamais (x^2 + 1)
+				return toujours, nil
+			}
+			return solveWord(en, "toujours vrai, sauf pour ", "always true, except for ") + list, nil
+		}
+		return solveWord(en, "toujours vrai, sauf la ou un denominateur s'annule",
+			"always true, except where a denominator is zero"), nil
 	}
 	v := vars[0]
 	vu := strings.ToUpper(v) // affichage en majuscule (v reste la cle interne en minuscule)
+	// r annule-t-il un denominateur ?
+	forbidden := func(r *big.Rat) bool {
+		for _, d := range interdits {
+			if len(c.substitute(d, map[string]*big.Rat{v: r})) == 0 {
+				return true
+			}
+		}
+		return false
+	}
 	deg := maxDeg(p, v)
 	if deg > 2 {
 		return "", fmt.Errorf("JE NE RESOUS QUE LE 1er ET LE 2nd DEGRE")
 	}
 	a := coeffDeg(p, v, 2)
 	b := coeffDeg(p, v, 1)
-	c := coeffDeg(p, v, 0)
+	k0 := coeffDeg(p, v, 0)
 	if deg == 1 {
-		// b x + c = 0
-		x := new(big.Rat).Neg(new(big.Rat).Quo(c, b))
+		// b x + k0 = 0
+		x := new(big.Rat).Neg(new(big.Rat).Quo(k0, b))
+		if forbidden(x) {
+			return aucune, nil
+		}
 		return fmt.Sprintf("%s = %s", vu, printRat(x)), nil
 	}
-	// a x^2 + b x + c = 0 : discriminant b^2 - 4ac
-	disc := new(big.Rat).Sub(new(big.Rat).Mul(b, b), ratScale(new(big.Rat).Mul(a, c), 4))
+	// a x^2 + b x + k0 = 0 : discriminant b^2 - 4 a k0
+	disc := new(big.Rat).Sub(new(big.Rat).Mul(b, b), ratScale(new(big.Rat).Mul(a, k0), 4))
 	twoA := ratScale(a, 2)
 	ou := solveWord(en, "ou", "or")
 	switch disc.Sign() {
@@ -959,6 +1116,9 @@ func solveEquation(src, lang string) (string, error) {
 		return solveWord(en, "pas de solution reelle", "no real solution"), nil
 	case 0:
 		x := new(big.Rat).Quo(new(big.Rat).Neg(b), twoA)
+		if forbidden(x) {
+			return aucune, nil
+		}
 		return fmt.Sprintf("%s = %s %s", vu, printRat(x),
 			solveWord(en, "(solution double)", "(double solution)")), nil
 	}
@@ -966,38 +1126,102 @@ func solveEquation(src, lang string) (string, error) {
 	if rt, ok := ratSqrt(disc); ok {
 		x1 := new(big.Rat).Quo(new(big.Rat).Add(new(big.Rat).Neg(b), rt), twoA)
 		x2 := new(big.Rat).Quo(new(big.Rat).Sub(new(big.Rat).Neg(b), rt), twoA)
-		lo, hi := printRat(x1), printRat(x2)
 		if x1.Cmp(x2) > 0 {
-			lo, hi = hi, lo
+			x1, x2 = x2, x1
 		}
-		return fmt.Sprintf("%s = %s %s %s = %s", vu, lo, ou, vu, hi), nil
+		switch f1, f2 := forbidden(x1), forbidden(x2); {
+		case f1 && f2:
+			return aucune, nil
+		case f1:
+			return fmt.Sprintf("%s = %s", vu, printRat(x2)), nil
+		case f2:
+			return fmt.Sprintf("%s = %s", vu, printRat(x1)), nil
+		}
+		return fmt.Sprintf("%s = %s %s %s = %s", vu, printRat(x1), ou, vu, printRat(x2)), nil
 	}
-	// racines irrationnelles : forme exacte avec radical, (p +/- q√d)/c
-	lo, hi := quadRadicalRoots(a, b, disc)
+	// racines irrationnelles : elles n'annulent un denominateur que si le trinome
+	// tout entier le divise (un polynome a coefficients rationnels ne peut pas
+	// s'annuler sur une seule des deux)
+	for _, d := range interdits {
+		if _, rem := c.divPolyLong(d, p); len(rem) == 0 {
+			return aucune, nil
+		}
+	}
+	// forme exacte avec radical, (p +/- q√d)/c
+	lo, hi := c.quadRadicalRoots(a, b, disc)
 	return fmt.Sprintf("%s = %s %s %s = %s", vu, lo, ou, vu, hi), nil
+}
+
+// les valeurs qui annulent l'un des denominateurs, sous la forme "X = 0 et X = 1"
+// ("" s'il n'y en a aucune). ok=false si on ne sait pas toutes les donner (plusieurs variables, ou un facteur
+// sans racine rationnelle qui pourrait encore s'annuler)
+func (c *algCtx) excludedValues(dens []poly, sep string) (string, bool) {
+	name := ""
+	var roots []*big.Rat
+	for _, d := range dens {
+		vars := varsOf(d)
+		if len(vars) != 1 || (name != "" && vars[0] != name) {
+			return "", false
+		}
+		name = vars[0]
+		_, mono, prim := c.pullCommon(d)
+		if mono[name] > 0 {
+			roots = append(roots, big.NewRat(0, 1)) // facteur x : s'annule en 0
+		}
+		cur := prim
+		for maxDeg(cur, name) >= 1 {
+			r, ok := c.rationalRoot(cur, name)
+			if !ok {
+				break
+			}
+			roots = append(roots, r)
+			cur, _ = c.divPolyLong(cur, linearFactor(name, r))
+		}
+		if maxDeg(cur, name) == 1 || maxDeg(cur, name) > 2 {
+			return "", false
+		}
+		if maxDeg(cur, name) == 2 { // reste un trinome : sans racine reelle, il ne s'annule jamais
+			a, b, k0 := coeffDeg(cur, name, 2), coeffDeg(cur, name, 1), coeffDeg(cur, name, 0)
+			disc := new(big.Rat).Sub(new(big.Rat).Mul(b, b), ratScale(new(big.Rat).Mul(a, k0), 4))
+			if disc.Sign() >= 0 {
+				return "", false
+			}
+		}
+	}
+	sort.Slice(roots, func(i, j int) bool { return roots[i].Cmp(roots[j]) < 0 })
+	var parts []string
+	for k, r := range roots {
+		if k > 0 && r.Cmp(roots[k-1]) == 0 {
+			continue
+		}
+		parts = append(parts, strings.ToUpper(name)+" = "+printRat(r))
+	}
+	return strings.Join(parts, sep), true
 }
 
 // --- EVALUE : remplace des variables par des valeurs ---
 
 // r^n pour n entier >= 0
-func ratPow(r *big.Rat, n int) *big.Rat {
+func (c *algCtx) ratPow(r *big.Rat, n int) *big.Rat {
 	res := big.NewRat(1, 1)
 	for i := 0; i < n; i++ {
 		res.Mul(res, r)
+		c.checkCoeff(res)
 	}
 	return res
 }
 
 // remplace dans le polynome les variables donnees par leur valeur. les variables
 // absentes de la table restent telles quelles (on peut donc evaluer partiellement).
-func substitute(p poly, vals map[string]*big.Rat) poly {
+func (c *algCtx) substitute(p poly, vals map[string]*big.Rat) poly {
+	c.tick(len(p))
 	out := poly{}
 	for _, t := range p {
 		coeff := new(big.Rat).Set(t.coeff)
 		exps := map[string]int{}
 		for v, e := range t.exps {
 			if val, ok := vals[v]; ok {
-				coeff.Mul(coeff, ratPow(val, e))
+				coeff.Mul(coeff, c.ratPow(val, e))
 			} else {
 				exps[v] = e
 			}
@@ -1009,7 +1233,7 @@ func substitute(p poly, vals map[string]*big.Rat) poly {
 
 // lit la liste de couples "variable valeur" ( [ x 3 y 5 ] ). la valeur est tout
 // ce qui suit jusqu'a la prochaine lettre seule, et doit valoir un nombre.
-func parsePairs(items []Datum) (map[string]*big.Rat, error) {
+func (c *algCtx) parsePairs(items []Datum) (map[string]*big.Rat, error) {
 	vals := map[string]*big.Rat{}
 	for i := 0; i < len(items); {
 		name := strings.ToLower(items[i].String())
@@ -1024,7 +1248,7 @@ func parsePairs(items []Datum) (map[string]*big.Rat, error) {
 		if i == start {
 			return nil, fmt.Errorf("IL MANQUE UNE VALEUR POUR %s", strings.ToUpper(name))
 		}
-		p, err := evalAlg(datumsToAlg(items[start:i]))
+		p, err := c.evalAlg(datumsToAlg(items[start:i]))
 		if err != nil {
 			return nil, err
 		}
@@ -1049,12 +1273,12 @@ func isSingleLetter(d Datum) bool {
 
 // --- FACTORISE : facteur commun, identites remarquables, trinome ---
 
-func factorize(p poly) string {
+func (c *algCtx) factorize(p poly) string {
 	if len(p) == 0 {
 		return "0"
 	}
-	content, mono, prim := pullCommon(p)
-	factors := factorPrimitive(prim)
+	content, mono, prim := c.pullCommon(p)
+	factors := c.factorPrimitive(prim)
 	return renderFactored(content, mono, factors)
 }
 
@@ -1066,7 +1290,7 @@ func gcdBig(a, b *big.Int) *big.Int {
 // sort le facteur commun : un coefficient rationnel et un monome present partout.
 // rend (contenu, monome commun, partie primitive a coefficients entiers premiers
 // entre eux et de tete positive).
-func pullCommon(p poly) (*big.Rat, map[string]int, poly) {
+func (c *algCtx) pullCommon(p poly) (*big.Rat, map[string]int, poly) {
 	// monome commun : le plus petit exposant de chaque variable
 	mono := map[string]int{}
 	first := true
@@ -1116,7 +1340,7 @@ func pullCommon(p poly) (*big.Rat, map[string]int, poly) {
 	// tete positive : on pousse le signe dans le contenu
 	if lead := prim.sorted(); len(lead) > 0 && lead[0].coeff.Sign() < 0 {
 		content.Neg(content)
-		prim = negPoly(prim)
+		prim = c.negPoly(prim)
 	}
 	return content, mono, prim
 }
@@ -1124,22 +1348,22 @@ func pullCommon(p poly) (*big.Rat, map[string]int, poly) {
 // factorise la partie primitive en une liste de facteurs (produit = entree).
 // a une variable : on extrait toutes les racines rationnelles (tout degre). a
 // plusieurs : on s'en tient aux identites remarquables.
-func factorPrimitive(q poly) []poly {
+func (c *algCtx) factorPrimitive(q poly) []poly {
 	if len(q) <= 1 {
 		return []poly{q}
 	}
 	if len(varsOf(q)) == 1 {
-		return factorUnivariate(q, varsOf(q)[0])
+		return c.factorUnivariate(q, varsOf(q)[0])
 	}
-	if fs := diffSquares(q); fs != nil {
+	if fs := c.diffSquares(q); fs != nil {
 		out := []poly{}
 		for _, f := range fs {
-			out = append(out, factorPrimitive(f)...)
+			out = append(out, c.factorPrimitive(f)...)
 		}
 		return out
 	}
-	if base := perfectSquare(q); base != nil {
-		sub := factorPrimitive(base)
+	if base := c.perfectSquare(q); base != nil {
+		sub := c.factorPrimitive(base)
 		return append(sub, sub...) // q = base^2
 	}
 	return []poly{q} // irreductible avec nos moyens : on laisse tel quel
@@ -1148,17 +1372,17 @@ func factorPrimitive(q poly) []poly {
 // factorise un polynome a une variable en facteurs lineaires (une par racine
 // rationnelle) suivis de ce qui reste sans racine rationnelle. ce reste est
 // rendu tel quel : x^2+1 est irreductible sur les rationnels, on ne le casse pas.
-func factorUnivariate(q poly, v string) []poly {
+func (c *algCtx) factorUnivariate(q poly, v string) []poly {
 	var factors []poly
 	cur := q
 	for maxDeg(cur, v) >= 1 {
-		r, ok := rationalRoot(cur, v)
+		r, ok := c.rationalRoot(cur, v)
 		if !ok {
 			break
 		}
 		lin := linearFactor(v, r)
 		factors = append(factors, lin)
-		cur, _ = divPolyLong(cur, lin) // division exacte (r est racine)
+		cur, _ = c.divPolyLong(cur, lin) // division exacte (r est racine)
 	}
 	return append(factors, cur) // le reste (constante 1 absorbee, ou facteur sans racine)
 }
@@ -1166,7 +1390,7 @@ func factorUnivariate(q poly, v string) []poly {
 // cherche une racine rationnelle p/q d'un polynome a une variable, via le
 // theoreme des racines rationnelles : p divise le terme constant, q le terme de
 // tete. rend false si aucune (ou si les coefficients debordent).
-func rationalRoot(p poly, v string) (*big.Rat, bool) {
+func (c *algCtx) rationalRoot(p poly, v string) (*big.Rat, bool) {
 	deg := maxDeg(p, v)
 	a0 := coeffDeg(p, v, 0)
 	if a0.Sign() == 0 {
@@ -1180,7 +1404,7 @@ func rationalRoot(p poly, v string) (*big.Rat, bool) {
 		for _, qq := range divisors(an.Num()) {
 			for _, s := range []int64{1, -1} {
 				r := new(big.Rat).SetFrac(big.NewInt(s*pp), big.NewInt(qq))
-				if evalPolyAt(p, v, r).Sign() == 0 {
+				if c.evalPolyAt(p, v, r).Sign() == 0 {
 					return r, true
 				}
 			}
@@ -1190,9 +1414,9 @@ func rationalRoot(p poly, v string) (*big.Rat, bool) {
 }
 
 // la valeur du polynome (a une variable) en r
-func evalPolyAt(p poly, v string, r *big.Rat) *big.Rat {
-	c, _ := substitute(p, map[string]*big.Rat{v: r}).asConst()
-	return c
+func (c *algCtx) evalPolyAt(p poly, v string, r *big.Rat) *big.Rat {
+	k, _ := c.substitute(p, map[string]*big.Rat{v: r}).asConst()
+	return k
 }
 
 // les diviseurs positifs de |n| (n tient dans un int64). on ne teste pas au-dela
@@ -1234,7 +1458,7 @@ func sqrtMonomial(t *term) poly {
 }
 
 // difference de deux carres A^2 - B^2 -> [A-B, A+B], sinon nil
-func diffSquares(q poly) []poly {
+func (c *algCtx) diffSquares(q poly) []poly {
 	if len(q) != 2 {
 		return nil
 	}
@@ -1255,11 +1479,11 @@ func diffSquares(q poly) []poly {
 	if A == nil || B == nil {
 		return nil
 	}
-	return []poly{subPoly(A, B), addPoly(A, B)}
+	return []poly{c.subPoly(A, B), c.addPoly(A, B)}
 }
 
 // carre parfait A^2 +/- 2AB + B^2 -> le binome A+B ou A-B, sinon nil
-func perfectSquare(q poly) poly {
+func (c *algCtx) perfectSquare(q poly) poly {
 	if len(q) != 3 {
 		return nil
 	}
@@ -1274,12 +1498,12 @@ func perfectSquare(q poly) poly {
 			mid := poly{}
 			k := 3 - i - j
 			mid.add(cloneExps(ts[k].exps), ts[k].coeff)
-			two := mulPoly(scalePoly(A, big.NewRat(2, 1)), B)
+			two := c.mulPoly(c.scalePoly(A, big.NewRat(2, 1)), B)
 			if polyEqual(mid, two) {
-				return addPoly(A, B)
+				return c.addPoly(A, B)
 			}
-			if polyEqual(mid, negPoly(two)) {
-				return subPoly(A, B)
+			if polyEqual(mid, c.negPoly(two)) {
+				return c.subPoly(A, B)
 			}
 		}
 	}
@@ -1361,6 +1585,9 @@ func argToAlg(v Value) (string, error) {
 	if v.Kind != KList {
 		return "", fmt.Errorf("DONNE L'EXPRESSION ENTRE CROCHETS, PAR EXEMPLE [ (X+1)(X-1) ]")
 	}
+	if tooDeep(v) {
+		return "", errTropProfond
+	}
 	return datumsToAlg(v.List), nil
 }
 
@@ -1385,13 +1612,16 @@ func datumToAlg(d Datum) string {
 // --- primitives ---
 
 func (i *Interp) registerCalcul() {
-	op := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) {
-		i.register(&primitive{arity: arity, reporter: true, fn: fn}, names...)
+	// chaque primitive tourne dans son propre contexte de calcul (budget, Ctrl+C)
+	op := func(arity int, fn func(c *algCtx, in *Interp, a []Value) (Value, error), names ...string) {
+		i.register(&primitive{arity: arity, reporter: true, fn: func(in *Interp, a []Value) (Value, error) {
+			return in.algRun(func(c *algCtx) (Value, error) { return fn(c, in, a) })
+		}}, names...)
 	}
 
 	// DEVELOPPE expr : developpe et reduit l'expression litterale
 	// DEVELOPPE [ (3x+5y)(3x-5y) ]  ->  9x^2 - 25y^2
-	op(1, func(in *Interp, a []Value) (Value, error) {
+	op(1, func(c *algCtx, in *Interp, a []Value) (Value, error) {
 		w, err := argToAlg(a[0])
 		if err != nil {
 			return Value{}, err
@@ -1399,7 +1629,7 @@ func (i *Interp) registerCalcul() {
 		if strings.Contains(w, "=") {
 			return Value{}, fmt.Errorf("DEVELOPPE VEUT UNE EXPRESSION, PAS UNE EGALITE")
 		}
-		s, err := developpeStr(w)
+		s, err := c.developpeStr(w)
 		if err != nil {
 			return Value{}, err
 		}
@@ -1408,7 +1638,7 @@ func (i *Interp) registerCalcul() {
 
 	// FACTORISE expr : factorise (facteur commun, identites remarquables, trinome)
 	// FACTORISE [ 9x^2 - 25y^2 ]  ->  (3x + 5y)(3x - 5y)
-	op(1, func(in *Interp, a []Value) (Value, error) {
+	op(1, func(c *algCtx, in *Interp, a []Value) (Value, error) {
 		w, err := argToAlg(a[0])
 		if err != nil {
 			return Value{}, err
@@ -1416,16 +1646,16 @@ func (i *Interp) registerCalcul() {
 		if strings.Contains(w, "=") {
 			return Value{}, fmt.Errorf("FACTORISE VEUT UNE EXPRESSION, PAS UNE EGALITE")
 		}
-		p, err := evalAlg(w)
+		p, err := c.evalAlg(w)
 		if err != nil {
 			return Value{}, err
 		}
-		return WordValue(factorize(p)), nil
+		return WordValue(c.factorize(p)), nil
 	}, "FACTORISE")
 
 	// RESOUS equation : resout une equation a une inconnue (1er ou 2nd degre)
 	// RESOUS [ x^2 - 5x + 6 = 0 ]  ->  x = 2 ou x = 3
-	op(1, func(in *Interp, a []Value) (Value, error) {
+	op(1, func(c *algCtx, in *Interp, a []Value) (Value, error) {
 		w, err := argToAlg(a[0])
 		if err != nil {
 			return Value{}, err
@@ -1433,7 +1663,7 @@ func (i *Interp) registerCalcul() {
 		if !strings.Contains(w, "=") {
 			return Value{}, fmt.Errorf("UNE EQUATION A UN SIGNE = (EXEMPLE [ 2x + 3 = 7 ])")
 		}
-		s, err := solveEquation(w, in.Lang())
+		s, err := c.solveEquation(w, in.Lang())
 		if err != nil {
 			return Value{}, err
 		}
@@ -1442,7 +1672,7 @@ func (i *Interp) registerCalcul() {
 
 	// EVALUE expr valeurs : remplace les variables par des nombres
 	// EVALUE [ x^2 + 1 ] [ x 3 ]  ->  10
-	op(2, func(in *Interp, a []Value) (Value, error) {
+	op(2, func(c *algCtx, in *Interp, a []Value) (Value, error) {
 		w, err := argToAlg(a[0])
 		if err != nil {
 			return Value{}, err
@@ -1452,22 +1682,33 @@ func (i *Interp) registerCalcul() {
 		}
 		// fraction-based : EVALUE marche aussi sur 1/(x+1) (rend une valeur ou une
 		// fraction reduite), pas seulement sur les polynomes.
-		f, err := evalFrac(w)
+		f, err := c.evalFrac(w)
 		if err != nil {
 			return Value{}, err
 		}
+		interdits := c.interdits // tout ce par quoi l'expression divise
 		if a[1].Kind != KList {
 			return Value{}, fmt.Errorf("DONNE LES VALEURS ENTRE CROCHETS, PAR EXEMPLE [ X 3 ]")
 		}
-		vals, err := parsePairs(a[1].List)
+		if tooDeep(a[1]) {
+			return Value{}, errTropProfond
+		}
+		vals, err := c.parsePairs(a[1].List)
 		if err != nil {
 			return Value{}, err
 		}
-		den := substitute(f.den, vals)
+		// la fraction est deja simplifiee : (x-1)/(x-1) est devenu 1. on verifie donc
+		// les denominateurs d'origine, pas seulement celui qui reste
+		for _, d := range interdits {
+			if len(c.substitute(d, vals)) == 0 {
+				return Value{}, fmt.Errorf("DIVISION PAR ZERO")
+			}
+		}
+		den := c.substitute(f.den, vals)
 		if len(den) == 0 {
 			return Value{}, fmt.Errorf("DIVISION PAR ZERO")
 		}
-		s, err := fracRender(frac{substitute(f.num, vals), den}.reduced())
+		s, err := c.fracRender(c.reduce(frac{c.substitute(f.num, vals), den}))
 		if err != nil {
 			return Value{}, err
 		}

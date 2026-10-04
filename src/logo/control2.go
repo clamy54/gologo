@@ -19,10 +19,8 @@ func catchable(err error) bool {
 	if _, ok := err.(*ctrl); ok {
 		return false
 	}
-	if _, ok := err.(*throwSignal); ok {
-		return false
-	}
-	return true
+	var ts *throwSignal
+	return !errors.As(err, &ts)
 }
 
 func (i *Interp) registerControl2() {
@@ -50,7 +48,8 @@ func (i *Interp) registerControl2() {
 		if err == nil {
 			return nil
 		}
-		if ts, ok := err.(*throwSignal); ok {
+		var ts *throwSignal
+		if errors.As(err, &ts) {
 			if ts.tag == tag {
 				return nil // attrape
 			}

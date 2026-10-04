@@ -74,11 +74,10 @@ func noteDurationMs(duree, tempo int) int {
 func (i *Interp) registerMusic() {
 	param := func(name string, lo, hi int, set func(*Interp, int)) {
 		i.register(cmd(1, func(in *Interp, a []Value) error {
-			n, err := toNumber(a[0])
+			k, err := intArg(a[0]) // un entier : OCTAVE 4.7 n'est pas OCTAVE 4
 			if err != nil {
 				return err
 			}
-			k := int(n)
 			if k < lo || k > hi {
 				return fmt.Errorf("%s N'AIME PAS %s", name, a[0].String())
 			}

@@ -1,7 +1,5 @@
 package logo
 
-import "math"
-
 // multi-tortue (compat MSWLogo/FMSLogo et XLogo) : plusieurs tortues sur le meme
 // ecran, une seule active a la fois qui recoit les commandes normales (AV, TD...).
 // FIXETORTUE choisit l'active, DEMANDE execute un bloc sur d'autres puis revient.
@@ -45,26 +43,28 @@ func (i *Interp) registerMultiTurtle() {
 		if a[0].Kind != KList || len(a[0].List) != 2 {
 			return Value{}, &badData{a[0].String()}
 		}
-		na, oka := datumNum(a[0].List[0])
-		nb, okb := datumNum(a[0].List[1])
-		if !oka || !okb || na != math.Trunc(na) || nb != math.Trunc(nb) {
+		na, oka := datumInt(a[0].List[0])
+		nb, okb := datumInt(a[0].List[1])
+		if !oka || !okb {
 			return Value{}, &badData{a[0].String()}
 		}
-		return BoolValue(in.Turtle.Collide(int(na), int(nb))), nil
+		return BoolValue(in.Turtle.Collide(na, nb)), nil
 	}}, "COLLISION?")
 }
 
 // convertit un argument en numero de tortue. au contraire d'un simple int(n) il
-// refuse les non-entiers : FIXETORTUE 1.9 est une erreur, pas un round vers 1
-func turtleIndex(v Value) (int, error) {
-	n, err := toNumber(v)
+// refuse les non-entiers (FIXETORTUE 1.9 est une erreur, pas un round vers 1) et
+// les valeurs qui ne tiennent pas dans un entier
+func turtleIndex(v Value) (int, error) { return intArg(v) }
+
+// entier exact porte par un element de liste (numero de tortue)
+func datumInt(d Datum) (int, bool) {
+	v, err := datumToValue(d)
 	if err != nil {
-		return 0, err
+		return 0, false
 	}
-	if n != math.Trunc(n) {
-		return 0, &badData{v.String()}
-	}
-	return int(n), nil
+	n, err := intArg(v)
+	return n, err == nil
 }
 
 // DEMANDE / ASK : n est un numero de tortue ou une liste de numeros. on joue le
@@ -79,11 +79,11 @@ func primDemande(in *Interp, a []Value) (Value, error) {
 	switch a[0].Kind {
 	case KList:
 		for _, d := range a[0].List {
-			n, ok := datumNum(d)
-			if !ok || n != math.Trunc(n) {
+			n, ok := datumInt(d)
+			if !ok {
 				return Value{}, &badData{a[0].String()}
 			}
-			nums = append(nums, int(n))
+			nums = append(nums, n)
 		}
 	default:
 		n, err := turtleIndex(a[0])
@@ -94,7 +94,12 @@ func primDemande(in *Interp, a []Value) (Value, error) {
 	}
 
 	save := in.Turtle.CurrentTurtle()
-	defer in.Turtle.SetTurtle(save) // on revient a la tortue de depart
+	defer func() { // on revient a la tortue de depart, si elle existe encore : apres
+		// un VE ou un DISTORTUE dans le bloc, la reselectionner la recreerait
+		if save < in.Turtle.TurtleCount() {
+			in.Turtle.SetTurtle(save)
+		}
+	}()
 	for _, n := range nums {
 		if err := in.Turtle.SetTurtle(n); err != nil {
 			return Value{}, err

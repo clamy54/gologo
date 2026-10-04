@@ -18,15 +18,15 @@ func (i *Interp) registerAnimate() {
 		if err != nil {
 			return err
 		}
-		x, err := toNumber(a[1])
+		x, err := toFinite(a[1])
 		if err != nil {
 			return err
 		}
-		y, err := toNumber(a[2])
+		y, err := toFinite(a[2])
 		if err != nil {
 			return err
 		}
-		sp, err := toNumber(a[3])
+		sp, err := toFinite(a[3])
 		if err != nil {
 			return err
 		}
@@ -53,15 +53,15 @@ func (i *Interp) registerAnimate() {
 		}
 		in.Turtle.StopMotion(id)
 		return nil
-	}), "STOPANIME")
+	}).argRange(0, 1), "STOPANIME")
 
 	// CADENCE n : images par seconde du moteur d'animation (1 a 240)
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
-		in.Turtle.SetFPS(int(n))
+		in.Turtle.SetFPS(numToInt(n))
 		return nil
 	}), "CADENCE")
 }

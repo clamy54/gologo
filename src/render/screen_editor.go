@@ -60,7 +60,11 @@ func (s *Screen) Edit(initial string) (string, bool) {
 	s.edEN = false         // a l'ouverture, le 1er Ctrl+T traduit vers l'anglais
 	s.edActive.Store(true) // rend edLines visible a l'interface avant qu'elle ne lise
 	s.invalidate()
-	res := <-s.edDone
+	var res editResult
+	select {
+	case res = <-s.edDone:
+	case <-s.closed: // la fenetre se ferme : comme un abandon
+	}
 	s.invalidate()
 	return res.text, res.ok
 }

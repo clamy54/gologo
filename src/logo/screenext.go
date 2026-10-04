@@ -83,19 +83,19 @@ func (i *Interp) registerScreenExt() {
 			return err
 		}
 		if sc, ok := in.screen(); ok {
-			sc.SetCursor(int(round1(col)), int(round1(lig)))
+			sc.SetCursor(numToInt(round1(col)), numToInt(round1(lig)))
 		}
 		return nil
 	}), "FCURS")
 
 	// ME n : nb de lignes texte visibles (1-25, 25 = plein texte)
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
 		if sc, ok := in.screen(); ok {
-			sc.SetTextLines(int(round1(n)))
+			sc.SetTextLines(numToInt(round1(n)))
 		}
 		return nil
 	}), "ME")

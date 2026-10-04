@@ -2,7 +2,6 @@ package logo
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 )
 
@@ -10,6 +9,44 @@ import (
 // borne l'allocation pour qu'un TABLEAU 1e18 rende une erreur au lieu de paniquer
 // (makeslice) ou de manger toute la memoire
 const maxArrayCells = 10_000_000
+
+// borne de l'origine d'un tableau (indice de sa 1re case). largement de quoi faire,
+// et les calculs indice - origine ou origine + taille ne debordent plus jamais
+const maxArrayOrigin = 1_000_000_000
+
+// nombre maximal de dimensions de TABLEAUMD : au-dela d'une vingtaine de dimensions
+// de taille 2 on depasse deja maxArrayCells, seules des dimensions de taille 1
+// pourraient s'empiler sans fin (et la construction est recursive)
+const maxArrayDims = 64
+
+// lit l'origine optionnelle d'un tableau (2e argument de TABLEAU & co)
+func originArg(a []Value) (int, error) {
+	if len(a) < 2 {
+		return 1, nil
+	}
+	o, err := intArg(a[1])
+	if err != nil {
+		return 0, err
+	}
+	if o < -maxArrayOrigin || o > maxArrayOrigin {
+		return 0, &badData{a[1].String()}
+	}
+	return o, nil
+}
+
+// position (a partir de 0) de la case d'indice idx, ou ok=false si elle n'existe
+// pas. ecrit sans soustraction signee : un indice extreme ne peut pas, en
+// debordant, retomber par hasard sur une case valide
+func (a *Array) pos(idx int) (int, bool) {
+	if idx < a.Origin {
+		return 0, false
+	}
+	d := uint64(idx) - uint64(a.Origin)
+	if d >= uint64(len(a.Items)) {
+		return 0, false
+	}
+	return int(d), true
+}
 
 // le cout d'un tableau MD tient-il sous le plafond ? on compte les cases de TOUS
 // les etages, pas seulement le produit final : TABLEAUMD [ 10000000 1 ] a un
@@ -41,8 +78,10 @@ func (i *Interp) registerArrays() {
 	op := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) {
 		i.register(&primitive{arity: arity, reporter: true, fn: fn}, names...)
 	}
-	vop := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) {
-		i.register(&primitive{arity: arity, reporter: true, variadic: true, fn: fn}, names...)
+	vop := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) *primitive {
+		p := &primitive{arity: arity, reporter: true, variadic: true, fn: fn}
+		i.register(p, names...)
+		return p
 	}
 
 	// TABLEAU taille / (TABLEAU taille origine) : tableau de taille cases, chacune
@@ -58,20 +97,16 @@ func (i *Interp) registerArrays() {
 		if size > maxArrayCells {
 			return Value{}, fmt.Errorf("TABLEAU TROP GRAND")
 		}
-		origin := 1
-		if len(a) >= 2 {
-			o, err := intArg(a[1])
-			if err != nil {
-				return Value{}, err
-			}
-			origin = o
+		origin, err := originArg(a)
+		if err != nil {
+			return Value{}, err
 		}
 		items := make([]Value, size)
 		for k := range items {
 			items[k] = ListValue(nil) // case vide = liste vide, facon FMSLogo
 		}
 		return ArrayValue(&Array{Items: items, Origin: origin}), nil
-	}, "TABLEAU")
+	}, "TABLEAU").argRange(1, 2)
 
 	// TABLEAUMD listetailles / (... origine) : tableau multi-dimensionnel
 	vop(1, func(in *Interp, a []Value) (Value, error) {
@@ -82,36 +117,28 @@ func (i *Interp) registerArrays() {
 		if len(sizes) == 0 {
 			return Value{}, fmt.Errorf("TABLEAUMD VEUT AU MOINS UNE DIMENSION")
 		}
-		if !mdSizeOK(sizes) {
+		if len(sizes) > maxArrayDims || !mdSizeOK(sizes) {
 			return Value{}, fmt.Errorf("TABLEAU TROP GRAND")
 		}
-		origin := 1
-		if len(a) >= 2 {
-			o, err := intArg(a[1])
-			if err != nil {
-				return Value{}, err
-			}
-			origin = o
+		origin, err := originArg(a)
+		if err != nil {
+			return Value{}, err
 		}
 		arr, err := buildMD(sizes, origin)
 		if err != nil {
 			return Value{}, err
 		}
 		return ArrayValue(arr), nil
-	}, "TABLEAUMD")
+	}, "TABLEAUMD").argRange(1, 2)
 
 	// LISTEVERSTABLEAU liste / (... origine) : tableau ayant les memes elements
 	vop(1, func(in *Interp, a []Value) (Value, error) {
 		if a[0].Kind != KList {
 			return Value{}, fmt.Errorf("LISTEVERSTABLEAU N'AIME PAS %s", a[0].String())
 		}
-		origin := 1
-		if len(a) >= 2 {
-			o, err := intArg(a[1])
-			if err != nil {
-				return Value{}, err
-			}
-			origin = o
+		origin, err := originArg(a)
+		if err != nil {
+			return Value{}, err
 		}
 		items := make([]Value, len(a[0].List))
 		for k, d := range a[0].List {
@@ -122,7 +149,7 @@ func (i *Interp) registerArrays() {
 			items[k] = v
 		}
 		return ArrayValue(&Array{Items: items, Origin: origin}), nil
-	}, "LISTEVERSTABLEAU")
+	}, "LISTEVERSTABLEAU").argRange(1, 2)
 
 	// TABLEAUVERSLISTE tableau : liste des cases (1re case en tete, quelle que soit
 	// l'origine). copie de surface, pour traiter le tableau avec APPLIQUE etc.
@@ -146,8 +173,7 @@ func (i *Interp) registerArrays() {
 			return fmt.Errorf("ORDONNE N'AIME PAS %s", a[0].String())
 		}
 		items := a[0].Arr.Items
-		sort.SliceStable(items, func(i, j int) bool { return valueLess(items[i], items[j]) })
-		return nil
+		return in.sortStable(items, func(i, j int) bool { return valueLess(items[i], items[j]) })
 	}), "ORDONNE")
 
 	// ITEMMD listeindices tableaumd : case d'un tableau multi-dimensionnel
@@ -164,8 +190,8 @@ func (i *Interp) registerArrays() {
 			if cur.Kind != KArray {
 				return Value{}, fmt.Errorf("ITEMMD : PAS ASSEZ DE DIMENSIONS")
 			}
-			pos := idx - cur.Arr.Origin
-			if pos < 0 || pos >= len(cur.Arr.Items) {
+			pos, ok := cur.Arr.pos(idx)
+			if !ok {
 				return Value{}, fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR ITEMMD")
 			}
 			cur = cur.Arr.Items[pos]
@@ -180,15 +206,15 @@ func (i *Interp) registerArrays() {
 			return fmt.Errorf("FIXEITEM N'AIME PAS %s", a[1].String())
 		}
 		arr := a[1].Arr
-		if reachesAnyArray(a[2], map[*Array]bool{arr: true}, map[*Array]bool{}) {
+		if reachesAnyArray(a[2], map[*Array]bool{arr: true}) {
 			return fmt.Errorf("FIXEITEM REFUSE UN TABLEAU CIRCULAIRE")
 		}
 		n, err := intArg(a[0])
 		if err != nil {
 			return err
 		}
-		pos := n - arr.Origin
-		if pos < 0 || pos >= len(arr.Items) {
+		pos, ok := arr.pos(n)
+		if !ok {
 			return fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR FIXEITEM")
 		}
 		arr.Items[pos] = a[2]
@@ -210,8 +236,8 @@ func (i *Interp) registerArrays() {
 		cur := a[1].Arr
 		path := map[*Array]bool{cur: true}
 		for _, idx := range idxs[:len(idxs)-1] {
-			pos := idx - cur.Origin
-			if pos < 0 || pos >= len(cur.Items) {
+			pos, ok := cur.pos(idx)
+			if !ok {
 				return fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR FIXEITEMMD")
 			}
 			nv := cur.Items[pos]
@@ -221,11 +247,11 @@ func (i *Interp) registerArrays() {
 			cur = nv.Arr
 			path[cur] = true
 		}
-		if reachesAnyArray(a[2], path, map[*Array]bool{}) {
+		if reachesAnyArray(a[2], path) {
 			return fmt.Errorf("FIXEITEMMD REFUSE UN TABLEAU CIRCULAIRE")
 		}
-		pos := idxs[len(idxs)-1] - cur.Origin
-		if pos < 0 || pos >= len(cur.Items) {
+		pos, ok := cur.pos(idxs[len(idxs)-1])
+		if !ok {
 			return fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR FIXEITEMMD")
 		}
 		cur.Items[pos] = a[2]
@@ -243,6 +269,9 @@ func (i *Interp) registerArrays() {
 	op(1, func(in *Interp, a []Value) (Value, error) {
 		if a[0].Kind != KArray {
 			return Value{}, fmt.Errorf("COPIETABLEAU N'AIME PAS %s", a[0].String())
+		}
+		if tooDeep(a[0]) { // la copie est recursive : on refuse avant de s'y perdre
+			return Value{}, errTropProfond
 		}
 		return ArrayValue(deepCopyArray(a[0].Arr, map[*Array]*Array{})), nil
 	}, "COPIETABLEAU")
@@ -352,43 +381,48 @@ func buildMD(sizes []int, origin int) (*Array, error) {
 
 // v atteint-il (en profondeur) l'un des tableaux cibles ? sert a refuser les cycles
 // dans FIXEITEM/FIXEITEMMD. descend dans les tableaux ET dans les listes (une liste
-// peut contenir un tableau). seen evite de retraiter un meme tableau (DAG)
-func reachesAnyArray(v Value, targets, seen map[*Array]bool) bool {
-	switch v.Kind {
-	case KArray:
-		a := v.Arr
-		if targets[a] {
-			return true
-		}
-		if seen[a] {
-			return false
-		}
-		seen[a] = true
-		for _, it := range a.Items {
-			if reachesAnyArray(it, targets, seen) {
-				return true
-			}
-		}
-	case KList:
-		for _, d := range v.List {
-			if reachesDatumArray(d, targets, seen) {
-				return true
-			}
+// peut contenir un tableau). parcours sans recursion (pile explicite) : la valeur
+// peut etre emboitee tres profond. seen evite de retraiter un meme tableau (DAG)
+func reachesAnyArray(v Value, targets map[*Array]bool) bool {
+	seen := map[*Array]bool{}
+	var arrays []*Array // tableaux a visiter
+	var lists [][]Datum // listes a visiter
+	push := func(v Value) {
+		switch v.Kind {
+		case KArray:
+			arrays = append(arrays, v.Arr)
+		case KList:
+			lists = append(lists, v.List)
 		}
 	}
-	return false
-}
-
-func reachesDatumArray(d Datum, targets, seen map[*Array]bool) bool {
-	switch d.Kind {
-	case DArray:
-		if d.Arr != nil {
-			return reachesAnyArray(ArrayValue(d.Arr), targets, seen)
-		}
-	case DList:
-		for _, e := range d.List {
-			if reachesDatumArray(e, targets, seen) {
+	push(v)
+	for len(arrays) > 0 || len(lists) > 0 {
+		if n := len(arrays); n > 0 {
+			a := arrays[n-1]
+			arrays = arrays[:n-1]
+			if targets[a] {
 				return true
+			}
+			if seen[a] {
+				continue
+			}
+			seen[a] = true
+			for _, it := range a.Items {
+				push(it)
+			}
+			continue
+		}
+		n := len(lists)
+		l := lists[n-1]
+		lists = lists[:n-1]
+		for _, d := range l {
+			switch d.Kind {
+			case DArray:
+				if d.Arr != nil {
+					arrays = append(arrays, d.Arr)
+				}
+			case DList:
+				lists = append(lists, d.List)
 			}
 		}
 	}

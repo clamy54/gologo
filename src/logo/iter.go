@@ -8,14 +8,26 @@ import (
 // iterateurs de liste a gabarit (Logo "etendu"). le gabarit est du code ou
 // l'element courant se lit via :? (et :?1 / :?2 pour REDUIS)
 
-// evalue une suite de Datum comme expression et rend sa valeur (ex. [ :? * 2 ])
+// evalue une suite de Datum comme expression et rend sa valeur (ex. [ :? * 2 ]).
+// le gabarit est UNE expression qui rend une valeur : ce qui la suivrait serait
+// ignore sans un mot, et une commande muette donnerait un resultat vide
 func (i *Interp) evalExpr(data []Datum) (Value, error) {
 	if err := i.enterEval(); err != nil {
 		return Value{}, err
 	}
 	defer func() { i.evalDepth-- }()
 	ev := &eval{i: i, data: data}
-	return ev.expr(0)
+	v, err := ev.expr(0)
+	if err != nil {
+		return Value{}, err
+	}
+	if !ev.atEnd() {
+		return Value{}, fmt.Errorf("QUE FAIRE DE %s", ev.data[ev.pos].String())
+	}
+	if !v.HasValue() {
+		return Value{}, fmt.Errorf("LE GABARIT NE REND RIEN")
+	}
+	return v, nil
 }
 
 // contexte local des variables de gabarit (:? etc.)
@@ -52,7 +64,7 @@ func iterDatums(v Value) []Datum {
 			out[k] = valueToDatum(it)
 		}
 		return out
-	case KWord, KNumber, KInt:
+	case KWord, KNumber, KInt, KBool:
 		rs := []rune(v.String())
 		out := make([]Datum, len(rs))
 		for k, r := range rs {

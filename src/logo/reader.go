@@ -1,6 +1,7 @@
 package logo
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
@@ -19,6 +20,7 @@ const (
 	DGroup                   // ( ... ) : liste d'instructions ou groupement, selon le contenu
 	DOp                      // operateur infixe : + - * / = < > <= >= <>
 	DArray                   // { ... } : tableau litteral (eventuellement { ... }@origine)
+	DBool                    // booleen range dans une liste a l'execution (Text = VRAI ou FAUX)
 )
 
 // un element de code source, parfois imbrique (DList/DGroup/DArray)
@@ -33,32 +35,47 @@ type Datum struct {
 	Big    *big.Int // DNumber : entier exact quand le litteral deborde 2^53
 }
 
-// un Datum sous forme source (pour afficher des listes)
-func (d Datum) String() string {
+// plafond d'imbrication des donnees parcourues recursivement (affichage, copie,
+// sauvegarde). une liste ou un tableau peut s'emboiter sans limite a l'execution
+// (DONNE "L LISTE :L en boucle) : au-dela, la recursion Go ferait deborder la pile
+const maxDataDepth = 10000
+
+// un Datum tel qu'on l'affiche dans une liste (ECRIS/MONTRE). ce n'est PAS une forme
+// relisible : les mots perdent leur " et les groupes ( ) deviennent des crochets.
+// pour du source re-executable, voir source.go
+func (d Datum) String() string { return d.str(0) }
+
+func (d Datum) str(depth int) string {
 	switch d.Kind {
 	case DNumber:
 		if d.Big != nil {
 			return d.Big.String()
 		}
 		return formatNumber(d.Num)
-	case DWord, DSymbol, DOp:
+	case DWord, DSymbol, DOp, DBool:
 		return d.Text
 	case DVarRef:
 		return ":" + d.Text
 	case DList, DGroup:
+		if depth >= maxDataDepth {
+			return "[...]" // trop profond : on coupe l'affichage plutot que la pile
+		}
 		parts := make([]string, len(d.List))
 		for i, e := range d.List {
-			parts[i] = e.String()
+			parts[i] = e.str(depth + 1)
 		}
 		// entre crochets, la forme standard d'une liste
 		return "[" + strings.Join(parts, " ") + "]"
 	case DArray:
 		if d.Arr != nil { // tableau deja construit (mis dans une liste a l'execution)
-			return d.Arr.String()
+			return d.Arr.str(depth)
+		}
+		if depth >= maxDataDepth {
+			return "{...}"
 		}
 		parts := make([]string, len(d.List))
 		for i, e := range d.List {
-			parts[i] = e.String()
+			parts[i] = e.str(depth + 1)
 		}
 		s := "{" + strings.Join(parts, " ") + "}"
 		if d.Origin != 1 {
@@ -80,34 +97,56 @@ func Read(src string) ([]Datum, error) {
 // caractere disparait, la ligne se prolonge, le saut de ligne reste (separateur). le
 // '!' doit etre colle au saut, le '~' tolere des espaces avant. ailleurs, conserve
 func joinContinuations(src string) string {
+	s, _ := stripContinuations(src)
+	return s
+}
+
+// une coupe faite par stripContinuations : a partir de l'octet `at` du texte
+// nettoye, il manque `removed` octets par rapport au texte d'origine
+type contCut struct{ at, removed int }
+
+// le texte sans ses continuations, et la liste des coupes, qui permet de retrouver
+// la position d'origine d'un octet du texte nettoye (cf lexSource). tout ce qui
+// decoupe du source doit passer par ici pour voir le meme texte que le lecteur
+func stripContinuations(src string) (string, []contCut) {
+	if !strings.ContainsAny(src, "!~") {
+		return src, nil
+	}
 	var b strings.Builder
-	rs := []rune(src)
-	for i := 0; i < len(rs); i++ {
-		if rs[i] == '!' { // MO5 : continuation seulement juste devant un saut de ligne
+	var cuts []contCut
+	removed := 0
+	n := len(src)
+	for i := 0; i < n; i++ {
+		c := src[i]
+		if c == '!' { // MO5 : continuation seulement juste devant un saut de ligne
 			j := i + 1
-			if j < len(rs) && rs[j] == '\r' {
+			if j < n && src[j] == '\r' {
 				j++
 			}
-			if j < len(rs) && rs[j] == '\n' {
-				continue // on saute le '!', le saut de ligne reste (fait office d'espace)
-			}
-		}
-		if rs[i] == '~' { // UCBLogo/MSWLogo : tilde de continuation (espaces toleres avant le saut)
-			j := i + 1
-			for j < len(rs) && (rs[j] == ' ' || rs[j] == '\t') {
-				j++
-			}
-			if j < len(rs) && rs[j] == '\r' {
-				j++
-			}
-			if j < len(rs) && rs[j] == '\n' {
-				i = j - 1 // saute le '~' et les espaces, le saut de ligne reste
+			if j < n && src[j] == '\n' {
+				removed++ // on saute le '!', le saut de ligne reste (fait office d'espace)
+				cuts = append(cuts, contCut{b.Len(), removed})
 				continue
 			}
 		}
-		b.WriteRune(rs[i])
+		if c == '~' { // UCBLogo/MSWLogo : tilde de continuation (espaces toleres avant le saut)
+			j := i + 1
+			for j < n && (src[j] == ' ' || src[j] == '\t') {
+				j++
+			}
+			if j < n && src[j] == '\r' {
+				j++
+			}
+			if j < n && src[j] == '\n' {
+				removed += j - i // saute le '~' et les espaces, le saut de ligne reste
+				cuts = append(cuts, contCut{b.Len(), removed})
+				i = j - 1
+				continue
+			}
+		}
+		b.WriteByte(c)
 	}
-	return b.String()
+	return b.String(), cuts
 }
 
 type reader struct {
@@ -180,9 +219,14 @@ func (r *reader) readSeq(term rune) ([]Datum, error) {
 			origin := 1
 			if r.pos < len(r.src) && r.src[r.pos] == '@' {
 				r.pos++
-				w := r.readWord()
+				w := ""
+				if r.pos < len(r.src) && r.src[r.pos] == '-' { // origine negative : {a b}@-2
+					w = "-"
+					r.pos++
+				}
+				w += r.readWord()
 				n, err := strconv.Atoi(w)
-				if err != nil {
+				if err != nil || n < -maxArrayOrigin || n > maxArrayOrigin {
 					return nil, fmt.Errorf("ORIGINE DE TABLEAU INVALIDE : %s", w)
 				}
 				origin = n
@@ -200,8 +244,8 @@ func (r *reader) readSeq(term rune) ([]Datum, error) {
 			// (":p-1") ce serait une soustraction
 			r.pos++
 			w := r.readWord()
-			if n, err := strconv.ParseFloat(w, 64); err == nil {
-				out = append(out, numberDatum(-n, "-"+w))
+			if d, ok := numberLiteral("-" + w); ok {
+				out = append(out, d)
 			} else {
 				out = append(out, Datum{Kind: DSymbol, Text: "-" + w})
 			}
@@ -230,14 +274,68 @@ func (r *reader) readSeq(term rune) ([]Datum, error) {
 			r.pos++
 			out = append(out, Datum{Kind: DVarRef, Text: r.readWord()})
 		default:
+			start := r.pos
 			w := r.readWord()
-			if n, err := strconv.ParseFloat(w, 64); err == nil {
-				out = append(out, numberDatum(n, w))
+			if r.pos == start {
+				// rien n'a ete consomme (octet nul : un delimiteur que personne ne
+				// mange). sans cette erreur on relirait le meme caractere sans fin
+				return nil, errCaractereNul
+			}
+			if d, ok := numberLiteral(w); ok {
+				out = append(out, d)
 			} else {
 				out = append(out, Datum{Kind: DSymbol, Text: w})
 			}
 		}
 	}
+}
+
+// un octet nul dans le source : fichier binaire ou abime, pas du Logo
+var errCaractereNul = fmt.Errorf("CARACTERE NUL DANS LE PROGRAMME")
+
+// w a-t-il la tete d'un nombre decimal ? seulement des chiffres, un point, un
+// exposant et des signes, avec au moins un chiffre. ParseFloat tout seul accepte
+// aussi "Inf", "NaN" ou l'hexa flottant, qui deviendraient des nombres par surprise
+// (un mot ou une procedure nommes INF ou NAN)
+func looksNumeric(w string) bool {
+	digit := false
+	for k := 0; k < len(w); k++ {
+		switch c := w[k]; {
+		case c >= '0' && c <= '9':
+			digit = true
+		case c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-':
+		default:
+			return false
+		}
+	}
+	return digit
+}
+
+// valeur d'un mot qui s'ecrit comme un nombre fini (ok=false sinon)
+func parseNumber(w string) (float64, bool) {
+	if !looksNumeric(w) {
+		return 0, false
+	}
+	n, err := strconv.ParseFloat(w, 64)
+	return n, err == nil
+}
+
+// lit w comme litteral numerique. un entier trop grand pour float64 (plus de 308
+// chiffres) reste un entier exact au lieu de retomber en simple symbole
+func numberLiteral(w string) (Datum, bool) {
+	if !looksNumeric(w) {
+		return Datum{}, false
+	}
+	n, err := strconv.ParseFloat(w, 64)
+	if err == nil {
+		return numberDatum(n, w), true
+	}
+	if errors.Is(err, strconv.ErrRange) {
+		if b, ok := bigIntLiteral(w); ok {
+			return Datum{Kind: DNumber, Big: b, Text: w}, true
+		}
+	}
+	return Datum{}, false
 }
 
 // lit un nom (symbole ou variable apres ":") : s'arrete aux delimiteurs et aux
@@ -322,7 +420,7 @@ func minusIsLiteral(src []rune, pos int) bool {
 		return true
 	}
 	switch p := src[pos-1]; p {
-	case ' ', '\t', '\n', '\r', '[', '(':
+	case ' ', '\t', '\n', '\r', '[', '(', '{':
 		return true
 	default:
 		return isInfixOp(p)
@@ -360,6 +458,8 @@ func datumToValue(d Datum) (Value, error) {
 		return NumberValue(d.Num), nil
 	case DWord, DSymbol, DOp:
 		return WordValue(d.Text), nil
+	case DBool:
+		return BoolValue(d.Text == "VRAI"), nil
 	case DVarRef:
 		return WordValue(":" + d.Text), nil
 	case DList, DGroup:
@@ -392,7 +492,8 @@ func valueToDatum(v Value) Datum {
 	case KWord:
 		return Datum{Kind: DWord, Text: v.Word}
 	case KBool:
-		return Datum{Kind: DSymbol, Text: v.String()}
+		// un vrai booleen, pas le mot VRAI : sorti de la liste il redevient booleen
+		return Datum{Kind: DBool, Text: v.String()}
 	case KList:
 		return Datum{Kind: DList, List: v.List}
 	case KArray:

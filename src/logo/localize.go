@@ -62,6 +62,41 @@ var errExact = map[string]string{
 	"LISTE D'INDICES ATTENDUE":                      "INDEX LIST EXPECTED",
 	"DECOUPE VEUT UN SEPARATEUR NON VIDE":           "SPLIT WANTS A NON-EMPTY SEPARATOR",
 	`FIXEFINLIGNE VEUT "LF OU "CRLF`:                `SETEOL WANTS "LF OR "CRLF`,
+	"CARACTERE NUL DANS LE PROGRAMME":               "NUL CHARACTER IN PROGRAM",
+	"FICHIER TROP GROS":                             "FILE TOO LARGE",
+	"LIGNE TROP LONGUE":                             "LINE TOO LONG",
+	"LE GABARIT NE REND RIEN":                       "THE TEMPLATE OUTPUTS NOTHING",
+	"CALCUL TROP GROS":                              "COMPUTATION TOO LARGE",
+	"IMPOSSIBLE A ECRIRE EN SOURCE LOGO":            "CANNOT BE WRITTEN AS LOGO SOURCE",
+
+	// calcul litteral
+	"APRES ^ IL FAUT UN EXPOSANT ENTIER":                                   "AFTER ^ AN INTEGER EXPONENT IS NEEDED",
+	"CETTE EXPRESSION N'EST PAS UN POLYNOME (DIVISION PAR UNE EXPRESSION)": "THIS EXPRESSION IS NOT A POLYNOMIAL (DIVISION BY AN EXPRESSION)",
+	"DONNE L'EXPRESSION ENTRE CROCHETS, PAR EXEMPLE [ (X+1)(X-1) ]":        "GIVE THE EXPRESSION IN BRACKETS, FOR EXAMPLE [ (X+1)(X-1) ]",
+	"DONNE LES VALEURS ENTRE CROCHETS, PAR EXEMPLE [ X 3 ]":                "GIVE THE VALUES IN BRACKETS, FOR EXAMPLE [ X 3 ]",
+	"IL MANQUE UN NOMBRE OU UNE VARIABLE":                                  "A NUMBER OR A VARIABLE IS MISSING",
+	"IL MANQUE UNE PARENTHESE FERMANTE":                                    "A CLOSING PARENTHESIS IS MISSING",
+	"JE NE COMPRENDS PAS LA SUITE DE L'EXPRESSION":                         "I DON'T UNDERSTAND THE REST OF THE EXPRESSION",
+	"JE NE RESOUS QU'UNE EQUATION A UNE SEULE INCONNUE":                    "I ONLY SOLVE EQUATIONS WITH A SINGLE UNKNOWN",
+	"JE NE RESOUS QUE LE 1er ET LE 2nd DEGRE":                              "I ONLY SOLVE 1st AND 2nd DEGREE EQUATIONS",
+	"L'EXPOSANT DOIT ETRE UN ENTIER POSITIF":                               "THE EXPONENT MUST BE A POSITIVE INTEGER",
+	"UNE EQUATION A UN SIGNE = (EXEMPLE [ 2x + 3 = 7 ])":                   "AN EQUATION HAS AN = SIGN (EXAMPLE [ 2x + 3 = 7 ])",
+	"UNE EQUATION DOIT AVOIR UN SEUL SIGNE = (EXEMPLE [ 2x + 3 = 7 ])":     "AN EQUATION MUST HAVE A SINGLE = SIGN (EXAMPLE [ 2x + 3 = 7 ])",
+}
+
+// messages a partie variable en fin : prefixe FR -> prefixe EN, la suite est gardee
+var errPrefix = [][2]string{
+	{"PIEGE MANQUANT POUR ", "NO CATCH FOR "},
+	{"PARAMETRE EN DOUBLE : ", "DUPLICATE PARAMETER: "},
+	{"NOM DE PARAMETRE INVALIDE : ", "INVALID PARAMETER NAME: "},
+	{"NUMERO DE TORTUE INVALIDE : ", "INVALID TURTLE NUMBER: "},
+	{"TROP DE TORTUES ", "TOO MANY TURTLES "},
+	{"SPRITE TROP GRAND ", "SPRITE TOO LARGE "},
+	{"CARACTERE INATTENDU : ", "UNEXPECTED CHARACTER: "},
+	{"NOMBRE INCORRECT : ", "INVALID NUMBER: "},
+	{"EXPOSANT TROP GRAND ", "EXPONENT TOO LARGE "},
+	{"ATTENDU UNE VARIABLE (UNE LETTRE), VU ", "EXPECTED A VARIABLE (ONE LETTER), GOT "},
+	{"IL MANQUE UNE VALEUR POUR ", "A VALUE IS MISSING FOR "},
 }
 
 // traduit un message FR en EN : table exacte, puis prefixe/suffixe reconnus,
@@ -72,6 +107,22 @@ func localizeErr(msg string) string {
 	}
 	if rest, ok := strings.CutPrefix(msg, "PAS ASSEZ DE DONNEES POUR "); ok {
 		return "NOT ENOUGH INPUTS TO " + primNameEN(rest)
+	}
+	if rest, ok := strings.CutPrefix(msg, "TROP DE DONNEES POUR "); ok {
+		return "TOO MANY INPUTS TO " + primNameEN(rest)
+	}
+	for _, pre := range errPrefix {
+		if rest, ok := strings.CutPrefix(msg, pre[0]); ok {
+			return pre[1] + rest
+		}
+	}
+	if rest, ok := strings.CutSuffix(msg, " VEUT UNE EXPRESSION, PAS UNE EGALITE"); ok {
+		return primNameEN(rest) + " WANTS AN EXPRESSION, NOT AN EQUATION"
+	}
+	if rest, ok := strings.CutPrefix(msg, "LA VALEUR DE "); ok {
+		if name, ok := strings.CutSuffix(rest, " DOIT ETRE UN NOMBRE"); ok {
+			return "THE VALUE OF " + name + " MUST BE A NUMBER"
+		}
 	}
 	if rest, ok := strings.CutPrefix(msg, "PAS ASSEZ D'ELEMENTS POUR "); ok {
 		return "NOT ENOUGH ITEMS FOR " + primNameEN(rest)

@@ -34,14 +34,14 @@ func (i *Interp) registerIODevices() {
 	// fin de fichier
 	op(0, func(in *Interp, a []Value) (Value, error) {
 		if of := in.curReadStream(); of != nil {
-			r, eof, err := of.readRune()
+			w, eof, err := of.readChars(1)
 			if err != nil {
-				return Value{}, errLectureImpossible
+				return Value{}, err
 			}
 			if eof {
 				return ListValue(nil), nil
 			}
-			return WordValue(string(r)), nil
+			return WordValue(w), nil
 		}
 		if in.keyb == nil {
 			// pas de clavier, pas de dialogue : la machine reste muette
@@ -57,7 +57,7 @@ func (i *Interp) registerIODevices() {
 		if of := in.curReadStream(); of != nil {
 			line, eof, err := of.readLine()
 			if err != nil {
-				return Value{}, errLectureImpossible
+				return Value{}, err
 			}
 			if eof {
 				return ListValue(nil), nil
@@ -77,7 +77,7 @@ func (i *Interp) registerIODevices() {
 		if of := in.curReadStream(); of != nil {
 			line, eof, err := of.readLine()
 			if err != nil {
-				return Value{}, errLectureImpossible
+				return Value{}, err
 			}
 			if eof {
 				return ListValue(nil), nil
@@ -124,7 +124,9 @@ func (i *Interp) registerIODevices() {
 		if in.keyb == nil {
 			return fmt.Errorf("CLAVIER INDISPONIBLE")
 		}
-		fmt.Fprint(in.Out, a[0].String()+" ") // le titre sert d'invite
+		if _, err := fmt.Fprint(in.Out, a[0].String()+" "); err != nil { // le titre sert d'invite
+			return errEcritureImpossible // pas de saisie derriere une invite invisible
+		}
 		line, ok := in.keyb.ReadLine()
 		if !ok {
 			return ErrInterrompu
@@ -136,21 +138,21 @@ func (i *Interp) registerIODevices() {
 	// manettes (emulees au clavier : fleches + barre d'espace)
 	// MANETTE n : direction 0-8 de la manette n (0 = repos)
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return Value{}, err
 		}
 		if in.joy == nil {
 			return numResult(0), nil
 		}
-		return numResult(float64(in.joy.JoyDir(int(n)))), nil
+		return numResult(float64(in.joy.JoyDir(numToInt(n)))), nil
 	}, "MANETTE")
 	// BOUTON? n : bouton de tir de la manette n enfonce ?
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return Value{}, err
 		}
-		return BoolValue(in.joy != nil && in.joy.JoyButton(int(n))), nil
+		return BoolValue(in.joy != nil && in.joy.JoyButton(numToInt(n))), nil
 	}, "BOUTON?")
 }

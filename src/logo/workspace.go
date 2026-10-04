@@ -11,12 +11,7 @@ import (
 func (i *Interp) registerWorkspace() {
 	// CONTENU : tous les mots connus, tries (procs, variables, primitives courantes)
 	i.register(&primitive{arity: 0, reporter: true, fn: func(in *Interp, a []Value) (Value, error) {
-		names := in.knownWords()
-		items := make([]Datum, len(names))
-		for k, n := range names {
-			items[k] = Datum{Kind: DWord, Text: n}
-		}
-		return ListValue(items), nil
+		return ListValue(in.knownWords()), nil
 	}}, "CONTENU")
 
 	// IM mot : imprime la definition d'une procedure
@@ -29,31 +24,40 @@ func (i *Interp) registerWorkspace() {
 		if p == nil {
 			return &badData{a[0].String()} // "IM N'AIME PAS ..."
 		}
-		fmt.Fprintln(in.Out, p.sourceText())
-		return nil
+		src, err := p.sourceText()
+		if err != nil {
+			return err
+		}
+		return in.printLine(src)
 	}), "IM")
 
 	// IMTS : juste les titres des procedures (ligne POUR ...)
 	i.register(cmd(0, func(in *Interp, a []Value) error {
 		for _, n := range in.procNamesSorted() {
-			fmt.Fprintln(in.Out, procTitle(in.procs[n]))
+			if err := in.printLine(procTitle(in.procs[n])); err != nil {
+				return err
+			}
 		}
 		return nil
 	}), "IMTS")
 
 	// IMNS : les noms et leurs valeurs, forme DONNE (re-executable)
 	i.register(cmd(0, func(in *Interp, a []Value) error {
-		in.printNames()
-		return nil
+		return in.printNames()
 	}), "IMNS")
 
 	// IMTOUT : les procedures completes puis les noms
 	i.register(cmd(0, func(in *Interp, a []Value) error {
 		for _, n := range in.procNamesSorted() {
-			fmt.Fprintln(in.Out, in.procs[n].sourceText())
+			src, err := in.procs[n].sourceText()
+			if err != nil {
+				return err
+			}
+			if err := in.printLine(src); err != nil {
+				return err
+			}
 		}
-		in.printNames()
-		return nil
+		return in.printNames()
 	}), "IMTOUT")
 
 	// EFP mot : efface une procedure
@@ -96,11 +100,27 @@ func (i *Interp) registerWorkspace() {
 }
 
 // tous les mots connus : d'abord ce que l'utilisateur a defini (procs + variables,
-// triees), puis les primitives de la langue courante
-func (i *Interp) knownWords() []string {
-	user := append(i.procNames(), i.varNames()...)
-	sort.Strings(user)
-	return append(user, i.primWords()...)
+// triees), puis les primitives de la langue courante. une procedure y figure en
+// nom nu et une variable en "mot : c'est la convention de SAUVE, qui peut ainsi
+// relire CONTENU sans confondre une procedure et une variable de meme nom
+func (i *Interp) knownWords() []Datum {
+	var user []Datum
+	for _, n := range i.procNames() {
+		user = append(user, Datum{Kind: DSymbol, Text: n})
+	}
+	for _, n := range i.varNames() {
+		user = append(user, Datum{Kind: DWord, Text: n})
+	}
+	sort.SliceStable(user, func(a, b int) bool {
+		if user[a].Text != user[b].Text {
+			return user[a].Text < user[b].Text
+		}
+		return user[a].Kind == DSymbol && user[b].Kind != DSymbol
+	})
+	for _, n := range i.primWords() {
+		user = append(user, Datum{Kind: DWord, Text: n})
+	}
+	return user
 }
 
 // noms de primitives (principaux + alias) dans la langue courante, tries
@@ -150,47 +170,27 @@ func (i *Interp) varNames() []string {
 	return names
 }
 
+// ecrit une ligne sur la console ; une sortie qui refuse l'ecriture (redirection
+// cassee) devient une erreur Logo au lieu de passer inapercue
+func (i *Interp) printLine(s string) error {
+	if _, err := fmt.Fprintln(i.Out, s); err != nil {
+		return errEcritureImpossible
+	}
+	return nil
+}
+
 // imprime les variables sous forme DONNE (re-executable), triees
-func (i *Interp) printNames() {
+func (i *Interp) printNames() error {
 	names := i.varNames()
 	sort.Strings(names)
 	for _, n := range names {
-		fmt.Fprintf(i.Out, "DONNE \"%s %s\n", n, valueSource(i.vars[n]))
-	}
-}
-
-// la 1re ligne "POUR nom :p1 ..." d'une procedure
-func procTitle(p *userProc) string {
-	t := "POUR " + p.name
-	for _, par := range p.params {
-		t += " :" + par
-	}
-	return t
-}
-
-// une valeur sous forme relisible (DONNE re-executable) : listes entre crochets,
-// mots prefixes de " (sinon BONJOUR serait relu comme un appel de procedure)
-func valueSource(v Value) string {
-	switch v.Kind {
-	case KList:
-		return "[" + v.String() + "]"
-	case KWord:
-		return quoteWord(v.Word)
-	}
-	return v.String()
-}
-
-// un mot sous forme de litteral relisible : "mot, avec \ devant les caracteres
-// que le lecteur prend pour des delimiteurs (espaces, crochets, ;, etc.)
-func quoteWord(w string) string {
-	var b strings.Builder
-	b.WriteByte('"')
-	for _, r := range w {
-		switch r {
-		case ' ', '\t', '\n', '\r', '[', ']', '(', ')', '{', '}', ';', '\\', '$':
-			b.WriteByte('\\')
+		line, err := donneSource(n, i.vars[n])
+		if err != nil {
+			return err
 		}
-		b.WriteRune(r)
+		if err := i.printLine(line); err != nil {
+			return err
+		}
 	}
-	return b.String()
+	return nil
 }

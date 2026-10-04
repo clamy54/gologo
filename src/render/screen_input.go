@@ -36,9 +36,20 @@ func (s *Screen) ReadChar() (rune, bool) {
 	s.kbWantLine = false
 	s.kbActive.Store(true)
 	s.invalidate()
-	res := <-s.kbResult
+	res := s.waitKb()
 	s.invalidate()
 	return res.ch, res.ok
+}
+
+// attend le resultat d'une lecture clavier ; la fermeture de la fenetre la termine
+// comme une interruption
+func (s *Screen) waitKb() kbRes {
+	select {
+	case res := <-s.kbResult:
+		return res
+	case <-s.closed:
+		return kbRes{}
+	}
 }
 
 // LL (logo.Keyboard) : affiche une invite, laisse saisir une ligne (visible a
@@ -48,7 +59,7 @@ func (s *Screen) ReadLine() (string, bool) {
 	s.kbWantLine = true
 	s.kbActive.Store(true)
 	s.invalidate()
-	res := <-s.kbResult
+	res := s.waitKb()
 	s.invalidate()
 	return res.line, res.ok
 }
@@ -316,7 +327,7 @@ func (s *Screen) handleInput(gtx layout.Context) {
 			}
 			if s.edActive.Load() && s.pgResolve != nil {
 				if word := s.edWordAtCursor(); word != "" {
-					if name, ok := s.pgResolve(word); ok {
+					if name, ok := s.pgResolve(word, true); ok {
 						// aide directe sur un mot : on ouvre la vue complete. toutes
 						// les fiches y figurent sous leur nom canonique (celui que
 						// rend pgResolve) ; en vue debutant la fiche serait indexee

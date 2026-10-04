@@ -11,9 +11,15 @@ func formePour(e *eval) (Value, error) {
 		return Value{}, fmt.Errorf("POUR ATTEND UN NOM DE PROCEDURE")
 	}
 	name := strings.ToUpper(e.next().Text)
+	if !validName(name) {
+		return Value{}, fmt.Errorf("POUR ATTEND UN NOM DE PROCEDURE")
+	}
 	var params []string
 	for !e.atEnd() && e.data[e.pos].Kind == DVarRef {
 		params = append(params, strings.ToUpper(e.next().Text))
+	}
+	if err := checkParams(params); err != nil {
+		return Value{}, err
 	}
 	var body []Datum
 	found := false
@@ -33,10 +39,14 @@ func formePour(e *eval) (Value, error) {
 	}
 	e.i.procs[name] = &userProc{name: name, params: params, body: body}
 	if !e.i.Quiet {
+		msg := "VOUS VENEZ DE DEFINIR " + name
 		if e.i.Lang() == "EN" {
-			fmt.Fprintf(e.i.Out, "%s DEFINED\n", name)
-		} else {
-			fmt.Fprintf(e.i.Out, "VOUS VENEZ DE DEFINIR %s\n", name)
+			msg = name + " DEFINED"
+		}
+		// la procedure est definie quoi qu'il arrive ; si le message ne peut pas
+		// s'ecrire (sortie cassee), on le signale au lieu de l'ignorer
+		if err := e.i.printLine(msg); err != nil {
+			return Value{}, err
 		}
 	}
 	return None, nil
@@ -61,10 +71,16 @@ func formeED(e *eval) (Value, error) {
 			for _, n := range d.List {
 				names = append(names, strings.ToUpper(n.Text))
 			}
-			initial = in.procsText(names) // [ ] -> "" (editeur vierge)
+			var err error
+			if initial, err = in.procsText(names); err != nil { // [ ] -> "" (editeur vierge)
+				return Value{}, err
+			}
 		case DWord, DSymbol:
 			e.pos++
-			initial = in.procsText([]string{strings.ToUpper(d.Text)})
+			var err error
+			if initial, err = in.procsText([]string{strings.ToUpper(d.Text)}); err != nil {
+				return Value{}, err
+			}
 		}
 	}
 	text, ok := in.editor(initial)
@@ -76,19 +92,44 @@ func formeED(e *eval) (Value, error) {
 }
 
 // concatene la source des procedures nommees (squelette vide si inconnue)
-func (i *Interp) procsText(names []string) string {
+func (i *Interp) procsText(names []string) (string, error) {
 	var b strings.Builder
 	for _, n := range names {
 		if b.Len() > 0 {
 			b.WriteString("\n\n")
 		}
 		if p := i.procs[n]; p != nil {
-			b.WriteString(p.sourceText())
+			src, err := p.sourceText()
+			if err != nil {
+				return "", err
+			}
+			b.WriteString(src)
 		} else {
-			fmt.Fprintf(&b, "POUR %s\n\nFIN", n) // nouvelle procedure : squelette vide
+			lit, ok := nameLiteral(n)
+			if !ok {
+				return "", &badData{n}
+			}
+			fmt.Fprintf(&b, "POUR %s\n\nFIN", lit) // nouvelle procedure : squelette vide
 		}
 	}
-	return b.String()
+	return b.String(), nil
+}
+
+// les parametres d'une procedure : des noms non vides, tous differents. deux
+// parametres de meme nom se partageraient une seule variable (le second argument
+// ecraserait le premier sans rien dire)
+func checkParams(params []string) error {
+	seen := make(map[string]bool, len(params))
+	for _, p := range params {
+		if !validName(p) {
+			return fmt.Errorf("NOM DE PARAMETRE INVALIDE : %s", p)
+		}
+		if seen[p] {
+			return fmt.Errorf("PARAMETRE EN DOUBLE : %s", p)
+		}
+		seen[p] = true
+	}
+	return nil
 }
 
 // redefinit les procedures POUR...FIN (source brute conservee), puis execute les
@@ -100,11 +141,14 @@ func (i *Interp) defineFromEditor(text string) error {
 		if p := i.procs[name]; p != nil {
 			old[name] = p // garde l'ancienne def pour la restaurer si l'edition est fautive
 		}
-		delete(i.procs, name) // autorise la redefinition (sinon "... EXISTE DEJA")
+		delete(i.procs, name) // le texte ne doit pas s'appuyer sur l'ancienne version
 	}
-	if err := i.RunString(text); err != nil {
-		// edition invalide : on annule TOUT (meme les procs deja redefinies avant
-		// l'erreur), pour remettre l'atelier exactement dans son etat d'avant
+	err := i.RunString(text)
+	if _, stop := err.(*ctrl); err != nil && !stop {
+		// edition invalide : on annule les definitions du texte (meme celles deja
+		// refaites avant l'erreur) et on retrouve les procedures d'avant. le reste
+		// de ce que le texte a execute avant l'erreur (variables, dessin, fichiers)
+		// n'est pas defait
 		for name := range blocks {
 			if p := old[name]; p != nil {
 				i.procs[name] = p
@@ -119,7 +163,7 @@ func (i *Interp) defineFromEditor(text string) error {
 			p.text = raw // source fidele pour la prochaine edition
 		}
 	}
-	return nil
+	return err // nil, ou le signal LOGO/RAZ qui continue de remonter
 }
 
 // debut (POUR/TO) et fin (FIN/END) d'une procedure, toute casse, FR et EN
@@ -127,24 +171,52 @@ func isProcStart(w string) bool { return strings.EqualFold(w, "POUR") || strings
 
 func isProcEnd(w string) bool { return strings.EqualFold(w, "FIN") || strings.EqualFold(w, "END") }
 
-// repere les blocs POUR <nom>...FIN et rend nom -> texte brut. fait a la main,
-// sans le lecteur de code, pour preserver la mise en forme de l'editeur
+// repere les blocs POUR <nom>...FIN et rend nom -> texte brut, pour preserver la
+// mise en forme de l'editeur. le decoupage suit celui du lecteur (cf lexSource) :
+// un FIN suivi d'un commentaire, plusieurs definitions sur une ligne, un POUR dans
+// un commentaire, une continuation ("POUR~" en fin de ligne) ou un mot-cle ecrit
+// avec un echappement sont vus comme le lecteur les verra
 func scanProcBlocks(text string) map[string]string {
 	out := map[string]string{}
-	lines := strings.Split(text, "\n")
-	for i := 0; i < len(lines); i++ {
-		f := strings.Fields(lines[i])
-		if len(f) < 2 || !isProcStart(f[0]) {
+	toks := lexSource(text)
+	for k := 0; k < len(toks); k++ {
+		t := toks[k]
+		if t.kind != tokWord || t.depth != 0 || !isProcStart(t.name()) {
 			continue
 		}
-		name := strings.ToUpper(f[1])
-		start := i
-		for i < len(lines) && !isProcEnd(strings.TrimSpace(lines[i])) {
-			i++
+		// le nom : le prochain jeton utile, un nom nu
+		n := k + 1
+		for n < len(toks) && (toks[n].kind == tokSpace || toks[n].kind == tokComment) {
+			n++
 		}
-		if i < len(lines) { // FIN trouvee
-			out[name] = strings.Join(lines[start:i+1], "\n")
+		if n >= len(toks) || toks[n].kind != tokWord || toks[n].depth != 0 {
+			continue
 		}
+		name := toks[n].name()
+		// la fin : le prochain FIN/END au meme niveau (hors listes)
+		end := -1
+		for m := n + 1; m < len(toks); m++ {
+			if toks[m].kind == tokWord && toks[m].depth == 0 && isProcEnd(toks[m].name()) {
+				end = m
+				break
+			}
+		}
+		if end < 0 {
+			break // FIN manquant : le lecteur le dira
+		}
+		stop := toks[end].end
+		// un commentaire qui suit FIN sur la meme ligne fait partie du bloc
+		for m := end + 1; m < len(toks); m++ {
+			if toks[m].kind == tokComment {
+				stop = toks[m].end
+				break
+			}
+			if toks[m].kind != tokSpace || strings.Contains(toks[m].s, "\n") {
+				break
+			}
+		}
+		out[name] = text[t.start:stop]
+		k = end
 	}
 	return out
 }
@@ -291,7 +363,12 @@ func formeRepetepour(e *eval) (Value, error) {
 	if se.atEnd() {
 		return Value{}, &badData{"[]"} // "REPETEPOUR N'AIME PAS ..."
 	}
-	name := strings.ToUpper(se.next().Text) // la variable de boucle
+	specText := Datum{Kind: DList, List: spec}.String()
+	nd := se.next() // la variable de boucle : un nom (nu ou "mot)
+	if (nd.Kind != DSymbol && nd.Kind != DWord) || nd.Text == "" {
+		return Value{}, &badData{specText}
+	}
+	name := strings.ToUpper(nd.Text)
 	start, err := se.expr(0)
 	if err != nil {
 		return Value{}, err
@@ -300,11 +377,11 @@ func formeRepetepour(e *eval) (Value, error) {
 	if err != nil {
 		return Value{}, err
 	}
-	from, err := toNumber(start)
+	from, err := toFinite(start)
 	if err != nil {
 		return Value{}, err
 	}
-	to, err := toNumber(end)
+	to, err := toFinite(end)
 	if err != nil {
 		return Value{}, err
 	}
@@ -314,9 +391,12 @@ func formeRepetepour(e *eval) (Value, error) {
 		if err != nil {
 			return Value{}, err
 		}
-		if step, err = toNumber(s); err != nil {
+		if step, err = toFinite(s); err != nil {
 			return Value{}, err
 		}
+	}
+	if !se.atEnd() { // [var debut fin pas] et rien d'autre
+		return Value{}, &badData{specText}
 	}
 	if step == 0 {
 		return Value{}, &badData{"0"}
@@ -332,6 +412,9 @@ func formeRepetepour(e *eval) (Value, error) {
 		frame[name] = NumberValue(v)
 		if err := e.i.runSeq(body); err != nil {
 			return Value{}, err
+		}
+		if v+step == v {
+			break // pas trop petit devant v (au-dela de 2^53) : v n'avancerait plus jamais
 		}
 	}
 	return None, nil

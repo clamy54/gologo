@@ -22,28 +22,68 @@ func splitLines(s string) []string {
 // lignes de contenu visibles (une est reservee au pied de page)
 const pgRows = (ScreenH-2*margin)/lineH - 1
 
+// une demande d'ouverture de l'aide venue de la primitive AIDE
+type helpRequest struct {
+	names      []string
+	details    map[string][]string
+	start      string
+	lang       string
+	switchLang logo.HelpSwitch
+}
+
 // ouvre le navigateur d'aide (logo.Helper) et met la tache de fond en attente
-// (Q/Echap ferme). start vide = mode liste ; sinon ouvre direct le detail de la commande
+// (Q/Echap ferme). start vide = mode liste ; sinon ouvre direct le detail de la
+// commande. l'ouverture elle-meme est faite par la boucle d'evenements, a qui
+// l'etat de l'aide appartient (cf serveHelpRequest)
 func (s *Screen) Help(names []string, details map[string][]string, start, lang string, switchLang logo.HelpSwitch) {
-	s.pgNames = names
-	s.pgDetails = details
-	s.pgDetail = start
-	s.pgLang = lang
-	s.pgSwitch = switchLang
-	s.pgOverlay = false
-	s.pgExtended = true // primitive AIDE : aide complete
-	s.pgScroll = 0
-	s.pgSel = 0
+	s.uiPending.Add(1)
+	select {
+	case s.helpReq <- helpRequest{names, details, start, lang, switchLang}:
+	case <-s.closed:
+		s.uiPending.Add(-1)
+		return
+	}
+	s.invalidate()
+	select {
+	case <-s.pgDone:
+	case <-s.closed:
+	}
+	s.invalidate()
+}
+
+// boucle d'evenements : ouvre l'aide demandee par la primitive AIDE. si l'aide
+// etait deja ouverte par F1, la demande la remplace, et sa fermeture reveillera le
+// programme qui attend
+func (s *Screen) serveHelpRequest() {
+	select {
+	case r := <-s.helpReq:
+		s.uiPending.Add(-1)
+		select { // jeton d'une fermeture anterieure : il reveillerait le programme trop tot
+		case <-s.pgDone:
+		default:
+		}
+		s.showHelp(r.names, r.details, r.start, r.lang, r.switchLang, true, false)
+	default:
+	}
+}
+
+// installe le contenu de l'aide et l'affiche. extended : liste complete ou
+// commandes d'origine seulement ; overlay : ouverte par F1 par-dessus (personne
+// n'attend pgDone)
+func (s *Screen) showHelp(names []string, details map[string][]string, start, lang string, switchLang logo.HelpSwitch, extended, overlay bool) {
+	s.pgNames, s.pgDetails, s.pgDetail = names, details, start
+	s.pgLang, s.pgSwitch = lang, switchLang
+	s.pgExtended = extended
+	s.pgSel, s.pgScroll = 0, 0
 	s.pgSearchTyping, s.pgSearchInput, s.pgSearchHits = false, "", nil
-	for i, n := range names {
+	for i, n := range names { // place la selection sur la fiche ouverte
 		if n == start {
 			s.pgSel = i
 			break
 		}
 	}
+	s.pgOverlay = overlay
 	s.pgActive.Store(true)
-	s.invalidate()
-	<-s.pgDone
 	s.invalidate()
 }
 
@@ -60,20 +100,7 @@ func (s *Screen) openHelpAt(start string, extended bool) {
 		return
 	}
 	names, details, lang, switchLang := s.pgOpen(extended)
-	s.pgNames, s.pgDetails, s.pgDetail = names, details, start
-	s.pgLang, s.pgSwitch = lang, switchLang
-	s.pgExtended = extended
-	s.pgSel, s.pgScroll = 0, 0
-	s.pgSearchTyping, s.pgSearchInput, s.pgSearchHits = false, "", nil
-	for i, n := range names { // place la selection sur la fiche ouverte
-		if n == start {
-			s.pgSel = i
-			break
-		}
-	}
-	s.pgOverlay = true
-	s.pgActive.Store(true)
-	s.invalidate()
+	s.showHelp(names, details, start, lang, switchLang, extended, true)
 }
 
 // logo.Pager : imprime si le texte tient dans le REPL, sinon ouvre un afficheur
@@ -90,7 +117,10 @@ func (s *Screen) Page(title string, lines []string) {
 	s.txtScroll = 0
 	s.txtActive.Store(true)
 	s.invalidate()
-	<-s.txtDone
+	select {
+	case <-s.txtDone:
+	case <-s.closed:
+	}
 	s.invalidate()
 }
 
@@ -309,6 +339,14 @@ func (s *Screen) helpToggleMode(extended bool) {
 	if current == "" && len(s.pgNames) > 0 {
 		current = s.pgNames[s.pgSel] // mode liste : selection
 	}
+	// la meme commande ne porte pas le meme nom dans les deux vues (CT en vue
+	// complete, CACHETORTUE en vue debutant) : on cherche sa fiche sous le nom
+	// qu'elle a dans la vue d'arrivee
+	if s.pgResolve != nil && current != "" {
+		if name, ok := s.pgResolve(current, extended); ok {
+			current = name
+		}
+	}
 	names, details, lang, switchLang := s.pgOpen(extended)
 	s.pgNames, s.pgDetails, s.pgLang, s.pgSwitch = names, details, lang, switchLang
 	s.pgExtended = extended
@@ -322,8 +360,12 @@ func (s *Screen) helpToggleMode(extended bool) {
 			break
 		}
 	}
-	if s.pgDetail != "" && !found {
-		s.pgDetail = "" // la fiche n'existe pas dans cette vue : retour a la grille
+	if s.pgDetail != "" {
+		if found {
+			s.pgDetail = current
+		} else {
+			s.pgDetail = "" // la fiche n'existe pas dans cette vue : retour a la grille
+		}
 	}
 	s.invalidate()
 }

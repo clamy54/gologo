@@ -16,8 +16,15 @@ const sampleRate = 44100
 // implemente logo.Sound. si l'audio ne demarre pas (pas de peripherique), ctx reste
 // nil et Tone se contente d'attendre la duree de la note pour garder le rythme
 type Player struct {
-	ctx *oto.Context
+	ctx    *oto.Context
+	cancel func() bool // interruption demandee ? (nil = jamais)
 }
+
+// branche le test d'interruption : une note en cours s'arrete des qu'il rend vrai,
+// au lieu de bloquer jusqu'au bout (une note peut durer plusieurs secondes)
+func (p *Player) SetCancel(f func() bool) { p.cancel = f }
+
+func (p *Player) cancelled() bool { return p.cancel != nil && p.cancel() }
 
 // ouvre le contexte audio. si ca echoue, rend un Player muet
 func New() *Player {
@@ -41,12 +48,24 @@ func (p *Player) Tone(freq float64, ms, timbre, volume int) {
 		return
 	}
 	if p.ctx == nil || freq <= 0 {
-		time.Sleep(time.Duration(ms) * time.Millisecond)
+		// silence : on attend par petits pas, pour rester interruptible
+		end := time.Now().Add(time.Duration(ms) * time.Millisecond)
+		for !p.cancelled() {
+			left := time.Until(end)
+			if left <= 0 {
+				break
+			}
+			time.Sleep(min(left, 10*time.Millisecond))
+		}
 		return
 	}
 	pl := p.ctx.NewPlayer(bytes.NewReader(wave(freq, ms, timbre, volume)))
 	pl.Play()
 	for pl.IsPlaying() {
+		if p.cancelled() {
+			pl.Pause() // coupe le son tout de suite
+			break
+		}
 		time.Sleep(2 * time.Millisecond)
 	}
 	pl.Close()

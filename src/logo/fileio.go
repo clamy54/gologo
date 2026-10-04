@@ -2,12 +2,15 @@ package logo
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync/atomic"
 	"unicode/utf8"
 )
 
@@ -18,7 +21,8 @@ import (
 //
 // choix d'implementation : on travaille en direct sur *os.File, sans bufio. la
 // position vue par Logo est donc l'offset reel du fichier - aucune subtilite de
-// buffer a invalider, et OUVREMAJ partage naturellement une seule position.
+// buffer a invalider, et OUVREMAJ partage naturellement une seule position. les
+// lectures se font par blocs, puis on rend au fichier ce qui a ete lu en trop.
 
 type fileMode int
 
@@ -32,12 +36,13 @@ const (
 func (m fileMode) readable() bool { return m == modeRead || m == modeUpdate }
 func (m fileMode) writable() bool { return m == modeWrite || m == modeAppend || m == modeUpdate }
 
-// un fichier ouvert : son nom logique, son chemin reel, le descripteur et le mode
+// un fichier ouvert : son nom logique, le descripteur et le mode
 type openFile struct {
 	name string
-	path string
 	f    *os.File
 	mode fileMode
+	brk  *atomic.Bool // interruption demandee (Ctrl+C), consultee dans les longues lectures
+	buf  []byte       // tampon de lecture, reutilise d'un appel a l'autre
 }
 
 // l'etat des E/S fichier d'un interpreteur : les fichiers ouverts et les deux flux
@@ -81,7 +86,8 @@ func (i *Interp) closeAllFiles() error {
 }
 
 // CloseFiles : ferme proprement les fichiers ouverts (a appeler a la sortie du
-// programme hote). rend la premiere erreur de Close, ou nil s'il n'y en a aucun
+// programme hote, une fois l'execution Logo terminee : les fichiers appartiennent a
+// la tache qui execute Logo). rend la premiere erreur de Close, ou nil
 func (i *Interp) CloseFiles() error { return i.closeAllFiles() }
 
 // messages d'erreur maison (traduits en EN a l'affichage, cf localize.go)
@@ -95,40 +101,50 @@ var (
 	errMauvaisMode        = fmt.Errorf("MAUVAIS MODE D'OUVERTURE")
 	errLectureImpossible  = fmt.Errorf("LECTURE IMPOSSIBLE")
 	errEcritureImpossible = fmt.Errorf("ECRITURE IMPOSSIBLE")
+	errTropGros           = fmt.Errorf("FICHIER TROP GROS")
+	errLigneTropLongue    = fmt.Errorf("LIGNE TROP LONGUE")
+)
+
+// taille maximale d'un fichier charge d'un coup par FICHIERVERSTABLEAU, et d'une
+// ligne lue par LISLIGNE/LL/LISMOT : de quoi voir venir, sans laisser un fichier
+// sans saut de ligne (ou enorme) remplir la memoire
+const (
+	maxDataBytes = 64 << 20
+	maxLineBytes = 16 << 20
 )
 
 // resout un nom de fichier de DONNEES : confine au dossier de travail (rejet des
 // chemins absolus et de la traversee ".."), mais qui PRESERVE le nom, l'extension
-// et la casse (contrairement a resolvePath qui force MAJUSCULES + .GLG). rend le
-// nom logique (cle du registre) et le chemin reel
-func (i *Interp) resolveDataPath(name string) (string, string, error) {
+// et la casse (contrairement aux .GLG, forces en MAJUSCULES). rend le nom relatif
+// au dossier de travail, qui sert aussi de nom logique (cle du registre). chaque
+// composant doit etre un nom de fichier valide (cf validFileName)
+func dataName(name string) (string, error) {
 	name = strings.TrimSpace(name)
 	if name == "" || filepath.IsAbs(name) {
-		return "", "", errNomInvalide
+		return "", errNomInvalide
 	}
 	clean := filepath.Clean(filepath.FromSlash(name))
-	if clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) || filepath.IsAbs(clean) {
-		return "", "", errNomInvalide
+	if !filepath.IsLocal(clean) {
+		return "", errNomInvalide
 	}
-	dir, err := i.ensureWorkDir()
-	if err != nil {
-		return "", "", err
+	for _, part := range strings.Split(clean, string(filepath.Separator)) {
+		if !validFileName(part) {
+			return "", errNomInvalide
+		}
 	}
-	return clean, filepath.Join(dir, clean), nil
+	return clean, nil
 }
 
 // un argument entier >= 0 (refuse 1.5 et les negatifs). rend un badData sinon, pour
-// le message maison "<PRIMITIVE> N'AIME PAS <valeur>" (cf invoke). pour LISCARS et
-// les positions, ou un demi-octet n'aurait aucun sens
+// le message maison "<PRIMITIVE> N'AIME PAS <valeur>" (cf invoke). pour les
+// positions d'octet, ou un demi-octet n'aurait aucun sens. passe par l'entier EXACT
+// (asIntOperand) : une position au-dela de 2^53 n'est pas arrondie par un float64
 func wholeArg(v Value) (int64, error) {
-	n, err := toNumber(v)
-	if err != nil {
-		return 0, err
-	}
-	if n < 0 || float64(int64(n)) != n {
+	b, ok := asIntOperand(v)
+	if !ok || b.Sign() < 0 || !b.IsInt64() {
 		return 0, &badData{v.String()}
 	}
-	return int64(n), nil
+	return b.Int64(), nil
 }
 
 // intArg : un argument entier de signe quelconque (taille, indice, position).
@@ -151,88 +167,111 @@ func intArg(v Value) (int, error) {
 
 // --- lecture/ecriture bas niveau sur le descripteur (en runes, pas en octets) ---
 
-// nombre d'octets de la rune d'apres son 1er octet (UTF-8)
-func runeLen(b byte) int {
-	switch {
-	case b < 0x80:
-		return 1
-	case b < 0xC0:
-		return 1 // octet de continuation isole : traite comme 1 (deviendra RuneError)
-	case b < 0xE0:
-		return 2
-	case b < 0xF0:
-		return 3
-	default:
-		return 4
+// taille des blocs de lecture
+const readChunk = 4096
+
+// le tampon de lecture du fichier (alloue au premier besoin)
+func (of *openFile) chunk() []byte {
+	if of.buf == nil {
+		of.buf = make([]byte, readChunk)
 	}
+	return of.buf
 }
 
-// lit une rune. eof=true (rune 0) s'il n'y a plus rien
-func (of *openFile) readRune() (rune, bool, error) {
-	var buf [4]byte
-	n, err := of.f.Read(buf[:1])
+func (of *openFile) interrupted() bool { return of.brk != nil && of.brk.Load() }
+
+// rend au fichier n octets lus en trop : la position redevient celle que Logo voit
+func (of *openFile) unread(n int) error {
 	if n == 0 {
-		if err == nil || err == io.EOF {
-			return 0, true, nil
-		}
-		return 0, false, err
+		return nil
 	}
-	size := runeLen(buf[0])
-	total := 1
-	for total < size { // complete la rune (s'arrete si le fichier se termine)
-		m, _ := of.f.Read(buf[total : total+1])
-		if m == 0 {
-			break
-		}
-		total++
-	}
-	r, _ := utf8.DecodeRune(buf[:total])
-	return r, false, nil
+	_, err := of.f.Seek(-int64(n), io.SeekCurrent)
+	return err
 }
 
 // lit une ligne (sans le saut final, \r\n tolere). eof=true si rien a lire.
 // une derniere ligne sans saut compte comme une ligne (comportement FMSLogo)
 func (of *openFile) readLine() (string, bool, error) {
-	var b strings.Builder
-	var one [1]byte
+	var line []byte
+	buf := of.chunk()
 	got := false
 	for {
-		n, err := of.f.Read(one[:])
+		if of.interrupted() {
+			return "", false, ErrInterrompu
+		}
+		n, err := of.f.Read(buf)
 		if n == 0 {
 			if err != nil && err != io.EOF {
-				return "", false, err
+				return "", false, errLectureImpossible
 			}
 			if !got {
 				return "", true, nil
 			}
-			return b.String(), false, nil
+			return string(line), false, nil
 		}
 		got = true
-		if one[0] == '\n' {
-			return strings.TrimSuffix(b.String(), "\r"), false, nil
+		if k := bytes.IndexByte(buf[:n], '\n'); k >= 0 {
+			line = append(line, buf[:k]...)
+			if err := of.unread(n - k - 1); err != nil { // ce qui suit le saut de ligne
+				return "", false, errLectureImpossible
+			}
+			if len(line) > maxLineBytes { // meme plafond que la ligne sans saut
+				return "", false, errLigneTropLongue
+			}
+			return strings.TrimSuffix(string(line), "\r"), false, nil
 		}
-		b.WriteByte(one[0])
+		line = append(line, buf[:n]...)
+		if len(line) > maxLineBytes {
+			return "", false, errLigneTropLongue
+		}
 	}
 }
 
-// lit n runes et les rend comme un mot. eof=true si rien a lire
+// lit n runes et les rend comme un mot. eof=true si rien a lire. une sequence UTF-8
+// invalide donne le caractere de remplacement et ne consomme qu'UN octet : les
+// octets valides qui suivent ne sont pas avales avec elle
 func (of *openFile) readChars(n int) (string, bool, error) {
 	if n <= 0 {
 		return "", false, nil
 	}
 	var b strings.Builder
-	for k := 0; k < n; k++ {
-		r, eof, err := of.readRune()
-		if err != nil {
-			return "", false, err
+	buf := of.chunk()
+	var pending []byte // octets lus pas encore decodes (sequence coupee, ou surplus)
+	got := 0
+	for got < n {
+		if of.interrupted() {
+			return "", false, ErrInterrompu
 		}
-		if eof {
-			if k == 0 {
-				return "", true, nil
+		want := len(buf)
+		if rest := n - got; rest < want/utf8.UTFMax {
+			want = rest * utf8.UTFMax // juste de quoi lire les runes demandees
+		}
+		m, err := of.f.Read(buf[:want])
+		if m == 0 && err != nil && err != io.EOF {
+			return "", false, errLectureImpossible
+		}
+		eof := m == 0
+		pending = append(pending, buf[:m]...)
+		k := 0
+		for k < len(pending) && got < n {
+			if !eof && !utf8.FullRune(pending[k:]) {
+				break // sequence coupee par la fin du bloc : on attend la suite
 			}
+			r, size := utf8.DecodeRune(pending[k:])
+			b.WriteRune(r)
+			k += size
+			got++
+		}
+		pending = pending[:copy(pending, pending[k:])]
+		if eof {
 			break
 		}
-		b.WriteRune(r)
+	}
+	if err := of.unread(len(pending)); err != nil {
+		return "", false, errLectureImpossible
+	}
+	if got == 0 {
+		return "", true, nil
 	}
 	return b.String(), false, nil
 }
@@ -263,7 +302,11 @@ func (of *openFile) size() (int64, error) {
 }
 
 // deplace le pointeur. refuse une position hors fichier ou tombant au milieu d'une
-// rune UTF-8 (POSITION INVALIDE) : on ne lit jamais un demi-caractere
+// rune UTF-8 (POSITION INVALIDE) : on ne lit ni n'ecrit jamais un demi-caractere.
+// le controle se fait par une lecture a position fixe (ReadAt), qui ne deplace pas
+// le pointeur : une position refusee laisse le flux exactement ou il etait. sur un
+// fichier que le systeme ne laisse pas relire, le controle est impossible et la
+// position est acceptee telle quelle
 func (of *openFile) setPos(p int64) error {
 	if p < 0 {
 		return errPositionInvalide
@@ -276,11 +319,8 @@ func (of *openFile) setPos(p int64) error {
 		return errPositionInvalide
 	}
 	if p < sz {
-		if _, err := of.f.Seek(p, io.SeekStart); err != nil {
-			return errPositionInvalide
-		}
 		var one [1]byte
-		if n, _ := of.f.Read(one[:]); n == 1 && one[0]&0xC0 == 0x80 {
+		if n, _ := of.f.ReadAt(one[:], p); n == 1 && one[0]&0xC0 == 0x80 {
 			return errPositionInvalide // octet de continuation : milieu de caractere
 		}
 	}
@@ -327,7 +367,7 @@ func (i *Interp) registerFileIO() {
 
 	// FERME nomfichier : ferme le fichier (et le retire des flux courants)
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		of, _, err := in.findOpen(a[0])
+		of, err := in.findOpen(a[0])
 		if err != nil {
 			return err
 		}
@@ -409,7 +449,7 @@ func (i *Interp) registerFileIO() {
 		}
 		line, eof, err := of.readLine()
 		if err != nil {
-			return Value{}, errLectureImpossible
+			return Value{}, err
 		}
 		if eof {
 			return ListValue(nil), nil
@@ -420,9 +460,12 @@ func (i *Interp) registerFileIO() {
 	// LISCARS n : lit n caracteres et les rend comme un mot. [ ] en fin de fichier.
 	// n doit etre un entier >= 0 (pas de demi-caractere)
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		n, err := wholeArg(a[0])
+		n, err := intArg(a[0])
 		if err != nil {
 			return Value{}, err
+		}
+		if n < 0 {
+			return Value{}, &badData{a[0].String()}
 		}
 		of := in.curReadStream()
 		if of == nil { // au clavier : lit n caracteres un a un
@@ -430,7 +473,7 @@ func (i *Interp) registerFileIO() {
 				return Value{}, fmt.Errorf("CLAVIER INDISPONIBLE")
 			}
 			var b strings.Builder
-			for k := 0; k < int(n); k++ {
+			for k := 0; k < n; k++ {
 				r, ok := in.keyb.ReadChar()
 				if !ok {
 					return Value{}, ErrInterrompu
@@ -439,9 +482,9 @@ func (i *Interp) registerFileIO() {
 			}
 			return WordValue(b.String()), nil
 		}
-		w, eof, err := of.readChars(int(n))
+		w, eof, err := of.readChars(n)
 		if err != nil {
-			return Value{}, errLectureImpossible
+			return Value{}, err
 		}
 		if eof {
 			return ListValue(nil), nil
@@ -457,28 +500,26 @@ func (i *Interp) registerFileIO() {
 		if err != nil {
 			return Value{}, err
 		}
-		_, path, err := in.resolveDataPath(name)
+		rel, err := dataName(name)
 		if err != nil {
 			return Value{}, err
 		}
-		info, err := os.Stat(path)
+		root, err := in.openWorkRoot()
 		if err != nil {
-			if os.IsNotExist(err) {
-				return Value{}, errIntrouvable
-			}
-			return Value{}, errLectureImpossible
+			return Value{}, err
 		}
-		if info.IsDir() {
-			return Value{}, errLectureImpossible
-		}
-		data, err := os.ReadFile(path)
+		defer root.Close()
+		data, err := readRegular(root, rel, maxDataBytes)
 		if err != nil {
-			return Value{}, errLectureImpossible
+			return Value{}, err
 		}
 		if !isTextData(data) {
 			return Value{}, errBinaire // un binaire ferait n'importe quoi en "lignes"
 		}
 		lines := splitLines(string(data))
+		if len(lines) > maxArrayCells {
+			return Value{}, fmt.Errorf("TABLEAU TROP GRAND")
+		}
 		items := make([]Value, len(lines))
 		for k, l := range lines {
 			items[k] = WordValue(l)
@@ -514,6 +555,25 @@ func splitLines(s string) []string {
 	return parts
 }
 
+// le flux de donnees ouvert sur le fichier name de root, ou nil. on compare les
+// FICHIERS (os.SameFile), pas les noms : TEST.TXT et test.txt sur un volume qui
+// ignore la casse, ou deux liens vers le meme fichier, designent le meme fichier
+func (i *Interp) streamOn(root *os.Root, name string) *openFile {
+	if i.fio == nil || len(i.fio.open) == 0 {
+		return nil
+	}
+	info, err := root.Stat(name)
+	if err != nil {
+		return nil
+	}
+	for _, of := range i.fio.open {
+		if fi, err := of.f.Stat(); err == nil && os.SameFile(info, fi) {
+			return of
+		}
+	}
+	return nil
+}
+
 // ouvre un fichier de donnees dans le mode demande, en verifiant toutes les
 // preconditions (deja ouvert, introuvable, dossier, droits...)
 func (i *Interp) openData(nameVal Value, mode fileMode) error {
@@ -521,75 +581,101 @@ func (i *Interp) openData(nameVal Value, mode fileMode) error {
 	if err != nil {
 		return err
 	}
-	key, path, err := i.resolveDataPath(name)
+	key, err := dataName(name)
 	if err != nil {
 		return err
 	}
-	fs := i.fileSet()
-	if _, ok := fs.open[key]; ok {
+	fset := i.fileSet()
+	if _, ok := fset.open[key]; ok {
 		return errDejaOuvert
 	}
+	root, err := i.openWorkRoot()
+	if err != nil {
+		return err
+	}
+	defer root.Close()
+	if i.streamOn(root, key) != nil {
+		return errDejaOuvert // meme fichier sous un autre nom (casse, lien)
+	}
+	failed := errEcritureImpossible
+	if mode == modeRead {
+		failed = errLectureImpossible
+	}
+	// seuls les fichiers ordinaires : un dossier ne se lit pas, et l'ouverture d'un
+	// tube nomme ou d'un peripherique pourrait bloquer sans fin
+	info, err := root.Stat(key)
+	switch {
+	case err == nil && !info.Mode().IsRegular():
+		return failed
+	case err != nil && mode == modeRead:
+		if errors.Is(err, fs.ErrNotExist) {
+			return errIntrouvable
+		}
+		return failed
+	}
+	// toutes les ouvertures sont non bloquantes (openNonBlock, sans effet sur un
+	// fichier ordinaire) : si le fichier a ete remplace par un tube nomme juste
+	// apres le controle ci-dessus, l'ouverture rend la main au lieu d'attendre un
+	// correspondant, et le controle sur le fichier ouvert le refuse
 	var f *os.File
 	switch mode {
 	case modeRead:
-		info, err := os.Stat(path)
-		if err != nil {
-			if os.IsNotExist(err) {
-				return errIntrouvable
-			}
-			return errLectureImpossible
-		}
-		if info.IsDir() {
-			return errLectureImpossible
-		}
-		f, err = os.Open(path)
-		if err != nil {
-			return errLectureImpossible
-		}
+		f, err = root.OpenFile(key, os.O_RDONLY|openNonBlock, 0)
 	case modeWrite:
 		// ecrase sans confirmer (fidelite FMSLogo) : pas de confirmOverwrite ici
-		f, err = os.Create(path)
-		if err != nil {
-			return errEcritureImpossible
-		}
+		f, err = root.OpenFile(key, os.O_RDWR|os.O_CREATE|os.O_TRUNC|openNonBlock, 0o666)
 	case modeAppend:
 		// pas d'O_APPEND : sinon le noyau force chaque ecriture en fin de fichier,
 		// meme apres FIXEPOSECRITURE. on ouvre en ecriture et on se place en fin a
 		// l'ouverture (les premieres ecritures ajoutent), tout en laissant le
-		// pointeur d'ecriture reellement deplacable.
-		f, err = os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0o644)
+		// pointeur d'ecriture reellement deplacable. ouvert aussi en lecture pour
+		// que FIXEPOSECRITURE puisse verifier la position (cf setPos) ; si les
+		// droits ne le permettent pas, en ecriture seule
+		f, err = root.OpenFile(key, os.O_CREATE|os.O_RDWR|openNonBlock, 0o644)
 		if err != nil {
-			return errEcritureImpossible
+			f, err = root.OpenFile(key, os.O_CREATE|os.O_WRONLY|openNonBlock, 0o644)
 		}
-		if _, err = f.Seek(0, io.SeekEnd); err != nil {
-			f.Close()
-			return errEcritureImpossible
+		if err == nil {
+			if _, serr := f.Seek(0, io.SeekEnd); serr != nil {
+				f.Close()
+				return failed
+			}
 		}
 	case modeUpdate:
-		f, err = os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0o644)
-		if err != nil {
-			return errEcritureImpossible
-		}
+		f, err = root.OpenFile(key, os.O_CREATE|os.O_RDWR|openNonBlock, 0o644)
 	}
-	fs.open[key] = &openFile{name: key, path: path, f: f, mode: mode}
+	if err != nil {
+		return failed
+	}
+	if fi, err := f.Stat(); err != nil || !fi.Mode().IsRegular() {
+		f.Close() // remplace entre le controle et l'ouverture
+		return failed
+	}
+	fset.open[key] = &openFile{name: key, f: f, mode: mode, brk: &i.brk}
 	return nil
 }
 
-// retrouve un fichier ouvert par son nom (erreur FICHIER NON OUVERT sinon)
-func (i *Interp) findOpen(nameVal Value) (*openFile, string, error) {
+// retrouve un fichier ouvert par son nom (erreur FICHIER NON OUVERT sinon). a
+// defaut du nom exact, on cherche le meme fichier ouvert sous un autre nom
+func (i *Interp) findOpen(nameVal Value) (*openFile, error) {
 	name, err := toWord(nameVal)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
-	key, _, err := i.resolveDataPath(name)
+	key, err := dataName(name)
 	if err != nil {
-		return nil, "", err
+		return nil, err
 	}
-	of, ok := i.fileSet().open[key]
-	if !ok {
-		return nil, key, errNonOuvert
+	if of, ok := i.fileSet().open[key]; ok {
+		return of, nil
 	}
-	return of, key, nil
+	if root, err := i.openWorkRoot(); err == nil {
+		defer root.Close()
+		if of := i.streamOn(root, key); of != nil {
+			return of, nil
+		}
+	}
+	return nil, errNonOuvert
 }
 
 // ferme un fichier et le retire des flux courants au besoin ; rend l'erreur de Close
@@ -618,7 +704,7 @@ func (i *Interp) setCurrent(arg Value, write bool) error {
 		}
 		return nil
 	}
-	of, _, err := i.findOpen(arg)
+	of, err := i.findOpen(arg)
 	if err != nil {
 		return err
 	}
@@ -656,7 +742,7 @@ func streamName(of *openFile) Value {
 	return WordValue(of.name)
 }
 
-// position pour POSLECTURE/POSECRITURE (-1 si clavier/console)
+// position pour POSLECTURE/POSECRITURE (-1 si clavier/console), en entier exact
 func streamPos(of *openFile) (Value, error) {
 	if of == nil {
 		return NumberValue(-1), nil
@@ -665,7 +751,7 @@ func streamPos(of *openFile) (Value, error) {
 	if err != nil {
 		return Value{}, errLectureImpossible
 	}
-	return NumberValue(float64(p)), nil
+	return intResultFromInt64(p), nil
 }
 
 // ecrit du texte sur le flux d'ecriture courant s'il y en a un, sinon sur la
@@ -682,6 +768,8 @@ func (i *Interp) writeText(s string) error {
 		}
 		return nil
 	}
-	fmt.Fprint(i.Out, s)
+	if _, err := fmt.Fprint(i.Out, s); err != nil {
+		return errEcritureImpossible // sortie redirigee qui refuse l'ecriture
+	}
 	return nil
 }

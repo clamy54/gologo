@@ -681,6 +681,9 @@ func exampleResultsLang(ex []string, lang string) []string {
 		// une seule ligne compacte (les sorties multi-lignes sont recollees)
 		res[i] = strings.Join(strings.Fields(strings.TrimSpace(buf.String())), " ")
 	}
+	if sandbox != nil {
+		sandbox.closeAllFiles() // un exemple fichier ne laisse rien d'ouvert derriere lui
+	}
 	return res
 }
 
@@ -726,12 +729,15 @@ func wrapText(s string, width int) []string {
 	return append(lines, cur)
 }
 
-// resout un mot (primitive ou alias, FR/EN) vers le nom de fiche d'aide tel
-// qu'affiche dans la langue courante, ou ("", false) si aucune fiche. sert au F1
-// contextuel de l'editeur (aide directe sur le mot sous le curseur)
-func (i *Interp) HelpName(word string) (string, bool) {
+// resout un mot (primitive ou alias, FR/EN) vers le nom de sa fiche d'aide tel
+// qu'affiche dans la langue courante et dans la vue demandee (extended : aide
+// complete, noms canoniques ; sinon aide debutant, noms longs), ou ("", false) si
+// aucune fiche. sert au F1 contextuel de l'editeur (aide directe sur le mot sous le
+// curseur) et a retrouver une fiche quand on change de vue : la meme commande n'y
+// porte pas forcement le meme nom (CT / CACHETORTUE)
+func (i *Interp) HelpName(word string, extended bool) (string, bool) {
 	if frKey, entry, ok := lookupHelp(word); ok {
-		return canonical(i.Lang(), frKey, entry), true
+		return aideDisplay(i.Lang(), frKey, entry, extended), true
 	}
 	return "", false
 }

@@ -91,16 +91,33 @@ func BoolValue(b bool) Value { return Value{Kind: KBool, Bool: b} }
 
 func ListValue(items []Datum) Value { return Value{Kind: KList, List: items} }
 
-// veracite Logo d'une valeur (pour SI/TANTQUE)
+// veracite Logo d'une valeur (pour SI/TANTQUE). un mot vaut vrai s'il s'ecrit VRAI
+// ou TRUE : les deux langues sont toujours comprises, comme pour les primitives
 func (v Value) IsTrue() bool {
 	switch v.Kind {
 	case KBool:
 		return v.Bool
 	case KWord:
-		return strings.EqualFold(v.Word, "VRAI")
+		return strings.EqualFold(v.Word, "VRAI") || strings.EqualFold(v.Word, "TRUE")
 	default:
 		return false
 	}
+}
+
+// booleen porte par v : un vrai booleen, ou un mot VRAI/FAUX/TRUE/FALSE
+func (v Value) asBool() (b, ok bool) {
+	switch v.Kind {
+	case KBool:
+		return v.Bool, true
+	case KWord:
+		switch strings.ToUpper(v.Word) {
+		case "VRAI", "TRUE":
+			return true, true
+		case "FAUX", "FALSE":
+			return false, true
+		}
+	}
+	return false, false
 }
 
 // la valeur telle que Logo l'afficherait (ECRIS)
@@ -120,20 +137,36 @@ func (v Value) String() string {
 	case KList:
 		parts := make([]string, len(v.List))
 		for i, d := range v.List {
-			parts[i] = d.String()
+			parts[i] = d.str(1)
 		}
 		return strings.Join(parts, " ")
 	case KArray:
-		return v.Arr.String()
+		return v.Arr.str(0)
 	}
 	return ""
 }
 
 // un tableau facon FMSLogo : { a b c }, avec @origine si elle n'est pas 1
-func (a *Array) String() string {
+func (a *Array) String() string { return a.str(0) }
+
+func (a *Array) str(depth int) string {
+	if depth >= maxDataDepth {
+		return "{...}"
+	}
 	parts := make([]string, len(a.Items))
 	for i, e := range a.Items {
-		parts[i] = e.String()
+		switch e.Kind {
+		case KArray:
+			parts[i] = e.Arr.str(depth + 1)
+		case KList:
+			sub := make([]string, len(e.List))
+			for k, d := range e.List {
+				sub[k] = d.str(depth + 2)
+			}
+			parts[i] = strings.Join(sub, " ")
+		default:
+			parts[i] = e.String()
+		}
 	}
 	s := "{" + strings.Join(parts, " ") + "}"
 	if a.Origin != 1 {

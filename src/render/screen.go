@@ -178,8 +178,11 @@ type Runner func(src string) error
 // compose la scene et gere le REPL. une tache de fond separee execute Logo ; le
 // verrou mu protege l'etat partage avec la composition
 type Screen struct {
-	mu       sync.Mutex
-	gfx      []gfxOp // journal graphique chronologique unique (traits/remplissages/etiquettes)
+	mu sync.Mutex
+	// operations graphiques pas encore dessinees (traits/remplissages/etiquettes,
+	// dans l'ordre). bakePending les applique au calque fieldImg puis les oublie
+	gfx      []gfxOp
+	gfxSpare []gfxOp // tampon recycle pour gfx (evite de reallouer a chaque image)
 	clearGen uint64
 	bg       turtle.Color
 	border   turtle.Color   // couleur du bord (FCB), defaut noir
@@ -215,6 +218,13 @@ type Screen struct {
 	quit      atomic.Bool
 	interrupt func()
 	win       *app.Window
+
+	// fermeture : closed est ferme une fois pour toutes quand la fenetre s'en va.
+	// toute attente de la tache de fond (clavier, editeur, aide, capture) le
+	// surveille, et la tache elle-meme signale sa fin sur workerDone
+	closed     chan struct{}
+	closeOnce  sync.Once
+	workerDone chan struct{}
 
 	// regle les modes modaux (editeur, aide, clavier) : la tache de fond remplit les
 	// champs PUIS passe le flag atomique a true ; apres ca, ils sont a l'interface
@@ -259,6 +269,11 @@ type Screen struct {
 	pgOverlay  bool                // aide ouverte en superposition (F1) : aucune tache n'attend pgDone
 	pgExtended bool                // aide complete (Shift+F1 / AIDE) vs debutant (F1 = commandes d'origine)
 	pgDone     chan struct{}
+	// l'etat de l'aide appartient a la boucle d'evenements. la primitive AIDE (tache
+	// de fond) ne l'ecrit pas elle-meme : elle depose sa demande ici, et la boucle
+	// l'ouvre. sans ca, F1 et AIDE pouvaient remplir les memes champs en meme temps
+	helpReq   chan helpRequest
+	uiPending atomic.Int32 // demandes en attente : la boucle doit tourner meme pendant un SCENE
 
 	// preference qui survit a la fermeture de l'aide : Shift+F1 bascule debutant <->
 	// complet, et F1 rouvre dans ce mode-la (au lieu de toujours retomber en debutant)
@@ -300,7 +315,7 @@ type Screen struct {
 	// fourni par main : ouvre l'aide hors primitive AIDE (F1) et donne la langue
 	// courante pour traduire l'affichage (barre de statut de l'editeur)
 	pgOpen    func(extended bool) (names []string, details map[string][]string, lang string, switchLang logo.HelpSwitch)
-	pgResolve func(word string) (string, bool) // mot -> nom de fiche (F1 contextuel editeur)
+	pgResolve func(word string, extended bool) (string, bool) // mot -> nom de sa fiche dans la vue donnee
 	getLang   func() string
 	translate func(src string, toEN bool) string // editeur Ctrl+T : traduit FR<->EN
 	edEN      bool                               // sens courant du Ctrl+T (faux = prochaine bascule vers l'anglais)
@@ -313,9 +328,12 @@ type Screen struct {
 	captureWaiting atomic.Int32 // COPIE en attente : force une frame meme pendant un SCENE gele
 
 	// composition cote processeur
-	frame       *image.RGBA // image plein ecran recopiee a l'ecran a chaque frame
-	fieldImg    *image.RGBA // traits dessines (fond transparent), coordonnees locales du champ
-	baked       int
+	frame *image.RGBA // image plein ecran recopiee a l'ecran a chaque frame
+	// calque du champ : tout ce qui a ete trace (fond transparent), en coordonnees
+	// locales du champ. protege par fieldMu : la boucle d'evenements le compose, la
+	// tache de fond peut y dessiner (journal plein) ou l'exporter (SAUVEPNG)
+	fieldMu     sync.Mutex
+	fieldImg    *image.RGBA
 	bakedGen    uint64
 	frozen      atomic.Int32 // SCENE : profondeur de gel ; >0 = ne presente pas de frame partielle
 	lastWin     image.Point  // derniere taille de fenetre vue (detection de resize)
@@ -330,6 +348,8 @@ func New() *Screen {
 		textBg:    color.RGBA{0, 0, 0, 255},
 		meLines:   textRows, // par defaut, pleine hauteur de texte
 		cmdCh:     make(chan string, 1),
+		closed:    make(chan struct{}),
+		helpReq:   make(chan helpRequest, 1),
 		edDone:    make(chan editResult, 1),
 		kbResult:  make(chan kbRes, 1),
 		pgDone:    make(chan struct{}, 1),
@@ -357,9 +377,9 @@ func (s *Screen) SetHelpOpener(f func(extended bool) ([]string, map[string][]str
 	s.pgOpen = f
 }
 
-// branche la resolution mot -> nom de fiche, pour le F1 contextuel de l'editeur
-// (logo.Interp.HelpName)
-func (s *Screen) SetHelpResolver(f func(string) (string, bool)) {
+// branche la resolution mot -> nom de fiche dans une vue (complete ou debutant),
+// pour le F1 contextuel de l'editeur et le changement de vue (logo.Interp.HelpName)
+func (s *Screen) SetHelpResolver(f func(word string, extended bool) (string, bool)) {
 	s.pgResolve = f
 }
 
@@ -372,13 +392,19 @@ func (s *Screen) SetTranslator(f func(src string, toEN bool) string) { s.transla
 // branche la localisation des messages d'erreur (FR/EN)
 func (s *Screen) SetErrorText(f func(error) string) { s.errText = f }
 
+// un dialogue occupe-t-il l'ecran (aide, afficheur, editeur, lecture clavier) ?
+func (s *Screen) modalActive() bool {
+	return s.pgActive.Load() || s.txtActive.Load() || s.edActive.Load() || s.kbActive.Load()
+}
+
 // demande un redraw (depuis n'importe quelle tache). pendant un SCENE (frozen > 0)
 // on s'abstient : l'ecran garde la derniere image complete jusqu'au bout du bloc
 // (cf BeginFrame/EndFrame)
 func (s *Screen) invalidate() {
-	// pendant un SCENE on s'abstient, SAUF si une COPIE attend une frame : sans ca
-	// le thread Logo resterait bloque sur captureCh (interblocage SCENE [ ... COPIE ... ])
-	if s.frozen.Load() > 0 && s.captureWaiting.Load() == 0 {
+	// pendant un SCENE on s'abstient, SAUF si quelque chose attend la boucle
+	// d'evenements : une COPIE (sinon le thread Logo resterait bloque sur captureCh),
+	// une demande d'aide, ou un dialogue ouvert qu'il faut bien afficher
+	if s.frozen.Load() > 0 && s.captureWaiting.Load() == 0 && s.uiPending.Load() == 0 && !s.modalActive() {
 		return
 	}
 	if s.win != nil {
@@ -402,9 +428,20 @@ func (s *Screen) EndFrame() {
 // --- turtle.Canvas ---
 
 func (s *Screen) DrawSegment(seg turtle.Segment) {
+	s.pushGfx(gfxOp{kind: gfxSeg, seg: seg})
+}
+
+// ajoute une operation au journal graphique. s'il deborde (personne ne compose :
+// fenetre masquee, boucle de dessin qui va plus vite que l'ecran), on l'applique
+// tout de suite au calque au lieu de le laisser grossir
+func (s *Screen) pushGfx(op gfxOp) {
 	s.mu.Lock()
-	s.gfx = append(s.gfx, gfxOp{kind: gfxSeg, seg: seg})
+	s.gfx = append(s.gfx, op)
+	n := len(s.gfx)
 	s.mu.Unlock()
+	if n >= maxPendingGfx {
+		s.bakePending()
+	}
 	s.invalidate()
 }
 
@@ -547,6 +584,44 @@ func (s *Screen) wakeBlockers() {
 	s.closePage()
 }
 
+// la fenetre se ferme : on previent la tache de fond. closed libere toutes ses
+// attentes (meme celles qui commenceraient juste apres), l'interruption arrete le
+// programme Logo en cours
+func (s *Screen) shutdown() {
+	s.closeOnce.Do(func() { close(s.closed) })
+	if s.interrupt != nil {
+		s.interrupt()
+	}
+	s.wakeBlockers()
+}
+
+// attend la fin de la tache de fond apres la fermeture, au plus timeout. rend true
+// si elle est bien arretee : alors seulement plus personne n'execute de Logo et
+// l'appelant peut refermer les fichiers. false : elle est restee coincee (appel
+// systeme bloquant) et il ne faut plus toucher a son etat
+func (s *Screen) WaitWorker(timeout time.Duration) bool {
+	if s.workerDone == nil {
+		return true // jamais demarree
+	}
+	deadline := time.After(timeout)
+	tick := time.NewTicker(20 * time.Millisecond)
+	defer tick.Stop()
+	for {
+		select {
+		case <-s.workerDone:
+			return true
+		case <-deadline:
+			return false
+		case <-tick.C:
+			// l'interruption est remise a zero au lancement d'un programme : si la
+			// tache en demarrait un au moment de fermer, on la redemande
+			if s.interrupt != nil {
+				s.interrupt()
+			}
+		}
+	}
+}
+
 // la boucle d'evenements Gio (appelee depuis main, sur sa tache principale)
 func (s *Screen) Run(w *app.Window) error {
 	s.win = w
@@ -554,18 +629,20 @@ func (s *Screen) Run(w *app.Window) error {
 	for {
 		switch e := w.Event().(type) {
 		case app.DestroyEvent:
-			s.wakeBlockers()
+			s.shutdown()
 			return e.Err
 		case app.FrameEvent:
 			gtx := app.NewContext(&ops, e)
 			if !s.started {
 				s.started = true
+				s.workerDone = make(chan struct{})
 				go s.worker()
 				if s.startup != "" {
 					s.Print("?" + s.startup)
 					s.dispatch(s.startup)
 				}
 			}
+			s.serveHelpRequest() // une primitive AIDE attend peut-etre son ouverture
 			s.handleInput(gtx)
 			// Verifie APRES handleInput : un Ctrl+Q (ou la primitive QUITTE) tape
 			// dans cette frame doit fermer tout de suite (sinon, au repos, aucune
@@ -573,7 +650,7 @@ func (s *Screen) Run(w *app.Window) error {
 			// fiable sur toutes les plateformes. (system.ActionClose ne ferme PAS la
 			// fenetre plein ecran sur macOS -> ecran noir sans fin de process.)
 			if s.quit.Load() {
-				s.wakeBlockers()
+				s.shutdown()
 				return nil
 			}
 			s.draw(gtx)
@@ -600,9 +677,17 @@ func (s *Screen) dispatch(line string) {
 }
 
 // tache de fond qui execute les lignes Logo. un programme long, voire increvable,
-// ne bloque pas l'interface et reste tuable par Ctrl+C
+// ne bloque pas l'interface et reste tuable par Ctrl+C. elle s'arrete a la
+// fermeture de la fenetre (closed) et le signale sur workerDone
 func (s *Screen) worker() {
-	for line := range s.cmdCh {
+	defer close(s.workerDone)
+	for {
+		var line string
+		select {
+		case <-s.closed:
+			return
+		case line = <-s.cmdCh:
+		}
 		if err := s.run(line); err != nil {
 			if errors.Is(err, logo.ErrQuitter) {
 				s.quit.Store(true)
@@ -642,18 +727,42 @@ type gfxOp struct {
 
 // logo.Filler (REMPLIS) : remplit la zone qui contient le point
 func (s *Screen) Fill(x, y float64, c turtle.Color) {
-	s.mu.Lock()
-	s.gfx = append(s.gfx, gfxOp{kind: gfxFill, x: x, y: y, col: c})
-	s.mu.Unlock()
-	s.invalidate()
+	s.pushGfx(gfxOp{kind: gfxFill, x: x, y: y, col: c})
 }
 
-// logo.Labeler (ETIQUETTE) : ecrit un texte dans le champ
+// logo.Labeler (ETIQUETTE) : ecrit un texte dans le champ. on ne garde que les
+// caracteres qui peuvent tomber dans le champ : un texte interminable ne coute ni
+// memoire ni temps de dessin pour sa partie invisible
 func (s *Screen) Label(x, y float64, text string, c turtle.Color) {
-	s.mu.Lock()
-	s.gfx = append(s.gfx, gfxOp{kind: gfxLabel, x: x, y: y, col: c, text: text})
-	s.mu.Unlock()
-	s.invalidate()
+	fx, _ := logoToField(x, y)
+	if fx >= fieldW {
+		return // commence a droite du champ : rien de visible
+	}
+	skip := 0 // caracteres entierement a gauche du champ
+	if fx < 0 {
+		k := math.Floor(-fx / charW)
+		if k > math.MaxInt32 {
+			return
+		}
+		skip = int(k)
+	}
+	keep := fieldW/charW + 2 // de quoi couvrir toute la largeur
+	start, end, n := len(text), len(text), 0
+	for i := range text {
+		if n == skip {
+			start = i
+		}
+		if n == skip+keep {
+			end = i
+			break
+		}
+		n++
+	}
+	if start >= end {
+		return
+	}
+	x += float64(skip*charW) / fieldScale // le texte garde reprend la ou il etait
+	s.pushGfx(gfxOp{kind: gfxLabel, x: x, y: y, col: c, text: text[start:end]})
 }
 
 // remplit la zone connexe de meme couleur que le pixel de depart (4-connexite, sans
@@ -700,12 +809,28 @@ func floodFill(img *image.RGBA, sx, sy int, col color.RGBA) {
 // compose la scene dans frame puis la recopie a l'ecran, a l'echelle de la fenetre
 // (ratio garde, centree)
 func (s *Screen) draw(gtx layout.Context) {
+	// les traces en attente rejoignent le calque a chaque image, meme quand la vue
+	// affichee n'est pas le champ (aide, editeur) ou que l'ecran est gele (SCENE)
+	s.bakePending()
 	s.compose()
-	// Sert une eventuelle capture plein ecran (COPIE) : frame vient d'etre composee
-	// et appartient a ce thread, on en renvoie une copie a la tache de fond.
+	// Sert une eventuelle capture plein ecran (COPIE). la requete peut arriver apres
+	// la composition ci-dessus, avec des traces poses entre-temps : on integre donc
+	// tout ce qui la precede et on recompose POUR elle, avant de repondre.
 	select {
 	case resp := <-s.captureCh:
-		resp <- cloneRGBA(s.frame)
+		s.bakePending()
+		if s.frozen.Load() > 0 && !s.modalActive() {
+			// en plein SCENE l'ecran garde l'image d'avant le bloc, mais la copie doit
+			// voir le dessin en cours : on le compose pour elle, puis on remet l'image
+			// affichee (pas de frame partielle a l'ecran)
+			shown := cloneRGBA(s.frame)
+			s.composeNow()
+			resp <- cloneRGBA(s.frame)
+			copy(s.frame.Pix, shown.Pix)
+		} else {
+			s.composeNow()
+			resp <- cloneRGBA(s.frame)
+		}
 	default:
 	}
 	win := gtx.Constraints.Max
@@ -744,11 +869,19 @@ func (s *Screen) draw(gtx layout.Context) {
 	paint.PaintOp{}.Add(gtx.Ops)
 }
 
-// dessine toute la scene dans s.frame (image CPU)
+// dessine la scene dans s.frame (image CPU), sauf pendant un SCENE : on garde alors
+// la derniere image complete (pas de frame partielle). un dialogue ouvert dans le
+// bloc (aide, editeur, afficheur, saisie au clavier) est affiche quand meme, sinon
+// le programme attendrait une reponse a une question que personne ne voit
 func (s *Screen) compose() {
-	if s.frozen.Load() > 0 {
-		return // SCENE en cours : on conserve la derniere image complete (pas de frame partielle)
+	if s.frozen.Load() > 0 && !s.modalActive() {
+		return
 	}
+	s.composeNow()
+}
+
+// dessine toute la scene dans s.frame, gel ou pas
+func (s *Screen) composeNow() {
 	if s.pgActive.Load() {
 		s.composeHelp()
 		return
@@ -774,31 +907,10 @@ func (s *Screen) compose() {
 		}
 	}
 	textCol, textBg := s.textCol, s.textBg
-	clearGen := s.clearGen
-	// Reinit du dessin si clearGen a change (VE/NETTOIE) ou incoherence du compteur.
-	reset := clearGen != s.bakedGen || s.baked > len(s.gfx)
-	from := s.baked
-	if reset {
-		from = 0
-	}
-	gfxCount := len(s.gfx)
-	// Copie de la queue non encore dessinee sous verrou : la tache de fond peut append dans
-	// s.gfx en meme temps ; on travaille sur notre propre tranche.
-	newGfx := append([]gfxOp(nil), s.gfx[from:gfxCount]...)
 	// Copie de la grille texte + curseur (tableaux : copie par valeur).
 	grid, gridFg := s.grid, s.gridFg
 	curRow, curCol, meLines := s.curRow, s.curCol, s.meLines
 	s.mu.Unlock()
-
-	if reset {
-		clearImage(s.fieldImg)
-		s.baked = 0
-		s.bakedGen = clearGen
-	}
-	// Rejoue la tranche du journal dans l'ordre : traits, remplissages, etiquettes
-	// melanges chronologiquement (sur le fil interface).
-	bakeGfx(s.fieldImg, newGfx)
-	s.baked = gfxCount
 
 	// Frame : fond noir.
 	draw.Draw(s.frame, s.frame.Bounds(), uniBlack, image.Point{}, draw.Src)
@@ -809,10 +921,12 @@ func (s *Screen) compose() {
 		draw.Draw(s.frame, bord, uniform(rgba(border)), image.Point{}, draw.Src) // bord FCB
 		fr := image.Rect(fieldX, fieldY, fieldX+fieldW, fieldY+fieldH)
 		draw.Draw(s.frame, fr, uniform(rgba(bg)), image.Point{}, draw.Src) // fond champ
-		draw.Draw(s.frame, fr, s.fieldImg, image.Point{}, draw.Over)       // traits
+		s.fieldMu.Lock()
+		draw.Draw(s.frame, fr, s.fieldImg, image.Point{}, draw.Over) // traits
+		s.fieldMu.Unlock()
 		for _, tst := range tsts {
 			if tst.Visible {
-				s.drawTurtle(tst, ushapes)
+				s.drawTurtle(tst, ushapes, rgba(bg))
 			}
 		}
 		textTop = fieldY + fieldH + margin
@@ -864,7 +978,7 @@ func fillRect(img *image.RGBA, x, y, w, h int, col color.RGBA) {
 
 // dessine la tortue dans frame (petits carres pivotes selon le cap), selon sa forme
 // (Shape : 0/1/2 integrees, >=3 par DEFSPRITE)
-func (s *Screen) drawTurtle(st turtle.State, userShapes map[int]turtleShape) {
+func (s *Screen) drawTurtle(st turtle.State, userShapes map[int]turtleShape, bg color.RGBA) {
 	sh := turtleShapes[0]
 	if st.Shape >= 0 && st.Shape < len(turtleShapes) {
 		sh = turtleShapes[st.Shape] // forme integree 0/1/2
@@ -876,6 +990,14 @@ func (s *Screen) drawTurtle(st turtle.State, userShapes map[int]turtleShape) {
 	hd := st.Heading * math.Pi / 180
 	sin, cos := math.Sin(hd), math.Cos(hd)
 	col := rgba(st.Pen)
+	if !st.Pen.IsRGB() && int(st.Pen) < 0 {
+		// crayon en mode gomme : il n'a pas de couleur a lui. la tortue se dessine
+		// en blanc, ou en noir sur un fond clair, pour rester visible
+		col = color.RGBA{255, 255, 255, 255}
+		if 299*int(bg.R)+587*int(bg.G)+114*int(bg.B) > 150000 {
+			col = color.RGBA{0, 0, 0, 255}
+		}
+	}
 	ccol := float64(len(sh.bm[0])-1) / 2 // colonne centrale (bitmap de largeur uniforme)
 	crow := float64(len(sh.bm)-1) / 2
 	for row, line := range sh.bm {
@@ -931,17 +1053,84 @@ func segWidth(w int) float64 {
 	return float64(w)
 }
 
+// borne le segment au rectangle [xmin,xmax] x [ymin,ymax] (Liang-Barsky). ok=false
+// s'il n'y passe pas. une extremite coupee par un bord est posee exactement sur ce
+// bord : avec des coordonnees gigantesques, x0 + t*dx n'a plus aucune precision
+func clipSegment(x0, y0, x1, y1, xmin, ymin, xmax, ymax float64) (float64, float64, float64, float64, bool) {
+	dx, dy := x1-x0, y1-y0
+	t0, t1 := 0.0, 1.0
+	e0, e1 := 0, 0 // bord qui a coupe chaque extremite (0 = aucun)
+	clip := func(p, q float64, edge int) bool {
+		if p == 0 {
+			return q >= 0 // parallele a ce bord : dedans ou dehors pour de bon
+		}
+		r := q / p
+		if p < 0 {
+			if r > t1 {
+				return false
+			}
+			if r > t0 {
+				t0, e0 = r, edge
+			}
+		} else {
+			if r < t0 {
+				return false
+			}
+			if r < t1 {
+				t1, e1 = r, edge
+			}
+		}
+		return true
+	}
+	if !clip(-dx, x0-xmin, 1) || !clip(dx, xmax-x0, 2) || !clip(-dy, y0-ymin, 3) || !clip(dy, ymax-y0, 4) {
+		return 0, 0, 0, 0, false
+	}
+	point := func(t float64, edge int) (float64, float64) {
+		x, y := x0+t*dx, y0+t*dy
+		switch edge {
+		case 1:
+			x = xmin
+		case 2:
+			x = xmax
+		case 3:
+			y = ymin
+		case 4:
+			y = ymax
+		}
+		// filet : jamais hors du rectangle, quoi qu'ait donne l'arrondi
+		return math.Min(math.Max(x, xmin), xmax), math.Min(math.Max(y, ymin), ymax)
+	}
+	ax, ay := point(t0, e0)
+	bx, by := point(t1, e1)
+	return ax, ay, bx, by, true
+}
+
+func finite(x float64) bool { return !math.IsNaN(x) && !math.IsInf(x, 0) }
+
 // trace un segment epais SANS lissage (pixels ecrits direct). invariant gomme : un
 // trait lisse laisserait une frange ineffacable ; la distance geometrique garantit
 // un effacement au pixel pres
 func drawSeg(img *image.RGBA, x0, y0, x1, y1 float64, col color.RGBA, width float64) {
 	hw := width / 2
+	b := img.Bounds()
+	// en mode FEN les coordonnees peuvent etre gigantesques : on ramene d'abord le
+	// segment, en flottant, a la partie qui peut toucher l'image. convertir en
+	// entier avant de borner donnerait n'importe quoi hors de la plage des entiers,
+	// et dx*dx + dy*dy deborderait
+	if !finite(x0) || !finite(y0) || !finite(x1) || !finite(y1) || !finite(x1-x0) || !finite(y1-y0) {
+		return
+	}
+	var ok bool
+	x0, y0, x1, y1, ok = clipSegment(x0, y0, x1, y1,
+		float64(b.Min.X)-hw-1, float64(b.Min.Y)-hw-1, float64(b.Max.X)+hw+1, float64(b.Max.Y)+hw+1)
+	if !ok {
+		return
+	}
 	minX := int(math.Floor(math.Min(x0, x1) - hw - 1))
 	maxX := int(math.Ceil(math.Max(x0, x1) + hw + 1))
 	minY := int(math.Floor(math.Min(y0, y1) - hw - 1))
 	maxY := int(math.Ceil(math.Max(y0, y1) + hw + 1))
-	b := img.Bounds() // borne a l'image (un trait au bord ne doit pas paniquer)
-	if minX < b.Min.X {
+	if minX < b.Min.X { // borne a l'image (un trait au bord ne doit pas paniquer)
 		minX = b.Min.X
 	}
 	if minY < b.Min.Y {
@@ -1035,16 +1224,37 @@ func deaccent(s string) string {
 	return b.String()
 }
 
-// rend un texte dans la couleur col, basicfont 7x13 x textScale
+// glyphes dessines en blanc opaque : sert de masque, la couleur est posee apres
+var uniWhite = image.NewUniform(color.RGBA{255, 255, 255, 255})
+
+// rend un texte dans la couleur col, basicfont 7x13 x textScale. seuls les
+// caracteres qui tombent dans dst sont rendus. col transparent = gomme : les pixels
+// du texte sont effaces du calque
 func drawText2x(dst *image.RGBA, x, y int, s string, col color.RGBA) {
 	if s == "" {
 		return
 	}
-	s = deaccent(s) // basicfont = ASCII seul : convertit les accents
-	w := len([]rune(s)) * 7
+	b := dst.Bounds()
+	if y >= b.Max.Y || y+13*textScale <= b.Min.Y || x >= b.Max.X {
+		return
+	}
+	r := []rune(deaccent(s)) // basicfont = ASCII seul : convertit les accents
+	first := 0
+	if x < b.Min.X {
+		first = (b.Min.X - x) / charW
+	}
+	if last := (b.Max.X-x)/charW + 1; last < len(r) {
+		r = r[:last]
+	}
+	if first >= len(r) {
+		return
+	}
+	r = r[first:]
+	x += first * charW
+	w := len(r) * 7
 	tmp := image.NewRGBA(image.Rect(0, 0, w, 13))
-	d := &font.Drawer{Dst: tmp, Src: uniform(col), Face: basicfont.Face7x13, Dot: fixed.P(0, 10)}
-	d.DrawString(s)
+	d := &font.Drawer{Dst: tmp, Src: uniWhite, Face: basicfont.Face7x13, Dot: fixed.P(0, 10)}
+	d.DrawString(string(r))
 	for ty := 0; ty < 13; ty++ {
 		for tx := 0; tx < w; tx++ {
 			if tmp.RGBAAt(tx, ty).A == 0 {

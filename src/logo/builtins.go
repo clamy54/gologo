@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"strconv"
 	"strings"
 
 	"beroot.com/logo/turtle"
@@ -14,7 +13,7 @@ import (
 func (i *Interp) registerBuiltins() {
 	// deplacement
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
@@ -22,7 +21,7 @@ func (i *Interp) registerBuiltins() {
 	}), "AV", "AVANCE")
 
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
@@ -30,7 +29,7 @@ func (i *Interp) registerBuiltins() {
 	}), "RE", "RECULE")
 
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
@@ -39,7 +38,7 @@ func (i *Interp) registerBuiltins() {
 	}), "TD", "TOURNEDROITE")
 
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
@@ -48,7 +47,7 @@ func (i *Interp) registerBuiltins() {
 	}), "TG", "TOURNEGAUCHE")
 
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
@@ -73,11 +72,11 @@ func (i *Interp) registerBuiltins() {
 
 	// FXY x y : amene la tortue au point (x, y), trace si crayon baisse
 	i.register(cmd(2, func(in *Interp, a []Value) error {
-		x, err := toNumber(a[0])
+		x, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
-		y, err := toNumber(a[1])
+		y, err := toFinite(a[1])
 		if err != nil {
 			return err
 		}
@@ -87,7 +86,7 @@ func (i *Interp) registerBuiltins() {
 	// CERCLE r : cercle de rayon r centre sur la tortue (facon XLogo). la tortue
 	// reste sur place, position et cap inchanges
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		r, err := toNumber(a[0])
+		r, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
@@ -97,15 +96,15 @@ func (i *Interp) registerBuiltins() {
 	// ARC r cap1 cap2 : arc de rayon r centre sur la tortue (facon XLogo), entre les
 	// caps boussole cap1 et cap2. la tortue ne bouge pas
 	i.register(cmd(3, func(in *Interp, a []Value) error {
-		r, err := toNumber(a[0])
+		r, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
-		cap1, err := toNumber(a[1])
+		cap1, err := toFinite(a[1])
 		if err != nil {
 			return err
 		}
-		cap2, err := toNumber(a[2])
+		cap2, err := toFinite(a[2])
 		if err != nil {
 			return err
 		}
@@ -144,11 +143,11 @@ func (i *Interp) registerBuiltins() {
 
 	// FIXETAILLECRAYON n : epaisseur du trait en pixels (mini 1)
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
-		in.Turtle.SetPenSize(int(round1(n)))
+		in.Turtle.SetPenSize(numToInt(round1(n)))
 		return nil
 	}), "FIXETAILLECRAYON")
 
@@ -213,6 +212,9 @@ func (i *Interp) registerBuiltins() {
 		if err != nil {
 			return err
 		}
+		if name == "" { // une variable sans nom ne se relit ni ne se sauve
+			return &badData{`"`}
+		}
 		in.setVar(name, a[1]) // ecrit la locale si elle existe, sinon la globale
 		return nil
 	}), "DONNE", "FIXE")
@@ -250,37 +252,49 @@ func (i *Interp) registerBuiltins() {
 	// ECRIS/TAPE/MONTRE ecrivent sur le flux d'ecriture courant (FIXEECRITURE) s'il
 	// y en a un, sinon sur la console (cf in.writeText)
 	i.register(vcmd(1, func(in *Interp, a []Value) error {
-		return in.writeText(joinValues(a) + "\n")
+		return in.writeText(in.joinValues(a) + "\n")
 	}), "ECRIS", "EC")
 	i.register(vcmd(1, func(in *Interp, a []Value) error {
-		return in.writeText(joinValues(a))
+		return in.writeText(in.joinValues(a))
 	}), "TAPE")
 
 	// MONTRE : comme ECRIS mais garde les crochets autour des listes (SHOW standard)
 	i.register(vcmd(1, func(in *Interp, a []Value) error {
 		parts := make([]string, len(a))
 		for i, v := range a {
-			parts[i] = showValue(v)
+			parts[i] = in.showValue(v)
 		}
 		return in.writeText(strings.Join(parts, " ") + "\n")
 	}), "MONTRE")
 }
 
+// texte affiche d'un objet. un booleen s'ecrit dans la langue courante (VRAI/FAUX,
+// TRUE/FALSE) ; les deux ecritures sont comprises partout, cf Value.IsTrue
+func (i *Interp) display(v Value) string {
+	if v.Kind == KBool && i.Lang() == "EN" {
+		if v.Bool {
+			return "TRUE"
+		}
+		return "FALSE"
+	}
+	return v.String()
+}
+
 // colle les objets en une chaine, separes par une espace (ECRIS/TAPE variadiques)
-func joinValues(a []Value) string {
+func (i *Interp) joinValues(a []Value) string {
 	parts := make([]string, len(a))
-	for i, v := range a {
-		parts[i] = v.String()
+	for k, v := range a {
+		parts[k] = i.display(v)
 	}
 	return strings.Join(parts, " ")
 }
 
 // objet avec les crochets autour d'une liste (pour MONTRE)
-func showValue(v Value) string {
+func (i *Interp) showValue(v Value) string {
 	if v.Kind == KList {
 		return "[" + v.String() + "]"
 	}
-	return v.String()
+	return i.display(v)
 }
 
 // construit une primitive "commande" (ne rend pas de valeur)
@@ -325,6 +339,9 @@ func (i *Interp) drawArc(r, cap1, cap2 float64) error {
 	}()
 
 	delta := cap2 - cap1
+	if math.Abs(delta) > 360 { // au-dela d'un tour on repasse sur le meme cercle
+		delta = math.Copysign(360, delta)
+	}
 	n := int(math.Abs(delta) + 0.5)
 	if n == 0 {
 		return nil // arc nul
@@ -389,11 +406,40 @@ func toNumber(v Value) (float64, error) {
 		f, _ := new(big.Float).SetInt(v.Int).Float64()
 		return f, nil
 	case KWord:
-		if n, err := strconv.ParseFloat(strings.Replace(v.Word, ",", ".", 1), 64); err == nil {
+		// meme regle que le lecteur : "INF" ou "NAN" sont des mots, pas des nombres
+		if n, ok := parseNumber(strings.Replace(v.Word, ",", ".", 1)); ok {
 			return n, nil
 		}
 	}
 	return 0, &badData{v.String()}
+}
+
+// comme toNumber, mais refuse l'infini et NaN : pour tout ce qui regle la tortue,
+// l'ecran, un son ou une duree. un calcul peut deborder (1e308 * 10), une
+// coordonnee ou une vitesse non : NaN traverse tous les controles de bornes
+// (ni plus petit ni plus grand que rien) et s'installerait dans l'etat graphique
+func toFinite(v Value) (float64, error) {
+	n, err := toNumber(v)
+	if err != nil {
+		return 0, err
+	}
+	if math.IsNaN(n) || math.IsInf(n, 0) {
+		return 0, &badData{v.String()}
+	}
+	return n, nil
+}
+
+// convertit un flottant fini en int en saturant : la conversion Go d'une valeur
+// hors plage donne un resultat qui depend de la machine
+func numToInt(n float64) int {
+	const lim = 1 << 30
+	switch {
+	case n >= lim:
+		return lim
+	case n <= -lim:
+		return -lim
+	}
+	return int(n)
 }
 
 func toWord(v Value) (string, error) {
@@ -404,16 +450,18 @@ func toWord(v Value) (string, error) {
 		return formatNumber(v.Num), nil
 	case KInt:
 		return v.Int.String(), nil
+	case KBool:
+		return v.String(), nil // un booleen se lit aussi comme le mot VRAI ou FAUX
 	}
 	return "", &badData{v.String()}
 }
 
 func toColor(v Value) (turtle.Color, error) {
-	n, err := toNumber(v)
+	n, err := toFinite(v)
 	if err != nil {
 		return 0, err
 	}
-	return turtle.Color(int(n)), nil
+	return turtle.Color(numToInt(n)), nil
 }
 
 // lit une couleur facon FCC : code palette (nombre) ou [ r v b ] (3 valeurs 0-255)
@@ -430,7 +478,7 @@ func penColor(v Value) (turtle.Color, error) {
 		if err != nil {
 			return 0, err
 		}
-		n, err := toNumber(dv)
+		n, err := toFinite(dv)
 		if err != nil {
 			return 0, err
 		}
@@ -459,11 +507,11 @@ func toCoordsList(v Value) ([][2]float64, error) {
 		if err != nil {
 			return nil, err
 		}
-		x, err := toNumber(xv)
+		x, err := toFinite(xv)
 		if err != nil {
 			return nil, err
 		}
-		y, err := toNumber(yv)
+		y, err := toFinite(yv)
 		if err != nil {
 			return nil, err
 		}
@@ -486,10 +534,10 @@ func toCoords(v Value) (x, y float64, err error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	if x, err = toNumber(xv); err != nil {
+	if x, err = toFinite(xv); err != nil {
 		return 0, 0, err
 	}
-	if y, err = toNumber(yv); err != nil {
+	if y, err = toFinite(yv); err != nil {
 		return 0, 0, err
 	}
 	return x, y, nil
@@ -564,6 +612,15 @@ func applyOp(op string, l, r Value) (Value, error) {
 }
 
 func valuesEqual(l, r Value) bool {
+	// un booleen contre un booleen ou contre son nom dans l'une des deux langues
+	// (VRAI = "TRUE) : on compare le sens, pas l'ecriture
+	if l.Kind == KBool || r.Kind == KBool {
+		lb, lok := l.asBool()
+		rb, rok := r.asBool()
+		if lok && rok {
+			return lb == rb
+		}
+	}
 	// au moins un entier exact : compare les valeurs entieres si l'autre en est
 	// un aussi (sinon on laisse filer vers la comparaison de chaines plus bas,
 	// pour ne pas changer le sens de "007 = "7 entre deux mots)

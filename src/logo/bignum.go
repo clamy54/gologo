@@ -150,27 +150,57 @@ func mulInt(l, r Value) (Value, bool) {
 	return intBin(l, r, (*big.Int).Mul)
 }
 
-// l < r en traitant les deux comme des nombres si possible (sans allouer dans le
-// cas courant). pour le tri de tableau (ORDONNE) : meme ordre que TRIE/datumLess,
-// mais sans passer par valueToDatum ni big.Int sur des nombres ordinaires.
+// ordre des tris (TRIE, ORDONNE) : un ordre TOTAL, sans quoi le resultat dependrait
+// de l'ordre d'arrivee des elements. d'abord tous les nombres, par valeur, puis tout
+// le reste (mots, listes...) par ordre d'ecriture. comparer "nombre contre nombre en
+// valeur, sinon en texte" ne suffit pas : 2 < 10 < 1A < 2 tournerait en rond
 func valueLess(a, b Value) bool {
-	if x, ok := asSmallInt(a); ok {
+	if x, ok := asSmallInt(a); ok { // cas courant : deux petits entiers, sans allouer
 		if y, ok2 := asSmallInt(b); ok2 {
 			return x < y
 		}
 	}
-	if a.Kind == KNumber && b.Kind == KNumber {
-		return a.Num < b.Num
+	an, aNum := sortNumber(a)
+	bn, bNum := sortNumber(b)
+	if aNum != bNum {
+		return aNum // les nombres passent avant les mots
 	}
-	if c, ok := intCmp(a, b); ok { // grands entiers exacts
-		return c < 0
+	if !aNum {
+		return a.String() < b.String()
 	}
-	an, aerr := toNumber(a)
-	bn, berr := toNumber(b)
-	if aerr == nil && berr == nil {
+	ai, aInt := asIntOperand(a)
+	bi, bInt := asIntOperand(b)
+	switch {
+	case aInt && bInt: // deux entiers exacts, grands compris
+		return ai.Cmp(bi) < 0
+	case !aInt && !bInt:
 		return an < bn
 	}
-	return a.String() < b.String()
+	// un entier exact contre un flottant : comparaison exacte, pour rester coherent
+	// avec l'ordre des entiers entre eux
+	return bigFloatOf(a, an).Cmp(bigFloatOf(b, bn)) < 0
+}
+
+// valeur numerique d'un element a trier. NaN n'est pas ordonnable : il est range
+// avec les mots
+func sortNumber(v Value) (float64, bool) {
+	if v.Kind == KInt {
+		f, _ := new(big.Float).SetInt(v.Int).Float64()
+		return f, true
+	}
+	n, err := toNumber(v)
+	if err != nil || math.IsNaN(n) {
+		return 0, false
+	}
+	return n, true
+}
+
+// v en big.Float exact (n = sa valeur flottante, deja calculee)
+func bigFloatOf(v Value, n float64) *big.Float {
+	if b, ok := asIntOperand(v); ok {
+		return new(big.Float).SetInt(b)
+	}
+	return big.NewFloat(n)
 }
 
 // applique un operateur binaire entier (Add, Sub, Mul...) si les deux operandes

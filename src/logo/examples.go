@@ -3,7 +3,6 @@ package logo
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 // commandes ...EX : CATALOGUEEX / CHARGEEX / RAMENEEX. memes effets que CATALOGUE /
@@ -38,21 +37,23 @@ func (i *Interp) ensureExamplesDir() (string, error) {
 }
 
 // verifie le dossier puis lit le .GLG nomme et rend son contenu
-// erreur LECTURE IMPOSSIBLE s'il manque, est illisible ou est un dossier
+// erreur LECTURE IMPOSSIBLE s'il manque, est illisible ou n'est pas un fichier
+// ordinaire. meme confinement que le dossier de travail (cf openWorkRoot)
 func (i *Interp) readExampleFile(name string) ([]byte, error) {
 	dir, err := i.ensureExamplesDir()
 	if err != nil {
 		return nil, err
 	}
-	path := filepath.Join(dir, fileBase(name))
-	if info, err := os.Stat(path); err != nil || info.IsDir() {
-		return nil, fmt.Errorf("LECTURE IMPOSSIBLE")
-	}
-	data, err := os.ReadFile(path)
+	rel, err := glgName(name)
 	if err != nil {
-		return nil, fmt.Errorf("LECTURE IMPOSSIBLE")
+		return nil, err
 	}
-	return data, nil
+	root, err := os.OpenRoot(dir)
+	if err != nil {
+		return nil, errLectureImpossible
+	}
+	defer root.Close()
+	return readSource(root, rel)
 }
 
 // lignes d'affichage des .GLG d'un dossier, au format de CATALOGUE (nom + taille +
@@ -106,8 +107,7 @@ func (i *Interp) registerExamples() {
 		if err != nil {
 			return err
 		}
-		in.showPaged("CATALOGUEEX", lines)
-		return nil
+		return in.showPaged("CATALOGUEEX", lines)
 	}), "CATALOGUEEX")
 
 	// RAMENEEX mot : comme RAMENE mais lit dans le dossier des exemples

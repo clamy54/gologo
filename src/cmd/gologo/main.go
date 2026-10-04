@@ -38,7 +38,9 @@ func main() {
 	interp.SetKeyboard(screen)              // LISCAR/LL/TOUCHE?
 	interp.SetMouse(screen)                 // POSOPT/CONTACT?
 	interp.SetJoystick(screen)              // manettes emulees au clavier
-	interp.SetSound(audio.New())            // JOUE
+	son := audio.New()
+	son.SetCancel(interp.Interrupted)       // Ctrl+C coupe la note en cours
+	interp.SetSound(son)                    // JOUE
 	interp.SetHelper(screen.Help)           // AIDE
 	screen.SetHelpOpener(interp.HelpOpen)   // F1
 	screen.SetHelpResolver(interp.HelpName) // F1 sur un mot : sa fiche
@@ -85,8 +87,15 @@ func main() {
 			w.Option(app.Fullscreen.Option())
 		}
 		err := screen.Run(w)
-		if cerr := interp.CloseFiles(); cerr != nil { // referme les fichiers de donnees
-			log.Println("fermeture fichiers:", cerr)
+		// la fenetre est fermee, mais un programme Logo tourne peut-etre encore :
+		// on attend que sa tache s'arrete avant de refermer les fichiers de
+		// donnees, qui lui appartiennent. si elle ne rend pas la main (appel
+		// systeme bloquant), on n'y touche pas : le systeme les refermera a la
+		// sortie, et les ecritures ne sont pas mises en tampon
+		if screen.WaitWorker(2 * time.Second) {
+			if cerr := interp.CloseFiles(); cerr != nil {
+				log.Println("fermeture fichiers:", cerr)
+			}
 		}
 		if err != nil {
 			log.Fatal(err)

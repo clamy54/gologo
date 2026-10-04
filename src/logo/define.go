@@ -22,6 +22,9 @@ func datumParamNames(items []Datum) ([]string, error) {
 		}
 		params = append(params, strings.ToUpper(name))
 	}
+	if err := checkParams(params); err != nil {
+		return nil, err
+	}
 	return params, nil
 }
 
@@ -37,6 +40,9 @@ func formeDefinis(e *eval) (Value, error) {
 		return Value{}, err
 	}
 	nameU := strings.ToUpper(name)
+	if !validName(nameU) { // un nom qu'on ne pourrait ni appeler ni relire
+		return Value{}, &badData{args[0].String()}
+	}
 	if args[1].Kind != KList {
 		return Value{}, &badData{args[1].String()}
 	}

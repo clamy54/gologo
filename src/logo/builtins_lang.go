@@ -18,8 +18,10 @@ func (i *Interp) registerOperations() {
 	}
 	// operation variadique : arite fixe hors parentheses, mais (OP a b c ...) passe
 	// tous les arguments a fn
-	vop := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) {
-		i.register(&primitive{arity: arity, reporter: true, variadic: true, fn: fn}, names...)
+	vop := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) *primitive {
+		p := &primitive{arity: arity, reporter: true, variadic: true, fn: fn}
+		i.register(p, names...)
+		return p
 	}
 
 	// arithmetique
@@ -132,13 +134,16 @@ func (i *Interp) registerOperations() {
 			if err != nil {
 				return Value{}, err
 			}
-			// largeur en int64 pour reperer un intervalle vide ou un debordement
-			// (bornes tres ecartees), sinon randN recevrait un n negatif et planterait
-			width := int64(hi) - int64(lo) + 1
-			if width < 1 || width != int64(int(width)) {
+			// largeur calculee en non signe : hi - lo deborde en signe quand les
+			// bornes sont tres ecartees, et un intervalle inverse passerait pour valide
+			if hi < lo {
 				return Value{}, fmt.Errorf("HASARD N'AIME PAS %s", a[1].String())
 			}
-			return NumberValue(float64(lo + in.randN(int(width)))), nil
+			width := uint64(hi) - uint64(lo) + 1
+			if width == 0 || width > math.MaxInt { // tout l'espace des entiers, ou plus qu'un int
+				return Value{}, fmt.Errorf("HASARD N'AIME PAS %s", a[1].String())
+			}
+			return intResultFromInt64(int64(lo) + int64(in.randN(int(width)))), nil
 		}
 		n, err := intArg(a[0])
 		if err != nil {
@@ -147,8 +152,8 @@ func (i *Interp) registerOperations() {
 		if n < 1 {
 			return Value{}, fmt.Errorf("HASARD N'AIME PAS %s", a[0].String())
 		}
-		return NumberValue(float64(in.randN(n))), nil
-	}, "HASARD")
+		return intResultFromInt64(int64(in.randN(n))), nil
+	}, "HASARD").argRange(1, 2)
 
 	// arithmetique : extensions
 	op(2, func(in *Interp, a []Value) (Value, error) {
@@ -333,8 +338,8 @@ func (i *Interp) registerOperations() {
 		}
 		if a[1].Kind == KArray { // n-ieme case du tableau (en tenant compte de l'origine)
 			arr := a[1].Arr
-			idx := k - arr.Origin
-			if idx < 0 || idx >= len(arr.Items) {
+			idx, ok := arr.pos(k)
+			if !ok {
 				return Value{}, fmt.Errorf("PAS ASSEZ D'ELEMENTS POUR ITEM")
 			}
 			return arr.Items[idx], nil
@@ -412,7 +417,9 @@ func (i *Interp) registerOperations() {
 			return Value{}, fmt.Errorf("TRIE N'AIME PAS %s", a[0].String())
 		}
 		items := append([]Datum(nil), a[0].List...)
-		sort.SliceStable(items, func(i, j int) bool { return datumLess(items[i], items[j]) })
+		if err := in.sortStable(items, func(i, j int) bool { return datumLess(items[i], items[j]) }); err != nil {
+			return Value{}, err
+		}
 		return ListValue(items), nil
 	}, "TRIE")
 
@@ -429,18 +436,27 @@ func (i *Interp) registerOperations() {
 		return v, nil
 	}, "CHOSE")
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		name, _ := toWord(a[0])
+		name, err := toWord(a[0])
+		if err != nil {
+			return Value{}, err
+		}
 		_, ok := in.lookupVar(name)
 		return BoolValue(ok), nil
 	}, "NOM?")
 
 	// examiner les procedures
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		name, _ := toWord(a[0])
+		name, err := toWord(a[0])
+		if err != nil {
+			return Value{}, err
+		}
 		return BoolValue(in.prims[strings.ToUpper(name)] != nil), nil
 	}, "PRIM?")
 	op(1, func(in *Interp, a []Value) (Value, error) {
-		name, _ := toWord(a[0])
+		name, err := toWord(a[0])
+		if err != nil {
+			return Value{}, err
+		}
 		return BoolValue(in.procs[strings.ToUpper(name)] != nil), nil
 	}, "PROC?")
 
@@ -493,7 +509,9 @@ func (i *Interp) registerOperations() {
 	i.register(&primitive{name: "LOGO", arity: 0, fn: func(in *Interp, a []Value) (Value, error) {
 		return None, &ctrl{kind: ctlLogo}
 	}}, "LOGO", "STOPTOUT")
-	// RAZ : apres confirmation, remet tout a zero (comme au demarrage)
+	// RAZ : apres confirmation, remet tout a zero (comme au demarrage). le programme
+	// en cours s'arrete la, comme avec LOGO : ses procedures viennent d'etre
+	// effacees, et les boucles et appels en cours doivent se defaire proprement
 	i.register(cmd(0, func(in *Interp, a []Value) error {
 		q := "REINITIALISER ? (O/N) "
 		if in.Lang() == "EN" {
@@ -505,6 +523,7 @@ func (i *Interp) registerOperations() {
 		}
 		if ok {
 			in.resetAll()
+			return &ctrl{kind: ctlLogo}
 		}
 		return nil
 	}), "RAZ")
@@ -629,12 +648,15 @@ func (i *Interp) registerOperations() {
 
 	// pause
 	i.register(cmd(1, func(in *Interp, a []Value) error {
-		n, err := toNumber(a[0])
+		n, err := toFinite(a[0])
 		if err != nil {
 			return err
 		}
 		if n < 0 {
 			return fmt.Errorf("ATTENDS N'AIME PAS %s", a[0].String())
+		}
+		if n > 1e12 { // plafond : des siecles, et le calcul en ms ne deborde pas
+			n = 1e12
 		}
 		// n soixantiemes de seconde (1 tick = 1/60 s, comme UCBLogo/FMSLogo :
 		// ATTENDS 60 = 1 s). on dort par petits pas pour rester interruptible
@@ -702,31 +724,49 @@ func datumNum(d Datum) (float64, bool) {
 	return n, err == nil
 }
 
-// ordonne deux elements pour TRIE : deux nombres par valeur, sinon par leur ecriture
+// arret d'un tri en cours (Ctrl+C)
+type sortStop struct{}
+
+// tri stable interruptible. le tri de la bibliotheque ne sait pas s'arreter : on en
+// sort par la fonction de comparaison, qui regarde de temps en temps si Ctrl+C a
+// ete demande. un tri interrompu laisse les elements dans un ordre quelconque, mais
+// n'en perd ni n'en duplique aucun (il ne fait que des echanges)
+func (in *Interp) sortStable(x any, less func(i, j int) bool) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(sortStop); !ok {
+				panic(r)
+			}
+			err = ErrInterrompu
+		}
+	}()
+	n := 0
+	sort.SliceStable(x, func(i, j int) bool {
+		if n++; n&0x3ff == 0 && in.brk.Load() {
+			panic(sortStop{})
+		}
+		return less(i, j)
+	})
+	return nil
+}
+
+// ordonne deux elements pour TRIE : meme ordre total que ORDONNE (cf valueLess)
 func datumLess(a, b Datum) bool {
 	av, ae := datumToValue(a)
 	bv, be := datumToValue(b)
-	if ae == nil && be == nil {
-		if c, ok := intCmp(av, bv); ok { // grands entiers : compare exact
-			return c < 0
-		}
+	if ae != nil || be != nil {
+		return a.String() < b.String()
 	}
-	if an, aok := datumNum(a); aok {
-		if bn, bok := datumNum(b); bok {
-			return an < bn
-		}
-	}
-	return a.String() < b.String()
+	return valueLess(av, bv)
 }
 
 // valide une base de numeration : un entier de 2 a 36 (sinon erreur)
 func baseArg(v Value) (int, error) {
-	n, err := toNumber(v)
+	b, err := intArg(v)
 	if err != nil {
 		return 0, err
 	}
-	b := int(n)
-	if float64(b) != n || b < 2 || b > 36 {
+	if b < 2 || b > 36 {
 		return 0, &badData{v.String()}
 	}
 	return b, nil

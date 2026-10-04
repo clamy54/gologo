@@ -13,8 +13,10 @@ func (i *Interp) registerStrings() {
 		i.register(&primitive{arity: arity, reporter: true, fn: fn}, names...)
 	}
 	// variadique : arite fixe hors parentheses, le reste passe par (OP ...)
-	vop := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) {
-		i.register(&primitive{arity: arity, reporter: true, variadic: true, fn: fn}, names...)
+	vop := func(arity int, fn func(*Interp, []Value) (Value, error), names ...string) *primitive {
+		p := &primitive{arity: arity, reporter: true, variadic: true, fn: fn}
+		i.register(p, names...)
+		return p
 	}
 
 	// MEMBRE chose1 chose2 : le reste de chose2 a partir de la 1re occurrence de
@@ -90,19 +92,19 @@ func (i *Interp) registerStrings() {
 			n = c
 		}
 		return WordValue(strings.Replace(s, old, nouveau, n)), nil
-	}, "SUBSTITUE")
+	}, "SUBSTITUE").argRange(3, 4)
 
 	// OTETOUT chose elements : elements (liste ou mot) prive de tous les membres
 	// egaux a chose. sur un mot, chose doit etre un seul caractere
 	op(2, func(in *Interp, a []Value) (Value, error) { return removeAll(a[0], a[1]) }, "OTETOUT")
 
 	// SANSDOUBLONS elements : copie sans doublons, on garde l'occurrence la plus a droite
-	op(1, func(in *Interp, a []Value) (Value, error) { return remDup(a[0]) }, "SANSDOUBLONS")
+	op(1, func(in *Interp, a []Value) (Value, error) { return in.remDup(a[0]) }, "SANSDOUBLONS")
 
 	// TRANCHE sequence debut fin : la sous-sequence de debut a fin inclus (indices
 	// a partir de 1, comme ITEM). (TRANCHE sequence debut) va jusqu'au bout.
 	// le type suit l'entree, les bornes hors limites sont ramenees proprement
-	vop(3, func(in *Interp, a []Value) (Value, error) { return slice(a) }, "TRANCHE")
+	vop(3, func(in *Interp, a []Value) (Value, error) { return slice(a) }, "TRANCHE").argRange(2, 3)
 
 	// REMPLACE seq n arg : seq avec l'element n remplace par arg (repris de XLogo).
 	// version non destructive, rend une nouvelle valeur ; le type suit l'entree
@@ -179,11 +181,16 @@ func removeAll(chose, elements Value) (Value, error) {
 	return WordValue(b.String()), nil
 }
 
-// copie sans doublons, l'occurrence la plus a droite l'emporte (SANSDOUBLONS)
-func remDup(v Value) (Value, error) {
+// copie sans doublons, l'occurrence la plus a droite l'emporte (SANSDOUBLONS).
+// chaque element est compare a tous les suivants : sur une tres longue liste c'est
+// long, d'ou le point d'interruption (Ctrl+C) a chaque element
+func (in *Interp) remDup(v Value) (Value, error) {
 	if v.Kind == KList {
 		out := []Datum{}
 		for i, d := range v.List {
+			if in.brk.Load() {
+				return Value{}, ErrInterrompu
+			}
 			ev, _ := datumToValue(d)
 			dernier := true // ce membre est-il sa derniere occurrence ?
 			for _, e2 := range v.List[i+1:] {
@@ -202,6 +209,9 @@ func remDup(v Value) (Value, error) {
 	r := []rune(v.String())
 	var b strings.Builder
 	for i, c := range r {
+		if in.brk.Load() {
+			return Value{}, ErrInterrompu
+		}
 		dernier := true
 		for _, c2 := range r[i+1:] {
 			if strings.EqualFold(string(c), string(c2)) {
@@ -235,7 +245,7 @@ func slice(a []Value) (Value, error) {
 			fin = f
 		}
 		// indices exprimes dans l'origine du tableau (comme ITEM), ramenes en positionnel
-		lo, hi := clampRange(debut-arr.Origin+1, fin-arr.Origin+1, n)
+		lo, hi := clampRange(rank(debut, arr.Origin), rank(fin, arr.Origin), n)
 		if lo > hi {
 			return ArrayValue(&Array{Items: []Value{}, Origin: 1}), nil
 		}
@@ -272,6 +282,21 @@ func slice(a []Value) (Value, error) {
 		return WordValue(""), nil
 	}
 	return WordValue(string(r[lo-1 : hi])), nil
+}
+
+// rang (a partir de 1) de l'indice idx dans un tableau d'origine donnee, sature
+// aux extremes : une borne demesuree reste "tres loin" du bon cote au lieu de
+// deborder et de revenir par l'autre bout
+func rank(idx, origin int) int {
+	const far = 1 << 30
+	d := int64(idx) - int64(origin)
+	switch {
+	case idx > 0 && origin < 0 && d < 0, d >= far: // debordement vers le haut, ou tres loin
+		return far
+	case idx < 0 && origin > 0 && d > 0, d <= -far:
+		return -far
+	}
+	return int(d) + 1
 }
 
 // ramene [debut..fin] dans [1..n] sans rouspeter (bornes hors limites tolerees)
