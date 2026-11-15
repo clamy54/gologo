@@ -6,7 +6,7 @@
 #define AppName "GoLogo"
 ; La version peut etre imposee a la compilation : ISCC.exe /DAppVersion=x.y gologo.iss
 #ifndef AppVersion
-  #define AppVersion "2.2"
+  #define AppVersion "2.3"
 #endif
 #define AppPublisher "Cyril Lamy"
 #define AppExe "gologo.exe"

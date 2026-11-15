@@ -2,6 +2,7 @@ package logo
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -37,7 +38,7 @@ func formePour(e *eval) (Value, error) {
 	if e.i.prims[name] != nil {
 		return Value{}, fmt.Errorf("%s EXISTE DEJA", name)
 	}
-	e.i.procs[name] = &userProc{name: name, params: params, body: body}
+	e.i.setProc(name, &userProc{name: name, params: params, body: body})
 	if !e.i.Quiet {
 		msg := "VOUS VENEZ DE DEFINIR " + name
 		if e.i.Lang() == "EN" {
@@ -109,7 +110,7 @@ func (i *Interp) procsText(names []string) (string, error) {
 			if !ok {
 				return "", &badData{n}
 			}
-			fmt.Fprintf(&b, "POUR %s\n\nFIN", lit) // nouvelle procedure : squelette vide
+			fmt.Fprintf(&b, "%s\n\nFIN", guardLineEnd("POUR "+lit)) // nouvelle procedure : squelette vide
 		}
 	}
 	return b.String(), nil
@@ -132,25 +133,83 @@ func checkParams(params []string) error {
 	return nil
 }
 
+// journal d'un chargement (editeur, RAMENE) : version d'avant de chaque procedure
+// touchee (nil = n'existait pas)
+type defJournal struct {
+	old map[string]*userProc
+}
+
+// (re)definit ou efface (p == nil) une procedure en la notant dans les journaux des
+// chargements en cours
+func (i *Interp) setProc(name string, p *userProc) {
+	for _, j := range i.defLogs {
+		if _, ok := j.old[name]; !ok {
+			j.old[name] = i.procs[name]
+		}
+	}
+	if p == nil {
+		delete(i.procs, name)
+	} else {
+		i.procs[name] = p
+	}
+}
+
+// efface toutes les procedures (journalise)
+func (i *Interp) clearProcs() {
+	for name := range i.procs {
+		i.setProc(name, nil)
+	}
+}
+
+// le bloc brut raw redefinit-il exactement p (nom, parametres, corps) ? sinon p
+// vient d'ailleurs : DEFINIS, POUR lance par EXEC, autre bloc du meme nom
+func (p *userProc) sameAs(raw string) bool {
+	data, err := Read(raw)
+	if err != nil || len(data) < 3 || data[0].Kind != DSymbol || !isProcStart(data[0].Text) {
+		return false
+	}
+	// decoupage et noms comme formePour : tous les :param de tete, en MAJ
+	end := len(data) - 1
+	last := data[end]
+	if last.Kind != DSymbol || !isProcEnd(last.Text) ||
+		data[1].Kind != DSymbol || strings.ToUpper(data[1].Text) != p.name {
+		return false
+	}
+	k := 2
+	for ; k < end && data[k].Kind == DVarRef; k++ {
+		n := k - 2
+		if n >= len(p.params) || strings.ToUpper(data[k].Text) != p.params[n] {
+			return false
+		}
+	}
+	if k-2 != len(p.params) {
+		return false
+	}
+	body := data[k:end]
+	if len(body) == 0 || len(p.body) == 0 {
+		return len(body) == len(p.body)
+	}
+	return reflect.DeepEqual(body, p.body)
+}
+
 // redefinit les procedures POUR...FIN (source brute conservee), puis execute les
 // eventuelles autres lignes du texte
 func (i *Interp) defineFromEditor(text string) error {
 	blocks := scanProcBlocks(text)
-	old := make(map[string]*userProc, len(blocks))
+	j := &defJournal{old: map[string]*userProc{}}
+	i.defLogs = append(i.defLogs, j)
+	depth := len(i.defLogs)
+	defer func() { i.defLogs = i.defLogs[:depth-1] }()
 	for name := range blocks {
-		if p := i.procs[name]; p != nil {
-			old[name] = p // garde l'ancienne def pour la restaurer si l'edition est fautive
-		}
-		delete(i.procs, name) // le texte ne doit pas s'appuyer sur l'ancienne version
+		i.setProc(name, nil) // le texte ne doit pas s'appuyer sur l'ancienne version
 	}
 	err := i.RunString(text)
 	if _, stop := err.(*ctrl); err != nil && !stop {
-		// edition invalide : on annule les definitions du texte (meme celles deja
-		// refaites avant l'erreur) et on retrouve les procedures d'avant. le reste
-		// de ce que le texte a execute avant l'erreur (variables, dessin, fichiers)
-		// n'est pas defait
-		for name := range blocks {
-			if p := old[name]; p != nil {
+		// edition invalide : toute procedure definie ou effacee par le texte (POUR,
+		// DEFINIS, EFP...) retrouve sa version d'avant. le reste de ce que le texte a
+		// execute avant l'erreur (variables, dessin, fichiers) n'est pas defait
+		for name, p := range j.old {
+			if p != nil {
 				i.procs[name] = p
 			} else {
 				delete(i.procs, name)
@@ -159,7 +218,7 @@ func (i *Interp) defineFromEditor(text string) error {
 		return err
 	}
 	for name, raw := range blocks {
-		if p := i.procs[name]; p != nil {
+		if p := i.procs[name]; p != nil && p.text == "" && p.sameAs(raw) {
 			p.text = raw // source fidele pour la prochaine edition
 		}
 	}

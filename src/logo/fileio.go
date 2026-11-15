@@ -622,8 +622,9 @@ func (i *Interp) openData(nameVal Value, mode fileMode) error {
 	case modeRead:
 		f, err = root.OpenFile(key, os.O_RDONLY|openNonBlock, 0)
 	case modeWrite:
-		// ecrase sans confirmer (fidelite FMSLogo) : pas de confirmOverwrite ici
-		f, err = root.OpenFile(key, os.O_RDWR|os.O_CREATE|os.O_TRUNC|openNonBlock, 0o666)
+		// ecrase sans confirmer (fidelite FMSLogo) : pas de confirmOverwrite ici.
+		// pas d'O_TRUNC : on ne vide le fichier qu'apres les controles ci-dessous
+		f, err = root.OpenFile(key, os.O_RDWR|os.O_CREATE|openNonBlock, 0o666)
 	case modeAppend:
 		// pas d'O_APPEND : sinon le noyau force chaque ecriture en fin de fichier,
 		// meme apres FIXEPOSECRITURE. on ouvre en ecriture et on se place en fin a
@@ -650,6 +651,18 @@ func (i *Interp) openData(nameVal Value, mode fileMode) error {
 	if fi, err := f.Stat(); err != nil || !fi.Mode().IsRegular() {
 		f.Close() // remplace entre le controle et l'ouverture
 		return failed
+	}
+	// un lien physique peut designer un fichier hors du dossier de travail, ce
+	// qu'os.Root ne voit pas : un fichier a plusieurs noms est refuse
+	if linkCount(f) != 1 {
+		f.Close()
+		return failed
+	}
+	if mode == modeWrite {
+		if err := f.Truncate(0); err != nil {
+			f.Close()
+			return failed
+		}
 	}
 	fset.open[key] = &openFile{name: key, f: f, mode: mode, brk: &i.brk}
 	return nil

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"math/big"
 	"strconv"
 	"strings"
 )
@@ -50,7 +51,7 @@ func writeEscaped(b *strings.Builder, w string, ops bool) bool {
 		switch {
 		case needsEscape(r):
 			b.WriteByte('\\')
-		case ops && isInfixOp(r) && !altSuffix(rs, k):
+		case ops && isInfixOp(r) && (k == 0 || !altSuffix(rs, k)): // "RE<#" mais pas "<B" en tete
 			b.WriteByte('\\')
 		case ops && k == 0 && (r == '"' || r == ':' || r == '#'):
 			b.WriteByte('\\')
@@ -313,8 +314,8 @@ func guardLineEnd(line string) string {
 
 // l'instruction DONNE qui recree la variable name avec la valeur v
 func donneSource(name string, v Value) (string, error) {
-	if tooDeep(v) {
-		return "", errTropProfond
+	if err := checkSource(v); err != nil {
+		return "", err
 	}
 	s, err := valueSource(v)
 	if err != nil {
@@ -343,15 +344,20 @@ func (p *userProc) sourceText() (string, error) {
 	if p.text != "" {
 		return p.text, nil
 	}
-	if tooDeep(ListValue(p.body)) {
-		return "", errTropProfond
+	if err := checkSource(ListValue(p.body)); err != nil {
+		return "", err
 	}
-	if body, ok := seqLiteral(p.body); ok && !hasProcEnd(p.body) {
-		return procTitle(p) + "\n" + guardLineEnd(body) + "\nFIN", nil
+	// un corps qui commence par :x serait relu comme un parametre de plus
+	lead := len(p.body) > 0 && p.body[0].Kind == DVarRef
+	if body, ok := seqLiteral(p.body); ok && !hasProcEnd(p.body) && !lead {
+		return guardLineEnd(procTitle(p)) + "\n" + guardLineEnd(body) + "\nFIN", nil
 	}
 	params := make([]string, len(p.params))
 	for k, par := range p.params {
 		params[k], _ = nameLiteral(par)
+		if strings.HasPrefix(par, ":") {
+			params[k] = `\:` + params[k] // DEFINIS retire un ':' de tete
+		}
 	}
 	body, err := listSource(p.body)
 	if err != nil {
@@ -371,42 +377,166 @@ func hasProcEnd(body []Datum) bool {
 	return false
 }
 
-// une liste ou un tableau est-il emboite au-dela de maxDataDepth ? parcours sans
-// recursion, justement parce qu'une telle valeur ferait deborder la pile
+// une liste ou un tableau est-il emboite au-dela de maxDataDepth ?
 func tooDeep(v Value) bool {
-	type item struct {
-		v     Value
-		depth int
+	_, deep := measure(v)
+	return deep
+}
+
+// avant d'ecrire v en source : ni trop emboite, ni plus gros que ce que RAMENE
+// relit. refuse avant de batir le texte
+func checkSource(v Value) error {
+	size, deep := measure(v)
+	if deep {
+		return errTropProfond
 	}
-	seen := map[*Array]bool{}
-	stack := []item{{v, 0}}
-	for len(stack) > 0 {
-		it := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		if it.depth >= maxDataDepth {
-			return true
+	if size > maxSourceBytes {
+		return errTropGros
+	}
+	return nil
+}
+
+// un conteneur vu par measure : tranche de liste (cle = debut + longueur) ou tableau
+type sliceKey struct {
+	p *Datum
+	n int
+}
+
+type node struct {
+	key  any
+	list []Datum
+	arr  []Value
+}
+
+func listNode(l []Datum) node {
+	if len(l) == 0 {
+		return node{key: sliceKey{}}
+	}
+	return node{key: sliceKey{&l[0], len(l)}, list: l}
+}
+
+func valueNode(v Value) (node, bool) {
+	switch {
+	case v.Kind == KArray && v.Arr != nil:
+		return node{key: v.Arr, arr: v.Arr.Items}, true
+	case v.Kind == KList:
+		return listNode(v.List), true
+	}
+	return node{}, false
+}
+
+func datumNode(d Datum) (node, bool) {
+	switch {
+	case d.Kind == DArray && d.Arr != nil:
+		return node{key: d.Arr, arr: d.Arr.Items}, true
+	case d.Kind == DList || d.Kind == DGroup || d.Kind == DArray:
+		return listNode(d.List), true
+	}
+	return node{}, false
+}
+
+// minorant du nombre de chiffres decimaux de z (log10(2) arrondi par defaut)
+func bigDigits(z *big.Int) int64 {
+	if b := z.BitLen(); b > 1 {
+		return int64(b-1)*30102/100000 + 1
+	}
+	return 1
+}
+
+// octets minimum du source d'un element non conteneur : un mot au moins ses
+// caracteres, un nombre son ecriture normalisee (pas celle du texte lu)
+func valueAtomSize(v Value) int64 {
+	switch v.Kind {
+	case KWord:
+		return max(1, int64(len(v.Word)))
+	case KNumber:
+		return int64(len(numberSource(v.Num)))
+	case KInt:
+		return bigDigits(v.Int)
+	case KBool:
+		return 4
+	}
+	return 1
+}
+
+func datumAtomSize(d Datum) int64 {
+	if d.Kind == DNumber {
+		if d.Big != nil {
+			return bigDigits(d.Big)
 		}
-		switch it.v.Kind {
-		case KArray:
-			if seen[it.v.Arr] {
+		return int64(len(numberSource(d.Num)))
+	}
+	return max(1, int64(len(d.Text)))
+}
+
+func satAdd(a, b int64) int64 {
+	if s := a + b; s < 1<<60 {
+		return s
+	}
+	return 1 << 60
+}
+
+// emboitement et taille depliee de v (minorant des octets de son source : une
+// sous-liste partagee s'ecrit autant de fois qu'elle apparait). memoise par objet :
+// lineaire en nombre d'objets distincts, meme si chaque etage reprend deux fois le
+// meme sous-objet. iteratif ; deep des que l'emboitement depasse maxDataDepth
+func measure(v Value) (size int64, deep bool) {
+	root, ok := valueNode(v)
+	if !ok {
+		return valueAtomSize(v), false
+	}
+	type frame struct {
+		n       node
+		k       int
+		h, size int64
+	}
+	type shape struct{ h, size int64 }
+	memo := map[any]shape{}
+	busy := map[any]bool{root.key: true}
+	stack := []*frame{{n: root, size: 2}}
+	var res shape
+	for len(stack) > 0 {
+		f := stack[len(stack)-1]
+		var c node
+		var isNode bool
+		var atom int64
+		switch {
+		case f.k < len(f.n.list):
+			d := f.n.list[f.k]
+			if c, isNode = datumNode(d); !isNode {
+				atom = datumAtomSize(d)
+			}
+		case f.k < len(f.n.arr):
+			if c, isNode = valueNode(f.n.arr[f.k]); !isNode {
+				atom = valueAtomSize(f.n.arr[f.k])
+			}
+		default:
+			stack = stack[:len(stack)-1]
+			delete(busy, f.n.key)
+			sh := shape{f.h + 1, f.size}
+			memo[f.n.key] = sh
+			if len(stack) == 0 {
+				res = sh
 				continue
 			}
-			seen[it.v.Arr] = true
-			for _, c := range it.v.Arr.Items {
-				if c.Kind == KArray || c.Kind == KList {
-					stack = append(stack, item{c, it.depth + 1})
-				}
-			}
-		case KList:
-			for _, d := range it.v.List {
-				switch {
-				case d.Kind == DArray && d.Arr != nil:
-					stack = append(stack, item{ArrayValue(d.Arr), it.depth + 1})
-				case d.Kind == DList || d.Kind == DGroup || d.Kind == DArray:
-					stack = append(stack, item{ListValue(d.List), it.depth + 1})
-				}
-			}
+			p := stack[len(stack)-1]
+			p.h, p.size = max(p.h, sh.h), satAdd(p.size, sh.size)
+			continue
 		}
+		f.k++
+		if !isNode {
+			f.size = satAdd(f.size, atom)
+			continue
+		}
+		if sh, ok := memo[c.key]; ok {
+			f.h, f.size = max(f.h, sh.h), satAdd(f.size, sh.size)
+			continue
+		}
+		if busy[c.key] || len(stack) >= maxDataDepth {
+			return 0, true
+		}
+		busy[c.key] = true
+		stack = append(stack, &frame{n: c, size: 2})
 	}
-	return false
+	return res.size, res.h > maxDataDepth
 }

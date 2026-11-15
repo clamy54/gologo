@@ -53,6 +53,7 @@ type Interp struct {
 	rng                 *rand.Rand // RNG de HASARD/PIOCHE ; nil = rand global (auto-seede par run)
 	prims               map[string]*primitive
 	procs               map[string]*userProc
+	defLogs             []*defJournal          // chargements en cours (cf defineFromEditor)
 	vars                map[string]Value       // variables globales
 	plists              map[string][]propEntry // listes de proprietes (PLIST/PPROP...), cle = nom en MAJUSCULES
 	frames              []map[string]Value     // pile des contextes locaux (appels de procs)

@@ -255,7 +255,73 @@ func TestSauveSelection(t *testing.T) {
 	}
 }
 
+// sous-listes partagees : la taille depliee est refusee avant de batir le texte
+func TestSauvePartage(t *testing.T) {
+	s := newSession(t)
+	s.ok(`DONNE "L [X] REPETE 32 [DONNE "L (LISTE :L :L)]`)
+	s.want(`SAUVE "DAG ["L]`, "ERR:FICHIER TROP GROS")
+	s.ok(`DONNE "T TABLEAU 2 REPETE 40 [DONNE "U TABLEAU 2 FIXEITEM 1 :U :T FIXEITEM 2 :U :T DONNE "T :U]`)
+	s.want(`SAUVE "DAGT ["T]`, "ERR:FICHIER TROP GROS")
+	s.ok(`DONNE "L [X] REPETE 3 [DONNE "L (LISTE :L :L)] SAUVE "PETIT ["L] EFN "L RAMENE "PETIT`)
+	s.want(`MONTRE :L`, "[[[[X] [X]] [[X] [X]]] [[[X] [X]] [[X] [X]]]]\n")
+	// un nombre compte pour son ecriture normalisee : un grand entier pese ses
+	// chiffres, des zeros de tete ne pesent rien
+	s.ok(`DONNE "T TABLEAU 1 FIXEITEM 1 :T 1` + strings.Repeat("0", 4095) + `
+REPETE 13 [DONNE "U TABLEAU 2 FIXEITEM 1 :U :T FIXEITEM 2 :U :T DONNE "T :U]`)
+	s.want(`SAUVE "OVER ["T]`, "ERR:FICHIER TROP GROS")
+	s.ok(`DONNE "L [` + strings.Repeat("0", 64) + `1] REPETE 18 [DONNE "L (LISTE :L :L)] SAUVE "ZEROS ["L] EFN "L RAMENE "ZEROS`)
+	s.want(`MONTRE COMPTE :L`, "2\n")
+}
+
+// titre fini par ~ ou ! : pas pris pour une continuation a la relecture
+func TestSauveTitreContinuation(t *testing.T) {
+	s := newSession(t)
+	s.ok(`POUR Q :X~ ECRIS :X~ FIN POUR P! ECRIS "OK FIN`)
+	s.ok(`SAUVE "PARAM [Q P!] EFP "Q EFP "P! RAMENE "PARAM`)
+	s.want(`Q 42 ECRIS PROC? "P! ECRIS PROC? "P`, "42\nVRAI\nFAUX\n")
+}
+
 // --- editeur ---
+
+// le source brut ne suit que la procedure nee de son bloc POUR ; DEFINIS et .EFT
+// sont annules comme POUR quand le chargement echoue
+func TestChargementJournal(t *testing.T) {
+	s := newSession(t)
+	ecrit := func(nom, texte string) {
+		if err := os.WriteFile(filepath.Join(s.in.workDirPath(), nom), []byte(texte), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	ecrit("STALE.GLG", "POUR P ECRIS \"OLD FIN\nDEFINIS \"P [] [ECRIS \"NEW]\n")
+	s.want(`RAMENE "STALE P SAUVE "SAVED [P] EFP "P RAMENE "SAVED P`, "NEW\nNEW\n")
+	s.ok(`POUR P ECRIS "OLD FIN POUR Q ECRIS "OLDQ FIN`)
+	ecrit("BROKEN.GLG", "DEFINIS \"P [] [ECRIS \"NEW]\nDEFINIS \"N [] []\nUNKNOWN\n")
+	s.want(`PIEGE "ERREUR [RAMENE "BROKEN] P ECRIS PROC? "N`, "OLD\nFAUX\n")
+	ecrit("WIPE.GLG", "EFP \"Q\n.EFT\nUNKNOWN\n")
+	s.want(`PIEGE "ERREUR [RAMENE "WIPE] P Q`, "OLD\nOLDQ\n")
+	// POUR lance par EXEC : le bloc statique du meme nom n'est pas son source
+	ecrit("DYN.GLG", "POUR P ECRIS \"OLD FIN\nEXEC [POUR P ECRIS \"NEW FIN]\n")
+	s.want(`RAMENE "DYN P SAUVE "SAVED [P] EFP "P RAMENE "SAVED P`, "NEW\nNEW\n")
+	// bloc decoupe comme POUR (tous les :param de tete) et noms compares en MAJ
+	ecrit("PARAMS.GLG", "POUR P :A :B FIN\nDEFINIS \"P [A] [:B]\n")
+	s.want(`RAMENE "PARAMS SAUVE "SAVED [P] EFP "P RAMENE "SAVED MONTRE TEXTE "P`, "[[A] [:B]]\n")
+	ecrit("FOLD.GLG", "POUR P :K ECRIS :K FIN\nDEFINIS \"P [K] [ECRIS :K]\n")
+	s.want(`RAMENE "FOLD SAUVE "SAVED [P] EFP "P RAMENE "SAVED P 42`, "42\n")
+	ecrit("DOTLESS.GLG", "POUR P :ı ECRIS :I FIN\n")
+	s.want(`RAMENE "DOTLESS IM "P`, "POUR P :ı ECRIS :I FIN\n")
+	// parametre dont le nom commence par ':' (forme DEFINIS)
+	s.ok(`DEFINIS "P ["::X "::] [:B] SAUVE "SAVED [P] EFP "P RAMENE "SAVED`)
+	s.want(`MONTRE TEXTE "P`, "[[:X :] [:B]]\n")
+	// '<' en tete de nom : operateur pour le lecteur, meme devant B ou #
+	s.ok(`DEFINIS "P ["<B "<# "RE<#] [:B] SAUVE "SAVED [P] EFP "P RAMENE "SAVED`)
+	s.want(`MONTRE TEXTE "P`, "[[<B <# RE<#] [:B]]\n")
+	s.ok(`POUR \<B :\<# ECRIS :\<# FIN SAUVE "SAVED [\<B] EFP "\<B RAMENE "SAVED`)
+	s.want(`\<B 5`, "5\n")
+	// second bloc jamais execute (LOGO avant)
+	ecrit("TWO.GLG", "POUR P ECRIS \"A FIN\nLOGO\nPOUR P ECRIS \"B FIN\n")
+	s.run(`RAMENE "TWO`)
+	s.want(`P SAUVE "SAVED [P] EFP "P RAMENE "SAVED P`, "A\nA\n")
+}
 
 func TestRollbackEditeur(t *testing.T) {
 	s := newSession(t)
@@ -427,6 +493,26 @@ func TestConfinement(t *testing.T) {
 	if _, err := os.Stat(filepath.Join(dehors, "pirate.txt")); err == nil {
 		t.Error("ecriture hors du dossier de travail")
 	}
+}
+
+// un lien physique vers un fichier exterieur n'est ni lu ni ecrase
+func TestLienPhysique(t *testing.T) {
+	s := newSession(t)
+	dehors := filepath.Join(t.TempDir(), "secret.txt")
+	if err := os.WriteFile(dehors, []byte("secret\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Link(dehors, filepath.Join(s.in.workDirPath(), "alias.txt")); err != nil {
+		t.Skip("lien physique impossible :", err)
+	}
+	s.want(`OUVREECRITURE "alias.txt`, "ERR:ECRITURE IMPOSSIBLE")
+	s.want(`OUVREAJOUT "alias.txt`, "ERR:ECRITURE IMPOSSIBLE")
+	s.want(`OUVRELECTURE "alias.txt`, "ERR:LECTURE IMPOSSIBLE")
+	s.want(`ECRIS FICHIERVERSTABLEAU "alias.txt`, "ERR:LECTURE IMPOSSIBLE")
+	if data, _ := os.ReadFile(dehors); string(data) != "secret\n" {
+		t.Errorf("fichier exterieur modifie : %q", data)
+	}
+	s.ok(`OUVREECRITURE "neuf.txt FIXEECRITURE "neuf.txt ECRIS 1 FERMETOUT`)
 }
 
 // une sortie qui refuse l'ecriture donne une erreur, pas un succes silencieux

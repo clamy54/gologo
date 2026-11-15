@@ -66,7 +66,7 @@ func (i *Interp) registerWorkspace() {
 		if err != nil {
 			return err
 		}
-		delete(in.procs, strings.ToUpper(name))
+		in.setProc(strings.ToUpper(name), nil)
 		return nil
 	}), "EFP")
 
@@ -82,7 +82,7 @@ func (i *Interp) registerWorkspace() {
 
 	// .EFT : table rase, on efface tout (procs + noms + proprietes)
 	i.register(cmd(0, func(in *Interp, a []Value) error {
-		in.procs = map[string]*userProc{}
+		in.clearProcs()
 		in.vars = map[string]Value{}
 		in.plists = map[string][]propEntry{}
 		in.edBuf = ""

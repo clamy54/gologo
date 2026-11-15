@@ -79,7 +79,7 @@ func formeDefinis(e *eval) (Value, error) {
 	if e.i.prims[nameU] != nil {
 		return None, fmt.Errorf("%s EXISTE DEJA", nameU)
 	}
-	e.i.procs[nameU] = &userProc{name: nameU, params: params, body: body}
+	e.i.setProc(nameU, &userProc{name: nameU, params: params, body: body})
 	return None, nil
 }
 

@@ -162,8 +162,8 @@ func readRegular(root *os.Root, name string, max int64) ([]byte, error) {
 		return nil, errLectureImpossible
 	}
 	defer f.Close()
-	if fi, err := f.Stat(); err != nil || !fi.Mode().IsRegular() {
-		return nil, errLectureImpossible
+	if fi, err := f.Stat(); err != nil || !fi.Mode().IsRegular() || linkCount(f) != 1 {
+		return nil, errLectureImpossible // lien physique : cf openData
 	}
 	data, err := io.ReadAll(io.LimitReader(f, max+1))
 	if err != nil {

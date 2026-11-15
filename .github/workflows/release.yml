@@ -28,7 +28,7 @@ jobs:
     outputs:
       version: ${{ steps.ver.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Extraire la version et controler le tag
         id: ver
         run: |
@@ -58,8 +58,8 @@ jobs:
     env:
       VER: ${{ needs.guard.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version-file: src/go.mod
           cache-dependency-path: src/go.sum
@@ -69,7 +69,7 @@ jobs:
         run: bash tools/build/build-linux.sh
       - name: Empaqueter le .deb
         run: bash dist/linux/build-deb.sh "$VER"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: linux-deb
           path: dist/linux/build/gologo_*_amd64.deb
@@ -83,8 +83,8 @@ jobs:
     env:
       VER: ${{ needs.guard.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version-file: src/go.mod
           cache-dependency-path: src/go.sum
@@ -94,7 +94,7 @@ jobs:
         run: bash dist/macos/make-app.sh "$VER"
       - name: Empaqueter le .dmg
         run: bash dist/macos/make-dmg.sh "$VER"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: macos-dmg
           path: dist/macos/build/GoLogo-*.dmg
@@ -107,8 +107,8 @@ jobs:
     env:
       VER: ${{ needs.guard.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version-file: src/go.mod
           cache-dependency-path: src/go.sum
@@ -124,7 +124,7 @@ jobs:
         run: |
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$env:VER" dist\windows\gologo.iss
           if ($LASTEXITCODE -ne 0) { throw "ISCC a echoue" }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: windows-setup
           path: dist/windows/output/GoLogo-Setup-*.exe
@@ -144,7 +144,7 @@ jobs:
       TAG: ${{ github.ref_name }}
       VER: ${{ needs.guard.outputs.version }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: assets
           merge-multiple: true
